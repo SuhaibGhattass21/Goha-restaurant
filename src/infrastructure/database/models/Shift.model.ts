@@ -10,7 +10,6 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { User } from "./user.model";
 import { ShiftWorker } from "./ShiftWorker.model";
-import { ShiftAdminPermission } from "./ShiftAdminPermission.model";
 import { ShiftType, ShiftStatus } from "../../../domain/enums/Shift.enums"
 
 @Entity("shifts")
@@ -53,9 +52,6 @@ export class Shift {
 
     @OneToMany(() => ShiftWorker, (sw) => sw.shift)
     shiftWorkers!: ShiftWorker[];
-
-    @OneToMany(() => ShiftAdminPermission, (sap) => sap.shift)
-    shiftAdminPermissions!: ShiftAdminPermission[];
 
     @Column({ type: "date" })
     created_at: Date = new Date(new Date().getTime());

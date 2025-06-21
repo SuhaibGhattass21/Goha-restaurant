@@ -5,11 +5,9 @@ export { ExternalReceipt } from "./ExternalReceipt.model";
 export { Order } from "./Order.model";
 export { OrderItem } from "./OrderItem.model";
 export { OrderItemExtra } from "./OrderItemExtra.model";
-export { Permission } from "./Permission.model";
 export { Product } from "./Product.model";
 export { ProductSizePrice } from "./ProductSizePrice.model";
 export { Shift } from "./Shift.model";
-export { ShiftAdminPermission } from "./ShiftAdminPermission.model";
 export { ShiftWorker } from "./ShiftWorker.model";
 export { StockItem } from "./StockItem.model";
 export { StockTransaction } from "./StockTransaction.model";
@@ -17,3 +15,4 @@ export { Supplier } from "./Supplier.model";
 export { SupplierInvoice } from "./SupplierInvoices.model"
 export { SupplierPayment } from "./SupplierPayments.model";
 export { User } from "./user.model";
+export { Permissions } from "./userPersmissions.model";

@@ -1,4 +1,4 @@
-import { Server } from '../src/interfaces/http/server/server'
+import { Server } from './interfaces/http/server/server'
 
 const server = new Server()
 server.start().catch((error) => {

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
-import { Category, CategoryExtra, CategorySize, ExternalReceipt, Order, OrderItem, OrderItemExtra, Permission, Product, ProductSizePrice, Shift, ShiftAdminPermission, ShiftWorker, StockItem, StockTransaction, Supplier, SupplierInvoice, SupplierPayment, User } from '../models';
+import { Category, CategoryExtra, CategorySize, ExternalReceipt, Order, OrderItem, OrderItemExtra, Product, ProductSizePrice, Shift, ShiftWorker, StockItem, StockTransaction, Supplier, SupplierInvoice, SupplierPayment, User, Permissions } from '../models';
 
 dotenv.config();
 
@@ -23,15 +23,13 @@ export const AppDataSource = new DataSource({
         StockItem,
         StockTransaction,
         OrderItemExtra,
-        Permission,
-        ShiftAdminPermission,
         ShiftWorker,
         Supplier,
         SupplierInvoice,
         SupplierPayment,
         ExternalReceipt,
         User,
-        Permission
+        Permissions,
     ],
     migrations: [],
     subscribers: [],

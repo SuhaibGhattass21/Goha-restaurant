@@ -4,6 +4,9 @@ import {
     Column,
     ManyToMany,
     JoinTable,
+    CreateDateColumn,
+    ManyToOne,
+    JoinColumn
 } from 'typeorm';
 import { v4 as uuidv4 } from "uuid";
 import { User } from './user.model';
@@ -19,6 +22,16 @@ export class Permissions {
 
     @Column({ type: "text", nullable: true })
     description?: string;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: "granted_by" })
+    granted_by!: User;
+
+    @CreateDateColumn({ type: "timestamptz" })
+    granted_at: Date = new Date(new Date().getTime());
+
+    @Column({ type: "boolean", default: false })
+    is_revoked: boolean = false;
 
     @ManyToMany(() => User, (user: User) => user.userPermissions)
     @JoinTable({

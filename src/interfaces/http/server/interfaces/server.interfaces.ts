@@ -1,9 +1,9 @@
-import { CategoryExtraRoutes } from "@interfaces/http/routes/category-extra.routes"
-import { CategorySizeRoutes } from "@interfaces/http/routes/category-size.routes"
-import { CategoryRoutes } from "@interfaces/http/routes/category.routes"
-import { ProductSizePriceRoutes } from "@interfaces/http/routes/product-size-price.routes"
-import { ProductRoutes } from "@interfaces/http/routes/product.routes"
-import { ShiftRoutes } from "@interfaces/http/routes/shift.routes"
+import { CategoryExtraRoutes } from "../../routes/Category/category-extra.routes"
+import { CategorySizeRoutes } from "../../routes/Category/category-size.routes"
+import { CategoryRoutes } from "../../routes/Category/category.routes"
+import { ProductSizePriceRoutes } from "../../routes/Product/product-size-price.routes"
+import { ProductRoutes } from "../../routes/Product/product.routes"
+import { ShiftRoutes } from "../../routes/shift.routes"
 
 export interface AppDependencies {
     categoryRoutes: CategoryRoutes
