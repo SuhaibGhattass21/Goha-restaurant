@@ -14,7 +14,7 @@ export interface AppDependencies {
     categorySizeRoutes: CategorySizeRoutes
     productRoutes: ProductRoutes
     productSizePriceRoutes: ProductSizePriceRoutes
-    shiftRoutes: ShiftRoutes
+    // shiftRoutes: ShiftRoutes
     userRoutes: UserRoutes
     permissionRoutes: PermissionRoutes
     authRoutes: AuthRoutes

@@ -4,7 +4,7 @@ export const swaggerOptions: swaggerJSDoc.Options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Goha Restaurant Café System API',
+            title: 'Goha Restaurant System API',
             version: '1.0.0',
             description: 'API documentation for Goha Restaurant Management System',
         },
