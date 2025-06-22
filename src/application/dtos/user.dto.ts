@@ -1,4 +1,75 @@
 import { IsString, IsOptional, IsBoolean, IsUUID, IsArray, IsNotEmpty, IsPhoneNumber, IsNumber } from 'class-validator';
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CreateUserDto:
+ *       type: object
+ *       required:
+ *         - username
+ *         - fullName
+ *         - hourRate
+ *         - password
+ *       properties:
+ *         username:
+ *           type: string
+ *         fullName:
+ *           type: string
+ *         hourRate:
+ *           type: number
+ *         password:
+ *           type: string
+ *         phone:
+ *           type: string
+ *         userPermissions:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: uuid
+ *
+ *     UpdateUserDto:
+ *       type: object
+ *       properties:
+ *         fullName:
+ *           type: string
+ *         hourRate:
+ *           type: number
+ *         password:
+ *           type: string
+ *         phone:
+ *           type: string
+ *         isActive:
+ *           type: boolean
+ *         userPermissions:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: uuid
+ *
+ *     UserResponseDto:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         username:
+ *           type: string
+ *         fullName:
+ *           type: string
+ *         hourRate:
+ *           type: number
+ *         phone:
+ *           type: string
+ *         isActive:
+ *           type: boolean
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         userPermissions:
+ *           type: array
+ *           items:
+ *             type: string
+ */
 
 export class CreateUserDto {
     @IsString()

@@ -1,6 +1,8 @@
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from '../../config/swagger';
 import { CategoryExtraController } from '../controllers/Category/category-extra.controller';
 import { CategorySizeController } from '../controllers/Category/category-size.controller';
 import { CategoryController } from '../controllers/Category/category.controller';
@@ -44,6 +46,10 @@ import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift
 export class Server {
     private app: express.Application
     private readonly PORT: number
+
+    private setupSwagger(): void {
+        this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    }
 
     constructor() {
         this.app = express()
@@ -234,8 +240,12 @@ export class Server {
                 console.log(`Goha Restaurant Cafe System running on http://localhost:${this.PORT}`)
                 console.log(`Health check: http://localhost:${this.PORT}/health`)
                 console.log(`API v1: http://localhost:${this.PORT}/api/v1`)
+                console.log(`http://localhost:${this.PORT}/api-docs`)
+
                 console.log('Server started successfully')
             })
+
+            this.setupSwagger();
 
         } catch (error) {
             console.error("Failed to start application:", error)

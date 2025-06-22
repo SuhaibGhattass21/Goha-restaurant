@@ -12,6 +12,85 @@ import {
 import { Type } from 'class-transformer';
 import { ShiftType } from '@domain/enums/Shift.enums';
 import { WorkerStatus } from '../../domain/enums/Worker.enums';
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     OpenShiftDTO:
+ *       type: object
+ *       required:
+ *         - shift_id
+ *         - cashier_id
+ *         - shift_type
+ *         - workers
+ *       properties:
+ *         shift_id:
+ *           type: string
+ *           format: uuid
+ *         cashier_id:
+ *           type: string
+ *           format: uuid
+ *         shift_type:
+ *           type: string
+ *           enum: [morning, night]
+ *         workers:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/AddShiftWorkerDTO'
+ *
+ *     AddShiftWorkerDTO:
+ *       type: object
+ *       required:
+ *         - user_id
+ *         - status
+ *         - hourly_rate
+ *       properties:
+ *         user_id:
+ *           type: string
+ *           format: uuid
+ *         status:
+ *           type: string
+ *           enum: [ADMIN, CASHIER, WAITER, CHEF, DELIVERY, KITCHEN, STEAWER, KITCHEN_ASSISTANT]
+ *         hourly_rate:
+ *           type: number
+ *
+ *     UpdateShiftTypeDTO:
+ *       type: object
+ *       required:
+ *         - shift_id
+ *         - admin_id
+ *         - shift_type
+ *       properties:
+ *         shift_id:
+ *           type: string
+ *         admin_id:
+ *           type: string
+ *         shift_type:
+ *           type: string
+ *           enum: [morning, night]
+ *
+ *     RequestCloseShiftDTO:
+ *       type: object
+ *       required:
+ *         - shift_id
+ *         - cashier_id
+ *       properties:
+ *         shift_id:
+ *           type: string
+ *         cashier_id:
+ *           type: string
+ *
+ *     ApproveCloseShiftDTO:
+ *       type: object
+ *       required:
+ *         - shift_id
+ *         - admin_id
+ *       properties:
+ *         shift_id:
+ *           type: string
+ *         admin_id:
+ *           type: string
+ */
 
 export class OpenShiftDTO {
     @IsUUID()
