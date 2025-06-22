@@ -1,5 +1,5 @@
-import { CreateUserDto, UserResponseDto } from "@application/dtos/user.dto";
-import { User } from "@infrastructure/database/models";
+import { CreateUserDto, UserResponseDto } from "../../application/dtos/user.dto";
+import { User } from "../../infrastructure/database/models";
 
 export class UserUseCases {
     constructor(private userRepository: IUserRepository) { }
@@ -24,6 +24,14 @@ export class UserUseCases {
 
         return this.mapToResponseDto(user);
     }
+
+    async getUserByUsername(username: string): Promise<UserResponseDto | null> {
+        const user = await this.userRepository.findBy({ username });
+        if (!user) return null;
+
+        return this.mapToResponseDto(user);
+    }
+
     async getAllUsers(page: number = 1, limit: number = 10): Promise<UserResponseDto[]> {
         const users = await this.userRepository.findAll(page, limit);
         return users.map(user => this.mapToResponseDto(user));

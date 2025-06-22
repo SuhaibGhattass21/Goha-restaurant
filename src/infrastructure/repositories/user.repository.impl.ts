@@ -1,4 +1,4 @@
-import { User } from "@infrastructure/database/models";
+import { User } from "../../infrastructure/database/models";
 import { Repository } from "typeorm";
 
 export class UserRepositoryImpl implements IUserRepository {
