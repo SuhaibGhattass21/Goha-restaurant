@@ -1,13 +1,33 @@
-import { PermissionRepository } from '../../infrastructure/repositories/permission.repository.impl';
+import { CreatePermissionDto, PermissionResponseDto, UpdatePermissionDto } from '../../application/dtos/Permission.dto';
+import { PermissionUseCases } from '../../application/use-cases/permission.use-case';
 
 export class PermissionService {
-    private permissionRepo = new PermissionRepository();
+    constructor(private useCase: PermissionUseCases) { }
 
-    async getPermissionsForAdmin(adminId: string) {
-        return this.permissionRepo.getPermissionsForAdmin(adminId);
+    create(data: CreatePermissionDto): Promise<PermissionResponseDto> {
+        return this.useCase.create(data);
     }
 
-    async getPermissionsForShift(shiftId: string) {
-        return this.permissionRepo.getPermissionsForShift(shiftId);
+    update(id: string, data: UpdatePermissionDto): Promise<PermissionResponseDto | null> {
+        return this.useCase.update(id, data);
+    }
+
+    findById(id: string): Promise<PermissionResponseDto | null> {
+        return this.useCase.findById(id);
+    }
+
+    findAll(): Promise<PermissionResponseDto[]> {
+        return this.useCase.findAll();
+    }
+
+    delete(id: string): Promise<boolean> {
+        return this.useCase.delete(id);
+    }
+    getPermissionsForAdmin(adminId: string): Promise<any[]> {
+        return this.useCase.getPermissionsForAdmin(adminId);
+    }
+
+    getPermissionsForShift(shiftId: string): Promise<any[]> {
+        return this.useCase.getPermissionsForShift(shiftId);
     }
 }

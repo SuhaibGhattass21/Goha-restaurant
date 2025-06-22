@@ -4,6 +4,8 @@ import { CategoryRoutes } from "../../routes/Category/category.routes"
 import { ProductSizePriceRoutes } from "../../routes/Product/product-size-price.routes"
 import { ProductRoutes } from "../../routes/Product/product.routes"
 import { ShiftRoutes } from "../../routes/shift.routes"
+import { UserRoutes } from "../../routes/user.routes"
+import { PermissionRoutes } from "../../routes/permission.routes"
 
 export interface AppDependencies {
     categoryRoutes: CategoryRoutes
@@ -12,4 +14,6 @@ export interface AppDependencies {
     productRoutes: ProductRoutes
     productSizePriceRoutes: ProductSizePriceRoutes
     shiftRoutes: ShiftRoutes
+    userRoutes: UserRoutes
+    permissionRoutes: PermissionRoutes
 }

@@ -7,6 +7,7 @@ import { CategoryController } from '../controllers/Category/category.controller'
 import { ProductSizePriceController } from '../controllers/Product/product-size-price.controller';
 import { ProductController } from '../controllers/Product/product.controller';
 import { ShiftController } from '../controllers/shift.controller';
+import { UserController } from '../controllers/user.controller';
 import { notFoundHandler, errorHandler } from '../middlewares/error-handler.middleware';
 import { CategoryExtraRoutes } from '../routes/Category/category-extra.routes';
 import { CategorySizeRoutes } from '../routes/Category/category-size.routes';
@@ -14,6 +15,7 @@ import { CategoryRoutes } from '../routes/Category/category.routes';
 import { ProductSizePriceRoutes } from '../routes/Product/product-size-price.routes';
 import { ProductRoutes } from '../routes/Product/product.routes';
 import { ShiftRoutes } from '../routes/shift.routes';
+import { UserRoutes } from '../routes/user.routes';
 import { AppDependencies } from './interfaces/server.interfaces';
 import { AppDataSource } from '../../../infrastructure/database/postgres/db';
 import { CategoryRepositoryImpl } from '../../../infrastructure/repositories/Category/category.repository.impl';
@@ -22,6 +24,9 @@ import { CategoryExtraRepositoryImpl } from '../../../infrastructure/repositorie
 import { CategoryExtraUseCases } from '../../../application/use-cases/Category/category-extra.use-cases';
 import { CategorySizeRepositoryImpl } from '../../../infrastructure/repositories/Category/category-size.repository';
 import { CategorySizeUseCases } from '../../../application/use-cases/Category/category-size.use-cases';
+import { UserRepositoryImpl } from '../../../infrastructure/repositories/user.repository.impl';
+import { UserUseCases } from '../../../application/use-cases/user.use-case';
+import { UserService } from '../../../domain/services/user.service';
 import { ProductRepositoryImpl } from '../../../infrastructure/repositories/Product/product.repository.impl';
 import { ProductUseCases } from '../../../application/use-cases/Product/product.use-cases';
 import { ProductSizePriceRepositoryImpl } from '../../../infrastructure/repositories/Product/product-size-price.repository.impl';
@@ -29,7 +34,12 @@ import { ProductSizePriceUseCases } from '../../../application/use-cases/Product
 import { ShiftRepositoryImpl } from '../../../infrastructure/repositories/shift.repository.impl';
 import { ShiftUseCases } from '../../../application/use-cases/shift.use-case';
 import { ShiftService } from '../../../domain/services/Shift.service';
-import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift } from '../../../infrastructure/database/models';
+import { PermissionRepositoryImpl } from '../../../infrastructure/repositories/permission.repository.impl';
+import { PermissionUseCases } from '../../../application/use-cases/permission.use-case'
+import { PermissionService } from '../../../domain/services/Permission.service';
+import { PermissionController } from '../controllers/permission.controller';
+import { PermissionRoutes } from '../routes/permission.routes';
+import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, User, Permissions } from '../../../infrastructure/database/models';
 
 export class Server {
     private app: express.Application
@@ -75,6 +85,8 @@ export class Server {
             const productRepo = AppDataSource.getRepository(Product)
             const productSizePriceRepo = AppDataSource.getRepository(ProductSizePrice)
             const shiftRepo = AppDataSource.getRepository(Shift)
+            const userRepo = AppDataSource.getRepository(User)
+            const permissionRepo = AppDataSource.getRepository(Permissions);
 
             // Setup Category module
             const categoryRepository = new CategoryRepositoryImpl(categoryRepo)
@@ -117,13 +129,30 @@ export class Server {
             const shiftController = new ShiftController(shiftService)
             const shiftRoutes = new ShiftRoutes(shiftController)
 
+            // Setup User module
+            const UserRepository = new UserRepositoryImpl(userRepo)
+            const userUseCases = new UserUseCases(UserRepository)
+            const userService = new UserService(userUseCases)
+            const userController = new UserController(userService)
+            const userRoutes = new UserRoutes(userController)
+
+            // Setup Permission module
+            const permissionRepository = new PermissionRepositoryImpl(permissionRepo);
+            const permissionUseCases = new PermissionUseCases(permissionRepository);
+            const permissionService = new PermissionService(permissionUseCases);
+            const permissionController = new PermissionController(permissionService);
+            const permissionRoutes = new PermissionRoutes(permissionController);
+
+
             return {
                 categoryRoutes,
                 categoryExtraRoutes,
                 categorySizeRoutes,
                 productRoutes,
                 productSizePriceRoutes,
-                shiftRoutes
+                shiftRoutes,
+                userRoutes,
+                permissionRoutes
             }
         } catch (error) {
             console.error("Error initializing dependencies:", error)
@@ -141,6 +170,9 @@ export class Server {
         apiV1.use("/products", dependencies.productRoutes.getRouter())
         apiV1.use("/product-size-prices", dependencies.productSizePriceRoutes.getRouter())
         apiV1.use("/shifts", dependencies.shiftRoutes.getRouter())
+        apiV1.use("/users", dependencies.userRoutes.getRouter())
+        apiV1.use("/permissions", dependencies.permissionRoutes.getRouter())
+
 
         this.app.use("/api/v1", apiV1)
 

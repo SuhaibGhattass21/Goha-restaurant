@@ -1,7 +1,7 @@
 import { User } from "@infrastructure/database/models";
 import { Repository } from "typeorm";
 
-class UserRepositoryImpl implements IUserRepository {
+export class UserRepositoryImpl implements IUserRepository {
     constructor(private userRepository: Repository<User>) { }
     create(data: User): Promise<User> {
         const user = this.userRepository.create(data);
@@ -10,13 +10,13 @@ class UserRepositoryImpl implements IUserRepository {
     findById(id: string): Promise<any | null> {
         return this.userRepository.findOne({
             where: { id },
-            relations: ["permissions"]
+            relations: ["userPermissions"]
         });
     }
     findBy(filter: any): Promise<User | null> {
         return this.userRepository.findOne({
             where: filter,
-            relations: ["permissions"]
+            relations: ["userPermissions"]
         });
     }
     update(id: string, data: Partial<User>): Promise<User | null> {
@@ -37,7 +37,7 @@ class UserRepositoryImpl implements IUserRepository {
         return this.userRepository.find({
             skip,
             take: limit || 10,
-            relations: ["permissions"],
+            relations: ["user_permissions"],
         });
     }
 

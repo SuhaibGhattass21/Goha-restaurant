@@ -1,19 +1,55 @@
-import { IPermissionRepository } from '@domain/repositories/permission.repository.interface';
+import { Repository } from 'typeorm';
+import { Permissions } from '../database/models/userPersmissions.model';
+import { IPermissionRepository } from '../../domain/repositories/permission.repository.interface';
+import { CreatePermissionDto, UpdatePermissionDto } from '../../application/dtos/Permission.dto';
 import { AppDataSource } from '../database/postgres/db';
 
-export class PermissionRepository implements IPermissionRepository {
-    create(permissionData: any): Promise<any> {
-        throw new Error('Method not implemented.');
+export class PermissionRepositoryImpl implements IPermissionRepository {
+    constructor(private permissionRepo: Repository<Permissions>) { }
+
+    async create(data: CreatePermissionDto): Promise<Permissions> {
+        const permission = this.permissionRepo.create({
+            name: data.name,
+            description: data.description,
+            granted_by: { id: data.granted_by },
+        });
+        return await this.permissionRepo.save(permission);
     }
-    findById(permissionId: string): Promise<any | null> {
-        throw new Error('Method not implemented.');
+
+    async findById(id: string): Promise<Permissions | null> {
+        return await this.permissionRepo.findOne({
+            where: { id },
+            relations: ['granted_by'],
+        });
     }
-    update(permissionId: string, permissionData: any): Promise<any | null> {
-        throw new Error('Method not implemented.');
+
+    async findByName(name: string): Promise<Permissions | null> {
+        return await this.permissionRepo.findOne({
+            where: { name },
+            relations: ['granted_by'],
+        });
     }
-    delete(permissionId: string): Promise<boolean> {
-        throw new Error('Method not implemented.');
+
+    async update(id: string, data: UpdatePermissionDto): Promise<Permissions | null> {
+        const permission = await this.permissionRepo.findOne({ where: { id } });
+        if (!permission) return null;
+
+        Object.assign(permission, data);
+        return await this.permissionRepo.save(permission);
     }
+
+    async delete(id: string): Promise<boolean> {
+        const result = await this.permissionRepo.delete(id);
+        return (result.affected ?? 0) > 0;
+    }
+
+    async findAll(): Promise<Permissions[]> {
+        return await this.permissionRepo.find({
+            relations: ['granted_by'],
+            order: { granted_at: 'DESC' },
+        });
+    }
+
     async getPermissionsForAdmin(adminId: string): Promise<any[]> {
         return AppDataSource.query(
             `SELECT * FROM admin_permissions_view WHERE admin_id = $1`,
