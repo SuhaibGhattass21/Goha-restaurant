@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean, IsUUID, IsArray, IsNotEmpty, IsPhoneNumber, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsUUID, IsArray, IsNotEmpty, IsPhoneNumber, IsNumber, IsDate } from 'class-validator';
 /**
  * @swagger
  * components:
@@ -144,6 +144,7 @@ export class UserResponseDto {
     @IsString()
     phone?: string;
 
+    @IsDate()
     createdAt!: Date;
 
     @IsBoolean()

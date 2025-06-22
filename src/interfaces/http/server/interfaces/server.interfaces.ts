@@ -1,3 +1,4 @@
+import { AuthRoutes } from "../../routes/auth.routes"
 import { CategoryExtraRoutes } from "../../routes/Category/category-extra.routes"
 import { CategorySizeRoutes } from "../../routes/Category/category-size.routes"
 import { CategoryRoutes } from "../../routes/Category/category.routes"
@@ -16,4 +17,5 @@ export interface AppDependencies {
     shiftRoutes: ShiftRoutes
     userRoutes: UserRoutes
     permissionRoutes: PermissionRoutes
+    authRoutes: AuthRoutes
 }
