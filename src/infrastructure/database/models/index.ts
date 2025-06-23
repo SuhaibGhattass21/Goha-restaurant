@@ -16,3 +16,5 @@ export { SupplierInvoice } from "./SupplierInvoices.model"
 export { SupplierPayment } from "./SupplierPayments.model";
 export { User } from "./user.model";
 export { Permissions } from "./userPersmissions.model";
+export { Worker } from "./Worker.model";
+export { CancelledOrder } from "./CanceledOrder.model";

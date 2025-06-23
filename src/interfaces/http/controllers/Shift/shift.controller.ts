@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { ShiftService } from '@domain/services/Shift.service';
+import type { ShiftService } from '@domain/services/Shift/Shift.service';
 
 export class ShiftController {
     constructor(private readonly shiftService: ShiftService) { }
@@ -26,7 +26,7 @@ export class ShiftController {
 
         try {
             const dto = { ...req.body, shift_id: req.params.id };
-            const shift = await this.shiftService.updateShiftType(dto);
+            const shift = await this.shiftService.updateType(dto);
 
             if (!shift) {
                 res.status(404).json({
@@ -54,7 +54,7 @@ export class ShiftController {
 
         try {
             const dto = { ...req.body, shift_id: req.params.id };
-            const shift = await this.shiftService.requestCloseShift(dto);
+            const shift = await this.shiftService.requestClose(dto);
 
             if (!shift) {
                 res.status(404).json({
@@ -82,7 +82,7 @@ export class ShiftController {
 
         try {
             const dto = { ...req.body, shift_id: req.params.id };
-            const shift = await this.shiftService.approveCloseShift(dto);
+            const shift = await this.shiftService.approveClose(dto);
 
             if (!shift) {
                 res.status(404).json({
@@ -108,7 +108,7 @@ export class ShiftController {
 
     async getShiftById(req: Request, res: Response): Promise<void> {
         try {
-            const shift = await this.shiftService.getShiftById(req.params.id);
+            const shift = await this.shiftService.getById(req.params.id);
             if (!shift) {
                 res.status(404).json({
                     success: false,
@@ -133,7 +133,7 @@ export class ShiftController {
     async getShiftsByCashier(req: Request, res: Response): Promise<void> {
         try {
             const cashierId = req.params.cashierId;
-            const shifts = await this.shiftService.getShiftsByCashier(cashierId);
+            const shifts = await this.shiftService.getByCashierId(cashierId);
 
             res.status(200).json({
                 success: true,
@@ -150,7 +150,7 @@ export class ShiftController {
 
     async getShiftSummary(req: Request, res: Response): Promise<void> {
         try {
-            const summary = await this.shiftService.getShiftSummary(req.params.id);
+            const summary = await this.shiftService.getSummary(req.params.id);
             res.status(200).json({
                 success: true,
                 data: summary,
@@ -177,5 +177,9 @@ export class ShiftController {
                 error: error.message,
             });
         }
+    }
+    async delete(req: Request, res: Response) {
+        const success = await this.shiftService.delete(req.params.id);
+        res.json({ success });
     }
 }

@@ -3,12 +3,13 @@ import {
     PrimaryGeneratedColumn,
     Column,
     CreateDateColumn,
-    OneToMany,
     ManyToMany,
     JoinTable,
+    OneToOne
 } from 'typeorm';
 import { v4 as uuidv4 } from "uuid";
 import { Permissions } from './userPersmissions.model';
+import { Worker } from './Worker.model';
 
 @Entity("users")
 export class User {
@@ -43,4 +44,7 @@ export class User {
         inverseJoinColumn: { name: "permission_id", referencedColumnName: "id" },
     })
     userPermissions?: Permissions[];
+
+    @OneToOne(() => Worker, (worker) => worker.user)
+    workerProfile?: Worker;
 }

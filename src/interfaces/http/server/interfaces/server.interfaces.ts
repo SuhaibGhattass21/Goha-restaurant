@@ -4,7 +4,7 @@ import { CategorySizeRoutes } from "../../routes/Category/category-size.routes"
 import { CategoryRoutes } from "../../routes/Category/category.routes"
 import { ProductSizePriceRoutes } from "../../routes/Product/product-size-price.routes"
 import { ProductRoutes } from "../../routes/Product/product.routes"
-import { ShiftRoutes } from "../../routes/shift.routes"
+import { ShiftRoutes } from "../../routes/Shift/shift.routes"
 import { UserRoutes } from "../../routes/user.routes"
 import { PermissionRoutes } from "../../routes/permission.routes"
 

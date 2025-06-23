@@ -11,7 +11,10 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ShiftType } from '@domain/enums/Shift.enums';
-import { WorkerStatus } from '../../domain/enums/Worker.enums';
+import { ShiftStatus } from '../../../domain/enums/Shift.enums';
+import { AddShiftWorkerDto } from './ShiftWorker.dto';
+
+
 /**
  * @swagger
  * components:
@@ -19,41 +22,23 @@ import { WorkerStatus } from '../../domain/enums/Worker.enums';
  *     OpenShiftDTO:
  *       type: object
  *       required:
- *         - shift_id
- *         - cashier_id
+ *         - opened_by
  *         - shift_type
  *         - workers
  *       properties:
- *         shift_id:
+ *         opened_by:
  *           type: string
  *           format: uuid
- *         cashier_id:
- *           type: string
- *           format: uuid
+ *           description: User ID of the cashier opening the shift
  *         shift_type:
  *           type: string
  *           enum: [morning, night]
+ *           description: Type of shift
  *         workers:
  *           type: array
  *           items:
  *             $ref: '#/components/schemas/AddShiftWorkerDTO'
- *
- *     AddShiftWorkerDTO:
- *       type: object
- *       required:
- *         - user_id
- *         - status
- *         - hourly_rate
- *       properties:
- *         user_id:
- *           type: string
- *           format: uuid
- *         status:
- *           type: string
- *           enum: [ADMIN, CASHIER, WAITER, CHEF, DELIVERY, KITCHEN, STEAWER, KITCHEN_ASSISTANT]
- *         hourly_rate:
- *           type: number
- *
+
  *     UpdateShiftTypeDTO:
  *       type: object
  *       required:
@@ -63,46 +48,92 @@ import { WorkerStatus } from '../../domain/enums/Worker.enums';
  *       properties:
  *         shift_id:
  *           type: string
+ *           format: uuid
  *         admin_id:
  *           type: string
+ *           format: uuid
  *         shift_type:
  *           type: string
  *           enum: [morning, night]
- *
+
  *     RequestCloseShiftDTO:
  *       type: object
  *       required:
  *         - shift_id
- *         - cashier_id
+ *         - closed_by
  *       properties:
  *         shift_id:
  *           type: string
- *         cashier_id:
+ *           format: uuid
+ *         closed_by:
  *           type: string
- *
+ *           format: uuid
+
  *     ApproveCloseShiftDTO:
  *       type: object
  *       required:
  *         - shift_id
- *         - admin_id
+ *         - approved_by_admin_id
  *       properties:
  *         shift_id:
  *           type: string
- *         admin_id:
+ *           format: uuid
+ *         approved_by_admin_id:
  *           type: string
+ *           format: uuid
+
+ *     ShiftResponseDto:
+ *       type: object
+ *       properties:
+ *         shift_id:
+ *           type: string
+ *           format: uuid
+ *         shift_type:
+ *           type: string
+ *           enum: [morning, night]
+ *         status:
+ *           type: string
+ *           enum: [OPENED, CLOSED, IN_PROGRESS, COMPLETED]
+ *         is_closed:
+ *           type: boolean
+ *         is_started_by_cashier:
+ *           type: boolean
+ *         is_close_requested:
+ *           type: boolean
+ *         start_time:
+ *           type: string
+ *           format: date-time
+ *         end_time:
+ *           type: string
+ *           format: date-time
+ *           nullable: true
+ *         opened_by:
+ *           type: string
+ *           format: uuid
+ *         closed_by:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
+ *         approved_by_admin_id:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
+ *         created_at:
+ *           type: string
+ *           format: date
  */
 
 export class OpenShiftDTO {
     @IsUUID()
-    cashier_id!: string;
+    opened_by!: string;
 
     @IsEnum(ShiftType)
     shift_type!: ShiftType;
 
     @IsArray()
     @ValidateNested({ each: true })
-    @Type(() => AddShiftWorkerDTO)
-    workers!: AddShiftWorkerDTO[];
+    @Type(() => AddShiftWorkerDto)
+    workers!: AddShiftWorkerDto[];
 }
 
 export class UpdateShiftTypeDTO {
@@ -116,30 +147,12 @@ export class UpdateShiftTypeDTO {
     admin_id!: string;
 }
 
-export class AddShiftWorkerDTO {
-    @IsUUID()
-    shift_id!: string;
-
-    @IsUUID()
-    user_id!: string;
-
-    @IsNumber()
-    hourly_rate!: number;
-
-    @IsEnum(WorkerStatus)
-    status!: WorkerStatus;
-
-    @IsOptional()
-    @IsString()
-    phone?: string;
-}
-
 export class RequestCloseShiftDTO {
     @IsUUID()
     shift_id!: string;
 
     @IsUUID()
-    cashier_id!: string;
+    closed_by!: string;
 }
 
 export class ApproveCloseShiftDTO {
@@ -147,7 +160,7 @@ export class ApproveCloseShiftDTO {
     shift_id!: string;
 
     @IsUUID()
-    admin_id!: string;
+    approved_by_admin_id!: string;
 }
 
 export class ShiftResponseDto {
@@ -157,28 +170,37 @@ export class ShiftResponseDto {
     @IsEnum(ShiftType)
     shift_type!: ShiftType;
 
+    @IsEnum(ShiftStatus)
+    status!: ShiftStatus;
+
     @IsBoolean()
     is_closed!: boolean;
+
+    @IsBoolean()
+    is_started_by_cashier!: boolean;
 
     @IsBoolean()
     is_close_requested!: boolean;
 
     @IsDate()
-    created_at!: Date;
+    start_time!: Date;
 
     @IsOptional()
     @IsDate()
     end_time?: Date;
 
     @IsUUID()
-    opened_by_cashier_id!: string;
+    opened_by!: string;
 
     @IsOptional()
     @IsUUID()
-    closed_by_cashier_id?: string;
+    closed_by?: string;
 
     @IsOptional()
     @IsUUID()
     approved_by_admin_id?: string;
+
+    @IsDate()
+    created_at!: Date;
 }
 

@@ -69,6 +69,9 @@ import { IsString, IsOptional, IsBoolean, IsUUID, IsArray, IsNotEmpty, IsPhoneNu
  *           type: array
  *           items:
  *             type: string
+ *         worker_id:
+ *           type: string
+ *           format: uuid
  */
 
 export class CreateUserDto {
@@ -153,4 +156,8 @@ export class UserResponseDto {
     @IsOptional()
     @IsArray()
     userPermissions?: string[];
+
+    @IsOptional()
+    @IsUUID()
+    worker_id?: string;
 }

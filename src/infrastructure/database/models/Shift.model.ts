@@ -21,21 +21,21 @@ export class Shift {
     shift_type!: ShiftType;
 
     @CreateDateColumn({ type: "timestamptz", nullable: false })
-    start_time: Date = new Date(new Date().getTime());
+    start_time: Date = new Date();
 
     @Column({ type: "timestamptz", nullable: false })
-    end_time: Date = new Date(new Date().getTime());
+    end_time: Date = new Date();
 
     @Column({ type: "enum", default: ShiftStatus.OPENED, enum: ShiftStatus })
     status!: ShiftStatus;
 
     @ManyToOne(() => User, { onDelete: "CASCADE" })
-    @JoinColumn({ name: "openedd_by" })
+    @JoinColumn({ name: "opened_by" })
     opened_by!: User;
 
     @ManyToOne(() => User, { onDelete: "CASCADE" })
     @JoinColumn({ name: "closed_by" })
-    closed_by!: User;
+    closed_by?: User;
 
     @Column({ type: 'boolean', default: false })
     is_started_by_cashier!: boolean;
@@ -54,5 +54,5 @@ export class Shift {
     shiftWorkers!: ShiftWorker[];
 
     @Column({ type: "date" })
-    created_at: Date = new Date(new Date().getTime());
+    created_at: Date = new Date();
 }
