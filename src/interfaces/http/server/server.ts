@@ -9,6 +9,7 @@ import { CategoryController } from '../controllers/Category/category.controller'
 import { ProductSizePriceController } from '../controllers/Product/product-size-price.controller';
 import { ProductController } from '../controllers/Product/product.controller';
 import { ShiftController } from '../controllers/Shift/shift.controller';
+import { WorkerController } from '../controllers/Shift/worker.controller';
 import { notFoundHandler, errorHandler } from '../middlewares/error-handler.middleware';
 import { CategoryExtraRoutes } from '../routes/Category/category-extra.routes';
 import { CategorySizeRoutes } from '../routes/Category/category-size.routes';
@@ -16,6 +17,7 @@ import { CategoryRoutes } from '../routes/Category/category.routes';
 import { ProductSizePriceRoutes } from '../routes/Product/product-size-price.routes';
 import { ProductRoutes } from '../routes/Product/product.routes';
 import { ShiftRoutes } from '../routes/Shift/shift.routes';
+import { WorkerRoutes } from '../routes/Shift/worker.routes';
 import { AppDependencies } from './interfaces/server.interfaces';
 import { AppDataSource } from '../../../infrastructure/database/postgres/db';
 import { CategoryRepositoryImpl } from '../../../infrastructure/repositories/Category/category.repository.impl';
@@ -38,7 +40,10 @@ import { PermissionUseCases } from '../../../application/use-cases/permission.us
 import { PermissionService } from '../../../domain/services/Permission.service';
 import { PermissionController } from '../controllers/permission.controller';
 import { PermissionRoutes } from '../routes/permission.routes';
-import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User } from '../../../infrastructure/database/models';
+import { WorkerRepositoryImpl } from '../../../infrastructure/repositories/Shift/worker.repository.impl';
+import { WorkerUseCases } from '../../../application/use-cases/Shift/worker.use-case'
+import { WorkerService } from '../../../domain/services/Shift/Worker.service';
+import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker } from '../../../infrastructure/database/models';
 import { AuthController } from '../controllers/auth.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { AuthRoutes } from '../routes/auth.routes';
@@ -95,8 +100,9 @@ export class Server {
             const productRepo = AppDataSource.getRepository(Product)
             const productSizePriceRepo = AppDataSource.getRepository(ProductSizePrice)
             const shiftRepo = AppDataSource.getRepository(Shift)
-            const permissionRepo = AppDataSource.getRepository(Permissions);
+            const permissionRepo = AppDataSource.getRepository(Permissions)
             const userRepo = AppDataSource.getRepository(User)
+            const workerRepo = AppDataSource.getRepository(Worker)
 
             // Setup Category module
             const categoryRepository = new CategoryRepositoryImpl(categoryRepo)
@@ -153,7 +159,12 @@ export class Server {
             const permissionController = new PermissionController(permissionService);
             const permissionRoutes = new PermissionRoutes(permissionController);
 
-
+            // Setup Permission module
+            const workerRepository = new WorkerRepositoryImpl(workerRepo);
+            const workerUseCases = new WorkerUseCases(workerRepository);
+            const workerService = new WorkerService(workerUseCases);
+            const workerController = new WorkerController(workerService);
+            const workerRoutes = new WorkerRoutes(workerController);
 
             // Setup User module
             const userRepository = new UserRepositoryImpl(userRepo);
@@ -173,6 +184,7 @@ export class Server {
                 shiftRoutes,
                 userRoutes,
                 permissionRoutes,
+                workerRoutes,
             }
         } catch (error) {
             console.error("Error initializing dependencies:", error)
@@ -191,6 +203,7 @@ export class Server {
         apiV1.use("/products", dependencies.productRoutes.getRouter())
         apiV1.use("/product-size-prices", dependencies.productSizePriceRoutes.getRouter())
         apiV1.use("/shifts", dependencies.shiftRoutes.getRouter())
+        apiV1.use("/workers", dependencies.workerRoutes.getRouter())
         apiV1.use("/users", dependencies.userRoutes.getRouter())
         apiV1.use("/permissions", dependencies.permissionRoutes.getRouter())
 

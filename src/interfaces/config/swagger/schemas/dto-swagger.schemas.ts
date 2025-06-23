@@ -320,43 +320,7 @@ export const swaggerSchemas = {
             },
         },
     },
-    CreateUserDto: {
-        type: "object",
-        required: ["username", "email", "password"],
-        properties: {
-            username: {
-                type: "string",
-                description: "Username of the user",
-            },
-            email: {
-                type: "string",
-                format: "email",
-                description: "Email of the user",
-            },
-            password: {
-                type: "string",
-                description: "Password of the user",
-            },
-        },
-    },
-    UpdateUserDto: {
-        type: "object",
-        properties: {
-            username: {
-                type: "string",
-                description: "Updated username of the user",
-            },
-            email: {
-                type: "string",
-                format: "email",
-                description: "Updated email of the user",
-            },
-            password: {
-                type: "string",
-                description: "Updated password of the user",
-            },
-        },
-    },
+
     OpenShiftDTO: {
         type: "object",
         required: ["opened_by", "shift_type", "workers"],
@@ -407,4 +371,139 @@ export const swaggerSchemas = {
             },
         },
     },
+    CreateWorkerDTO: {
+        type: "object",
+        required: ["full_name", "status", "base_hourly_rate"],
+        properties: {
+            full_name: {
+                type: "string",
+                description: "Full name of the worker",
+            },
+            status: {
+                type: "string",
+                enum: [
+                    "admin",
+                    "cashier",
+                    "chef",
+                    "waiter",
+                    "delivery",
+                    "kitchen",
+                    "steawer",
+                    "kitchen_assistant"
+                ],
+                description: "Worker status role",
+            },
+            base_hourly_rate: {
+                type: "number",
+                format: "decimal",
+                minimum: 0,
+                description: "Base hourly rate for the worker",
+            },
+            phone: {
+                type: "string",
+                description: "Optional phone number of the worker",
+            },
+            user_id: {
+                type: "string",
+                format: "uuid",
+                description: "Optional user account ID if the worker has login access",
+            },
+        },
+    },
+
+    UpdateWorkerDTO: {
+        type: "object",
+        properties: {
+            full_name: {
+                type: "string",
+                description: "Updated full name of the worker",
+            },
+            status: {
+                type: "string",
+                enum: [
+                    "admin",
+                    "cashier",
+                    "chef",
+                    "waiter",
+                    "delivery",
+                    "kitchen",
+                    "steawer",
+                    "kitchen_assistant"
+                ],
+                description: "Updated status of the worker",
+            },
+            base_hourly_rate: {
+                type: "number",
+                format: "decimal",
+                minimum: 0,
+                description: "Updated hourly rate",
+            },
+            phone: {
+                type: "string",
+                description: "Updated phone number",
+            },
+            is_active: {
+                type: "boolean",
+                description: "Indicates whether the worker is active",
+            },
+            user_id: {
+                type: "string",
+                format: "uuid",
+                description: "User ID if worker is linked to a user",
+            },
+        },
+    },
+
+    WorkerResponseDTO: {
+        type: "object",
+        properties: {
+            worker_id: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the worker",
+            },
+            full_name: {
+                type: "string",
+                description: "Full name of the worker",
+            },
+            status: {
+                type: "string",
+                enum: [
+                    "admin",
+                    "cashier",
+                    "chef",
+                    "waiter",
+                    "delivery",
+                    "kitchen",
+                    "steawer",
+                    "kitchen_assistant"
+                ],
+                description: "Status/role of the worker",
+            },
+            base_hourly_rate: {
+                type: "number",
+                format: "decimal",
+                description: "Base hourly wage",
+            },
+            phone: {
+                type: "string",
+                description: "Phone number (if available)",
+            },
+            is_active: {
+                type: "boolean",
+                description: "Is the worker currently active",
+            },
+            joined_at: {
+                type: "string",
+                format: "date-time",
+                description: "Join date of the worker",
+            },
+            user_id: {
+                type: "string",
+                format: "uuid",
+                description: "Linked user account ID, if applicable",
+            },
+        },
+    },
+
 };

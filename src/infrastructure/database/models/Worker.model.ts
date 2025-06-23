@@ -24,6 +24,9 @@ export class Worker {
     @JoinColumn({ name: 'user_id' })
     user?: User;
 
+    @Column({ nullable: true })
+    user_id?: string;
+
     @Column({ type: "text", nullable: true })
     phone?: string;
 

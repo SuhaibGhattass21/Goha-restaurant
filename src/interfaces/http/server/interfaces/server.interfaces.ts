@@ -7,6 +7,7 @@ import { ProductRoutes } from "../../routes/Product/product.routes"
 import { ShiftRoutes } from "../../routes/Shift/shift.routes"
 import { UserRoutes } from "../../routes/user.routes"
 import { PermissionRoutes } from "../../routes/permission.routes"
+import { WorkerRoutes } from "../../routes/Shift/worker.routes"
 
 export interface AppDependencies {
     categoryRoutes: CategoryRoutes
@@ -18,4 +19,5 @@ export interface AppDependencies {
     userRoutes: UserRoutes
     permissionRoutes: PermissionRoutes
     authRoutes: AuthRoutes
+    workerRoutes: WorkerRoutes
 }
