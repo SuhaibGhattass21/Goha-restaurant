@@ -5,7 +5,6 @@ import type {
     ApproveCloseShiftDTO,
     ShiftResponseDto
 } from '@application/dtos/Shift/Shift.dto';
-import type { Shift } from '@infrastructure/database/models/Shift.model';
 import { ShiftUseCases } from '@application/use-cases/Shift/shift.use-case';
 
 export class ShiftService {

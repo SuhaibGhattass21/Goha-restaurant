@@ -1,5 +1,5 @@
 import { body, param } from 'express-validator';
-import { ShiftType } from '@domain/enums/Shift.enums';
+import { ShiftType } from '../../../../domain/enums/Shift.enums';
 
 export class ShiftValidator {
     static open() {

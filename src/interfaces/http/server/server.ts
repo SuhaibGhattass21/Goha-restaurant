@@ -8,14 +8,14 @@ import { CategorySizeController } from '../controllers/Category/category-size.co
 import { CategoryController } from '../controllers/Category/category.controller';
 import { ProductSizePriceController } from '../controllers/Product/product-size-price.controller';
 import { ProductController } from '../controllers/Product/product.controller';
-// import { ShiftController } from '../controllers/shift.controller';
+import { ShiftController } from '../controllers/Shift/shift.controller';
 import { notFoundHandler, errorHandler } from '../middlewares/error-handler.middleware';
 import { CategoryExtraRoutes } from '../routes/Category/category-extra.routes';
 import { CategorySizeRoutes } from '../routes/Category/category-size.routes';
 import { CategoryRoutes } from '../routes/Category/category.routes';
 import { ProductSizePriceRoutes } from '../routes/Product/product-size-price.routes';
 import { ProductRoutes } from '../routes/Product/product.routes';
-// import { ShiftRoutes } from '../routes/shift.routes';
+import { ShiftRoutes } from '../routes/Shift/shift.routes';
 import { AppDependencies } from './interfaces/server.interfaces';
 import { AppDataSource } from '../../../infrastructure/database/postgres/db';
 import { CategoryRepositoryImpl } from '../../../infrastructure/repositories/Category/category.repository.impl';
@@ -30,9 +30,9 @@ import { ProductRepositoryImpl } from '../../../infrastructure/repositories/Prod
 import { ProductUseCases } from '../../../application/use-cases/Product/product.use-cases';
 import { ProductSizePriceRepositoryImpl } from '../../../infrastructure/repositories/Product/product-size-price.repository.impl';
 import { ProductSizePriceUseCases } from '../../../application/use-cases/Product/product-size-price.use-cases';
-// import { ShiftRepositoryImpl } from '../../../infrastructure/repositories/shift.repository.impl';
-// import { ShiftUseCases } from '../../../application/use-cases/shift.use-case';
-// import { ShiftService } from '../../../domain/services/Shift.service';
+import { ShiftRepositoryImpl } from '../../../infrastructure/repositories/Shift/shift.repository.impl';
+import { ShiftUseCases } from '../../../application/use-cases/Shift/shift.use-case';
+import { ShiftService } from '../../../domain/services/Shift/Shift.service';
 import { PermissionRepositoryImpl } from '../../../infrastructure/repositories/permission.repository.impl';
 import { PermissionUseCases } from '../../../application/use-cases/permission.use-case'
 import { PermissionService } from '../../../domain/services/Permission.service';
@@ -94,7 +94,7 @@ export class Server {
             const categorySizeRepo = AppDataSource.getRepository(CategorySize)
             const productRepo = AppDataSource.getRepository(Product)
             const productSizePriceRepo = AppDataSource.getRepository(ProductSizePrice)
-            // const shiftRepo = AppDataSource.getRepository(Shift)
+            const shiftRepo = AppDataSource.getRepository(Shift)
             const permissionRepo = AppDataSource.getRepository(Permissions);
             const userRepo = AppDataSource.getRepository(User)
 
@@ -133,11 +133,11 @@ export class Server {
             const productSizePriceRoutes = new ProductSizePriceRoutes(productSizePriceController)
 
             // Setup Shift module
-            // const shiftRepository = new ShiftRepositoryImpl(shiftRepo)
-            // const shiftUseCases = new ShiftUseCases(shiftRepository)
-            // const shiftService = new ShiftService(shiftUseCases)
-            // const shiftController = new ShiftController(shiftService)
-            // const shiftRoutes = new ShiftRoutes(shiftController)
+            const shiftRepository = new ShiftRepositoryImpl(shiftRepo)
+            const shiftUseCases = new ShiftUseCases(shiftRepository)
+            const shiftService = new ShiftService(shiftUseCases)
+            const shiftController = new ShiftController(shiftService)
+            const shiftRoutes = new ShiftRoutes(shiftController)
 
             // Setup User module
             const UserRepository = new UserRepositoryImpl(userRepo)
@@ -170,7 +170,7 @@ export class Server {
                 categorySizeRoutes,
                 productRoutes,
                 productSizePriceRoutes,
-                // shiftRoutes,
+                shiftRoutes,
                 userRoutes,
                 permissionRoutes,
             }
@@ -190,7 +190,7 @@ export class Server {
         apiV1.use("/category-sizes", dependencies.categorySizeRoutes.getRouter())
         apiV1.use("/products", dependencies.productRoutes.getRouter())
         apiV1.use("/product-size-prices", dependencies.productSizePriceRoutes.getRouter())
-        // apiV1.use("/shifts", dependencies.shiftRoutes.getRouter())
+        apiV1.use("/shifts", dependencies.shiftRoutes.getRouter())
         apiV1.use("/users", dependencies.userRoutes.getRouter())
         apiV1.use("/permissions", dependencies.permissionRoutes.getRouter())
 

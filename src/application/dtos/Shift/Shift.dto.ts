@@ -10,7 +10,7 @@ import {
     IsDate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ShiftType } from '@domain/enums/Shift.enums';
+import { ShiftType } from '../../../domain/enums/Shift.enums';
 import { ShiftStatus } from '../../../domain/enums/Shift.enums';
 import { AddShiftWorkerDto } from './ShiftWorker.dto';
 

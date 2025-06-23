@@ -6,9 +6,7 @@ import {
     JoinColumn
 } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
-import { User } from "./user.model";
 import { Shift } from "./Shift.model";
-import { WorkerStatus } from "../../../domain/enums/Worker.enums"
 import { Worker } from "./Worker.model";
 
 @Entity("shift_workers")
