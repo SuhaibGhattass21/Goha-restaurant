@@ -1,4 +1,5 @@
 import swaggerJSDoc from 'swagger-jsdoc';
+import { swaggerSchemas } from './schemas/dto-swagger.schemas';
 
 export const swaggerOptions: swaggerJSDoc.Options = {
     definition: {
@@ -14,10 +15,13 @@ export const swaggerOptions: swaggerJSDoc.Options = {
                 description: 'Development server',
             },
         ],
+        components: {
+            schemas: swaggerSchemas,
+        }
     },
     apis: [
-        './src/interfaces/http/routes/**/*.ts', // points to your route definitions with swagger comments
-        './src/application/dtos/**/*.ts',
+        './src/interfaces/config/swagger/schemas/*.ts',
+        './src/interfaces/config/swagger/schemas/dto-swagger.schemas.ts',
     ],
 };
 

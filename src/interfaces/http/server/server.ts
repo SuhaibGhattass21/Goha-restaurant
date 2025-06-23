@@ -2,7 +2,7 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
-import { swaggerSpec } from '../../config/swagger';
+import { swaggerSpec } from '../../config/swagger/swagger.config';
 import { CategoryExtraController } from '../controllers/Category/category-extra.controller';
 import { CategorySizeController } from '../controllers/Category/category-size.controller';
 import { CategoryController } from '../controllers/Category/category.controller';
