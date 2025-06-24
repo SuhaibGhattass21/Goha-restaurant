@@ -50,6 +50,7 @@ import {
   StockItem,
   Permissions,
   User,
+  StockTransaction,
 } from "../../../infrastructure/database/models"
 import { AuthController } from "../controllers/auth.controller"
 import { AuthMiddleware } from "../middlewares/auth.middleware"
@@ -58,6 +59,10 @@ import { AuthUseCases } from "../../../application/use-cases/auth.use-case"
 import { UserRepositoryImpl } from "../../../infrastructure/repositories/user.repository.impl"
 import { UserController } from "../controllers/user.controller"
 import { UserRoutes } from "../routes/user.routes"
+import { StockTransactionController } from "../controllers/StockTransaction/stock-transaction.controller"
+import { StockTransactionRoutes } from "../routes/StockTransaction/stock-transaction.routes"
+import { StockTransactionRepositoryImpl } from "../../../infrastructure/repositories/StockTransaction/stock-transaction.repository.impl"
+import { StockTransactionUseCases } from "../../../application/use-cases/StockTransaction/stock-transaction.use-cases"
 
 export class Server {
   private app: express.Application
@@ -112,6 +117,7 @@ export class Server {
       // const shiftRepo = AppDataSource.getRepository(Shift)
       const permissionRepo = AppDataSource.getRepository(Permissions)
       const userRepo = AppDataSource.getRepository(User)
+      const stockTransactionRepo = AppDataSource.getRepository(StockTransaction)
 
       // Setup Category module
       const categoryRepository = new CategoryRepositoryImpl(categoryRepo)
@@ -153,6 +159,12 @@ export class Server {
       const stockItemController = new StockItemController(stockItemUseCases)
       const stockItemRoutes = new StockItemRoutes(stockItemController)
 
+      // Setup StockTransaction module
+      const stockTransactionRepository = new StockTransactionRepositoryImpl(stockTransactionRepo)
+      const stockTransactionUseCases = new StockTransactionUseCases(stockTransactionRepository, stockItemRepository)
+      const stockTransactionController = new StockTransactionController(stockTransactionUseCases)
+      const stockTransactionRoutes = new StockTransactionRoutes(stockTransactionController)
+
       // Setup Shift module
       // const shiftRepository = new ShiftRepositoryImpl(shiftRepo)
       // const shiftUseCases = new ShiftUseCases(shiftRepository)
@@ -189,7 +201,7 @@ export class Server {
         productRoutes,
         productSizePriceRoutes,
         stockItemRoutes,
-        // shiftRoutes,
+        stockTransactionRoutes,
         userRoutes,
         permissionRoutes,
       }
@@ -210,6 +222,7 @@ export class Server {
     apiV1.use("/products", dependencies.productRoutes.getRouter())
     apiV1.use("/product-size-prices", dependencies.productSizePriceRoutes.getRouter())
     apiV1.use("/stock-items", dependencies.stockItemRoutes.getRouter())
+    apiV1.use("/stock-transactions", dependencies.stockTransactionRoutes.getRouter())
     // apiV1.use("/shifts", dependencies.shiftRoutes.getRouter())
     apiV1.use("/users", dependencies.userRoutes.getRouter())
     apiV1.use("/permissions", dependencies.permissionRoutes.getRouter())
