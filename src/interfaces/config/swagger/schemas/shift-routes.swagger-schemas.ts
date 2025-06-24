@@ -176,3 +176,97 @@
  *       200:
  *         description: Shift deleted successfully
  */
+/**
+ * @swagger
+ * tags:
+ *   name: ShiftWorkers
+ *   description: Manage workers assigned to shifts
+ */
+
+/**
+ * @swagger
+ * /shift-workers:
+ *   post:
+ *     summary: Assign a worker to a shift
+ *     tags: [ShiftWorkers]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateShiftWorkerDto'
+ *     responses:
+ *       201:
+ *         description: Shift worker created successfully
+ */
+
+/**
+ * @swagger
+ * /shift-workers:
+ *   get:
+ *     summary: Get all shift worker assignments
+ *     tags: [ShiftWorkers]
+ *     responses:
+ *       200:
+ *         description: List of all shift workers
+ */
+
+/**
+ * @swagger
+ * /shift-workers/{id}:
+ *   get:
+ *     summary: Get shift worker details by ID
+ *     tags: [ShiftWorkers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ShiftWorker ID
+ *     responses:
+ *       200:
+ *         description: Shift worker details retrieved
+ */
+
+/**
+ * @swagger
+ * /shift-workers/{id}:
+ *   put:
+ *     summary: Update a shift worker assignment
+ *     tags: [ShiftWorkers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ShiftWorker ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateShiftWorkerDto'
+ *     responses:
+ *       200:
+ *         description: Shift worker updated
+ */
+
+/**
+ * @swagger
+ * /shift-workers/{id}:
+ *   delete:
+ *     summary: Delete a shift worker by ID
+ *     tags: [ShiftWorkers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ShiftWorker ID to delete
+ *     responses:
+ *       200:
+ *         description: Shift worker deleted successfully
+ */

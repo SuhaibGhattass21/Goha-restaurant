@@ -505,5 +505,115 @@ export const swaggerSchemas = {
             },
         },
     },
+    AddShiftWorkerDto: {
+        type: "object",
+        required: ["shift_id", "worker_id", "hourly_rate", "start_time"],
+        properties: {
+            shift_id: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the shift the worker is assigned to",
+            },
+            worker_id: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the worker",
+            },
+            hourly_rate: {
+                type: "number",
+                format: "decimal",
+                minimum: 0,
+                description: "Hourly wage for the worker in this shift",
+            },
+            start_time: {
+                type: "string",
+                format: "date-time",
+                description: "Start time of the worker's shift assignment",
+            },
+            end_time: {
+                type: "string",
+                format: "date-time",
+                description: "Optional end time of the worker's shift assignment",
+            },
+        },
+    },
 
+    UpdateShiftWorkerDto: {
+        type: "object",
+        properties: {
+            shift_id: {
+                type: "string",
+                format: "uuid",
+                description: "Updated shift ID (optional)",
+            },
+            worker_id: {
+                type: "string",
+                format: "uuid",
+                description: "Updated worker ID (optional)",
+            },
+            hourly_rate: {
+                type: "number",
+                format: "decimal",
+                minimum: 0,
+                description: "Updated hourly rate",
+            },
+            start_time: {
+                type: "string",
+                format: "date-time",
+                description: "Updated start time of shift",
+            },
+            end_time: {
+                type: "string",
+                format: "date-time",
+                description: "Updated end time of shift",
+            },
+            calculated_salary: {
+                type: "number",
+                format: "decimal",
+                minimum: 0,
+                description: "Calculated salary based on shift duration and hourly rate",
+            },
+        },
+    },
+
+    ShiftWorkerResponseDto: {
+        type: "object",
+        properties: {
+            shift_worker_id: {
+                type: "string",
+                format: "uuid",
+                description: "Unique ID of the shift worker assignment",
+            },
+            shift_id: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the assigned shift",
+            },
+            worker_id: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the worker",
+            },
+            hourly_rate: {
+                type: "number",
+                format: "decimal",
+                description: "Hourly wage during the shift",
+            },
+            start_time: {
+                type: "string",
+                format: "date-time",
+                description: "Start timestamp of the shift work",
+            },
+            end_time: {
+                type: "string",
+                format: "date-time",
+                description: "End timestamp of the shift work (if ended)",
+            },
+            calculated_salary: {
+                type: "number",
+                format: "decimal",
+                description: "Total salary earned in this shift segment",
+            },
+        },
+    },
 };

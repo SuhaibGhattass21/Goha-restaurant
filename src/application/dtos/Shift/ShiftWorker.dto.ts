@@ -5,12 +5,18 @@ import {
     IsDate,
     IsEnum,
     Min,
+    IsArray,
+    ValidateNested
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { WorkerStatus } from '../../../domain/enums/Worker.enums';
 
 export class AddShiftWorkerDto {
     @IsUUID()
     worker_id!: string;
+
+    @IsUUID()
+    shift_id!: string;
 
     @IsEnum(WorkerStatus)
     status!: WorkerStatus;
@@ -25,6 +31,34 @@ export class AddShiftWorkerDto {
     @IsOptional()
     @IsDate()
     end_time?: Date;
+}
+
+export class UpdateShiftWorkerDto {
+    @IsOptional()
+    @IsUUID()
+    shift_id?: string;
+
+    @IsOptional()
+    @IsUUID()
+    worker_id?: string;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    hourly_rate?: number;
+
+    @IsOptional()
+    @IsDate()
+    start_time?: Date;
+
+    @IsOptional()
+    @IsDate()
+    end_time?: Date;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    calculated_salary?: number;
 }
 
 export class ShiftWorkerResponseDto {
@@ -54,3 +88,9 @@ export class ShiftWorkerResponseDto {
     calculated_salary!: number;
 }
 
+export class AssignMultipleShiftWorkersDto {
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => AddShiftWorkerDto)
+    workers!: AddShiftWorkerDto[];
+}

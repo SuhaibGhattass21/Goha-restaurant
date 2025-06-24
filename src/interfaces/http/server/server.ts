@@ -40,10 +40,15 @@ import { PermissionUseCases } from '../../../application/use-cases/permission.us
 import { PermissionService } from '../../../domain/services/Permission.service';
 import { PermissionController } from '../controllers/permission.controller';
 import { PermissionRoutes } from '../routes/permission.routes';
+import { ShiftWorkerRepositoryImpl } from '../../../infrastructure/repositories/Shift/shiftWorker.repository.impl';
+import { ShiftWorkerUseCase } from '../../../application/use-cases/Shift/shiftWorker.use-case';
+import { ShiftWorkerService } from '../../../domain/services/Shift/ShiftWorker.service';
+import { ShiftWorkerController } from '../controllers/Shift/shiftWorker.controller';
+import { ShiftWorkerRoutes } from '../routes/Shift/shiftWorker.routes';
 import { WorkerRepositoryImpl } from '../../../infrastructure/repositories/Shift/worker.repository.impl';
 import { WorkerUseCases } from '../../../application/use-cases/Shift/worker.use-case'
 import { WorkerService } from '../../../domain/services/Shift/Worker.service';
-import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker } from '../../../infrastructure/database/models';
+import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker, ShiftWorker } from '../../../infrastructure/database/models';
 import { AuthController } from '../controllers/auth.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { AuthRoutes } from '../routes/auth.routes';
@@ -103,6 +108,7 @@ export class Server {
             const permissionRepo = AppDataSource.getRepository(Permissions)
             const userRepo = AppDataSource.getRepository(User)
             const workerRepo = AppDataSource.getRepository(Worker)
+            const shiftWorkerRepo = AppDataSource.getRepository(ShiftWorker)
 
             // Setup Category module
             const categoryRepository = new CategoryRepositoryImpl(categoryRepo)
@@ -173,6 +179,13 @@ export class Server {
             const authMiddleware = new AuthMiddleware(authUseCases);
             const authRoutes = new AuthRoutes(authController, authMiddleware);
 
+            // Setup ShiftWorker module
+            const shiftWorkerRepository = new ShiftWorkerRepositoryImpl(shiftWorkerRepo)
+            const shiftWorkerUseCases = new ShiftWorkerUseCase(shiftWorkerRepository)
+            const shiftWorkerService = new ShiftWorkerService(shiftWorkerUseCases)
+            const shiftWorkerController = new ShiftWorkerController(shiftWorkerService)
+            const shiftWorkerRoutes = new ShiftWorkerRoutes(shiftWorkerController)
+
 
             return {
                 authRoutes,
@@ -185,6 +198,7 @@ export class Server {
                 userRoutes,
                 permissionRoutes,
                 workerRoutes,
+                shiftWorkerRoutes,
             }
         } catch (error) {
             console.error("Error initializing dependencies:", error)
@@ -206,6 +220,7 @@ export class Server {
         apiV1.use("/workers", dependencies.workerRoutes.getRouter())
         apiV1.use("/users", dependencies.userRoutes.getRouter())
         apiV1.use("/permissions", dependencies.permissionRoutes.getRouter())
+        apiV1.use("/shift-workers", dependencies.shiftWorkerRoutes.getRouter())
 
         this.app.use("/api/v1", apiV1)
 
