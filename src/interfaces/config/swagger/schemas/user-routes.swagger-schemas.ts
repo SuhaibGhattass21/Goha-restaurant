@@ -48,7 +48,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateUserDto'
+ *             $ref: '#/components/schemas/CreateUserDTO'
  *     responses:
  *       201:
  *         description: User created
@@ -71,7 +71,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateUserDto'
+ *             $ref: '#/components/schemas/UpdateUserDTO'
  *     responses:
  *       200:
  *         description: User updated

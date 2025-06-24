@@ -37,7 +37,7 @@ export class UserRepositoryImpl implements IUserRepository {
         return this.userRepository.find({
             skip,
             take: limit || 10,
-            relations: ["user_permissions"],
+            relations: ["userPermissions"],
         });
     }
 
