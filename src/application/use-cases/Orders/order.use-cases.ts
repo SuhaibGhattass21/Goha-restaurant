@@ -10,13 +10,15 @@ import type {
   OrderSummaryDto,
   OrderStatsDto,
 } from "@application/dtos/Orders/order.dto"
-import type { OrderStatus, OrderType } from "../../../domain/enums/Order.enums"
+import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums" // Declare the variable here
+import type { CancelledOrderUseCases } from "./cancelled-order.use-cases"
 
 export class OrderUseCases {
   constructor(
     private orderRepository: IOrderRepository,
     private orderItemRepository: IOrderItemRepository,
     private orderItemExtraRepository: IOrderItemExtraRepository,
+    private cancelledOrderUseCases: CancelledOrderUseCases, // Add this line
   ) {}
 
   async createOrder(orderData: CreateOrderDto): Promise<OrderResponseDto> {
@@ -134,6 +136,23 @@ export class OrderUseCases {
 
   async updateOrderStatus(id: string, status: OrderStatus): Promise<OrderResponseDto | null> {
     const order = await this.orderRepository.updateStatus(id, status)
+    if (order && status === OrderStatus.CANCELLED) {
+      // Ensure cashier and shift relations are loaded and not null
+      if (!order.cashier || !order.shift) {
+        console.error(
+          `Error: Cannot create cancelled order for order ${id}. Missing cashier or shift information. Order details:`,
+          order,
+        )
+        throw new Error(`Failed to log cancelled order: Missing cashier or shift details for order ${id}.`)
+      }
+
+      await this.cancelledOrderUseCases.createCancelledOrder({
+        order_id: order.order_id,
+        cancelled_by: order.cashier.id,
+        shift_id: order.shift.shift_id,
+        reason: "Order status changed to CANCELLED automatically", // Default reason
+      })
+    }
     if (order) {
       // Recalculate total if needed
       await this.orderRepository.calculateOrderTotal(id)
@@ -182,7 +201,7 @@ export class OrderUseCases {
         ? {
             shift_id: order.shift.shift_id,
             shift_type: order.shift.shift_type,
-            start_time: order.shift.start_time.toISOString(),
+            start_time: order.shift.start_time?.toISOString() || "", // Add defensive check
             status: order.shift.status,
           }
         : undefined,
@@ -192,7 +211,7 @@ export class OrderUseCases {
       total_price: Number(order.total_price),
       customer_name: order.customer_name,
       customer_phone: order.customer_phone,
-      created_at: order.created_at.toISOString(),
+      created_at: order.created_at?.toISOString() || "", // Add defensive check
       items: order.items?.map((item) => this.mapItemToResponseDto(item)) || [],
       items_count: order.items?.length || 0,
     }

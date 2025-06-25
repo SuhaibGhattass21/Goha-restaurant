@@ -9,6 +9,8 @@ import type { UserRoutes } from "../../routes/user.routes"
 import type { PermissionRoutes } from "../../routes/permission.routes"
 import type { OrderItemRoutes } from "../../routes/Orders/order-item.routes"
 import type { OrderRoutes } from "../../routes/Orders/order.routes"
+import type { CancelledOrderRoutes } from "../../routes/Orders/cancelled-order.routes" 
+
 export interface AppDependencies {
   categoryRoutes: CategoryRoutes
   categoryExtraRoutes: CategoryExtraRoutes
@@ -20,5 +22,6 @@ export interface AppDependencies {
   permissionRoutes: PermissionRoutes
   authRoutes: AuthRoutes
   orderItemRoutes: OrderItemRoutes
-orderRoutes: OrderRoutes
+  orderRoutes: OrderRoutes
+  cancelledOrderRoutes: CancelledOrderRoutes 
 }

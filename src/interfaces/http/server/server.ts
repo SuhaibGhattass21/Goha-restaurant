@@ -10,7 +10,8 @@ import { ProductSizePriceController } from "../controllers/Product/product-size-
 import { ProductController } from "../controllers/Product/product.controller"
 import { ShiftController } from "../controllers/Shift/shift.controller"
 import { OrderItemController } from "../controllers/Orders/order-item.controller"
-import { OrderController } from "../controllers/Orders/order.controller" // New import
+import { OrderController } from "../controllers/Orders/order.controller"
+import { CancelledOrderController } from "../controllers/Orders/cancelled-order.controller" // New import
 import { notFoundHandler, errorHandler } from "../middlewares/error-handler.middleware"
 import { CategoryExtraRoutes } from "../routes/Category/category-extra.routes"
 import { CategorySizeRoutes } from "../routes/Category/category-size.routes"
@@ -19,7 +20,8 @@ import { ProductSizePriceRoutes } from "../routes/Product/product-size-price.rou
 import { ProductRoutes } from "../routes/Product/product.routes"
 import { ShiftRoutes } from "../routes/Shift/shift.routes"
 import { OrderItemRoutes } from "../routes/Orders/order-item.routes"
-import { OrderRoutes } from "../routes/Orders/order.routes" // New import
+import { OrderRoutes } from "../routes/Orders/order.routes"
+import { CancelledOrderRoutes } from "../routes/Orders/cancelled-order.routes" // New import
 import type { AppDependencies } from "./interfaces/server.interfaces"
 import { AppDataSource } from "../../../infrastructure/database/postgres/db"
 import { CategoryRepositoryImpl } from "../../../infrastructure/repositories/Category/category.repository.impl"
@@ -40,8 +42,10 @@ import { ShiftService } from "../../../domain/services/Shift/Shift.service"
 import { OrderItemRepositoryImpl } from "../../../infrastructure/repositories/Orders/order-item.repository.impl"
 import { OrderItemExtraRepositoryImpl } from "../../../infrastructure/repositories/Orders/order-item-extra.repository.impl"
 import { OrderItemUseCases } from "../../../application/use-cases/Orders/order-item.use-cases"
-import { OrderRepositoryImpl } from "../../../infrastructure/repositories/Orders/order.repository.impl" // New import
-import { OrderUseCases } from "../../../application/use-cases/Orders/order.use-cases" // New import
+import { OrderRepositoryImpl } from "../../../infrastructure/repositories/Orders/order.repository.impl"
+import { OrderUseCases } from "../../../application/use-cases/Orders/order.use-cases"
+import { CancelledOrderRepositoryImpl } from "../../../infrastructure/repositories/Orders/cancelled-order.repository.impl" // New import
+import { CancelledOrderUseCases } from "../../../application/use-cases/Orders/cancelled-order.use-cases" // New import
 import { PermissionRepositoryImpl } from "../../../infrastructure/repositories/permission.repository.impl"
 import { PermissionUseCases } from "../../../application/use-cases/permission.use-case"
 import { PermissionService } from "../../../domain/services/Permission.service"
@@ -58,7 +62,9 @@ import {
   User,
   OrderItem,
   OrderItemExtra,
-  Order, // New model import
+  Order,
+  CancelledOrder, // New model import
+  ExternalReceipt,
 } from "../../../infrastructure/database/models"
 import { AuthController } from "../controllers/auth.controller"
 import { AuthMiddleware } from "../middlewares/auth.middleware"
@@ -122,7 +128,9 @@ export class Server {
       const userRepo = AppDataSource.getRepository(User)
       const orderItemRepo = AppDataSource.getRepository(OrderItem)
       const orderItemExtraRepo = AppDataSource.getRepository(OrderItemExtra)
-      const orderRepo = AppDataSource.getRepository(Order) // New repository
+      const orderRepo = AppDataSource.getRepository(Order)
+      const cancelledOrderRepo = AppDataSource.getRepository(CancelledOrder) // New repository
+      const externalReceiptRepo = AppDataSource.getRepository(ExternalReceipt) // New repository
 
       // Setup Category module
       const categoryRepository = new CategoryRepositoryImpl(categoryRepo)
@@ -172,11 +180,24 @@ export class Server {
       const orderItemController = new OrderItemController(orderItemUseCases)
       const orderItemRoutes = new OrderItemRoutes(orderItemController)
 
-      // Setup Order module (NEW)
+      // Setup CancelledOrder module (NEW)
+      const cancelledOrderRepository = new CancelledOrderRepositoryImpl(cancelledOrderRepo)
+      const cancelledOrderUseCases = new CancelledOrderUseCases(cancelledOrderRepository)
+
+
+      // Setup Order module
       const orderRepository = new OrderRepositoryImpl(orderRepo)
-      const orderUseCases = new OrderUseCases(orderRepository, orderItemRepository, orderItemExtraRepository)
+      const orderUseCases = new OrderUseCases(
+        orderRepository,
+        orderItemRepository,
+        orderItemExtraRepository,
+        cancelledOrderUseCases,
+      )
       const orderController = new OrderController(orderUseCases)
       const orderRoutes = new OrderRoutes(orderController)
+
+      const cancelledOrderController = new CancelledOrderController(cancelledOrderUseCases)
+      const cancelledOrderRoutes = new CancelledOrderRoutes(cancelledOrderController)
 
       // Setup User module
       const UserRepository = new UserRepositoryImpl(userRepo)
@@ -210,7 +231,8 @@ export class Server {
         userRoutes,
         permissionRoutes,
         orderItemRoutes,
-        orderRoutes, // New dependency
+        orderRoutes,
+        cancelledOrderRoutes, // New dependency
       }
     } catch (error) {
       console.error("Error initializing dependencies:", error)
@@ -232,7 +254,8 @@ export class Server {
     apiV1.use("/users", dependencies.userRoutes.getRouter())
     apiV1.use("/permissions", dependencies.permissionRoutes.getRouter())
     apiV1.use("/order-items", dependencies.orderItemRoutes.getRouter())
-    apiV1.use("/orders", dependencies.orderRoutes.getRouter()) // New route
+    apiV1.use("/orders", dependencies.orderRoutes.getRouter())
+    apiV1.use("/cancelled-orders", dependencies.cancelledOrderRoutes.getRouter()) // New route
 
     this.app.use("/api/v1", apiV1)
 
