@@ -9,3 +9,9 @@ export enum OrderType {
     TAKEAWAY = 'takeaway',
     DELIVERY = 'delivery'
 }
+
+export enum OrderPaymentMethod {
+    CASH = 'cash',
+    CARD = 'card',
+    WALLET = 'wallet',
+}
