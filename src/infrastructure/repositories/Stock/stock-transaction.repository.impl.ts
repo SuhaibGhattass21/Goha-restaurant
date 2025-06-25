@@ -7,13 +7,13 @@ import type {
 import type { IStockTransactionRepository } from "@domain/repositories/Stock/stock-transaction.repository.interface"
 
 export class StockTransactionRepositoryImpl implements IStockTransactionRepository {
-  constructor(private stockTransactionRepository: Repository<StockTransaction>) { }
+  constructor(private stockTransactionRepository: Repository<StockTransaction>) {}
 
   async create(transactionData: CreateStockTransactionDto): Promise<StockTransaction> {
     const transaction = this.stockTransactionRepository.create({
       stockItem: { stock_item_id: transactionData.stock_item_id },
       type: transactionData.type,
-      quantity: transactionData.quantity,
+      quantity: Number(transactionData.quantity),
       admin: { id: transactionData.user_id },
       shift: { shift_id: transactionData.shift_id },
     })
@@ -83,24 +83,41 @@ export class StockTransactionRepositoryImpl implements IStockTransactionReposito
   }
 
   async update(id: string, transactionData: UpdateStockTransactionDto): Promise<StockTransaction | null> {
-    const updateData: any = { ...transactionData }
+    // First, get the existing transaction
+    const existingTransaction = await this.findById(id)
+    if (!existingTransaction) {
+      return null
+    }
 
+    // Prepare the update data
+    const updateData: Partial<StockTransaction> = {}
+
+    // Handle simple fields
+    if (transactionData.type !== undefined) {
+      updateData.type = transactionData.type
+    }
+
+    if (transactionData.quantity !== undefined) {
+      updateData.quantity = Number(transactionData.quantity)
+    }
+
+    // Handle relationships
     if (transactionData.stock_item_id) {
-      updateData.stockItem = { stock_item_id: transactionData.stock_item_id }
-      delete updateData.stock_item_id
+      updateData.stockItem = { stock_item_id: transactionData.stock_item_id } as any
     }
 
     if (transactionData.user_id) {
-      updateData.admin = { id: transactionData.user_id }
-      delete updateData.user_id
+      updateData.admin = { id: transactionData.user_id } as any
     }
 
     if (transactionData.shift_id) {
-      updateData.shift = { shift_id: transactionData.shift_id }
-      delete updateData.shift_id
+      updateData.shift = { shift_id: transactionData.shift_id } as any
     }
 
-    await this.stockTransactionRepository.update(id, updateData)
+    // Use the repository's save method instead of update for better relationship handling
+    const transactionToUpdate = { ...existingTransaction, ...updateData }
+    await this.stockTransactionRepository.save(transactionToUpdate)
+
     return await this.findById(id)
   }
 

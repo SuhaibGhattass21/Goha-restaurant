@@ -14,7 +14,7 @@ export class StockTransactionUseCases {
   constructor(
     private stockTransactionRepository: IStockTransactionRepository,
     private stockItemRepository: IStockItemRepository,
-  ) { }
+  ) {}
 
   async createStockTransaction(transactionData: CreateStockTransactionDto): Promise<StockTransactionResponseDto> {
     // Verify stock item exists
@@ -27,10 +27,11 @@ export class StockTransactionUseCases {
     const transaction = await this.stockTransactionRepository.create(transactionData)
 
     // Update stock item quantity
+    const quantity = Number(transactionData.quantity)
     const newQuantity =
       transactionData.type === "in"
-        ? stockItem.current_quantity + transactionData.quantity
-        : stockItem.current_quantity - transactionData.quantity
+        ? Number(stockItem.current_quantity) + quantity
+        : Number(stockItem.current_quantity) - quantity
 
     if (newQuantity < 0) {
       throw new Error("Insufficient stock quantity")
@@ -73,16 +74,30 @@ export class StockTransactionUseCases {
         throw new Error("Stock item not found")
       }
 
+      // Convert to numbers to ensure proper arithmetic
+      const currentStockQuantity = Number(stockItem.current_quantity)
+      const originalQuantity = Number(existingTransaction.quantity)
+      const newQuantity = transactionData.quantity !== undefined ? Number(transactionData.quantity) : originalQuantity
+      const newType = transactionData.type || existingTransaction.type
+      const originalType = existingTransaction.type
+
       // Reverse the original transaction effect
-      const originalEffect =
-        existingTransaction.type === "in" ? -existingTransaction.quantity : existingTransaction.quantity
+      let reversalEffect = 0
+      if (originalType === "in") {
+        reversalEffect = -originalQuantity
+      } else {
+        reversalEffect = originalQuantity
+      }
 
       // Apply new transaction effect
-      const newType = transactionData.type || existingTransaction.type
-      const newQuantity = transactionData.quantity || existingTransaction.quantity
-      const newEffect = newType === "in" ? newQuantity : -newQuantity
+      let newEffect = 0
+      if (newType === "in") {
+        newEffect = newQuantity
+      } else {
+        newEffect = -newQuantity
+      }
 
-      const updatedStockQuantity = stockItem.current_quantity + originalEffect + newEffect
+      const updatedStockQuantity = currentStockQuantity + reversalEffect + newEffect
 
       if (updatedStockQuantity < 0) {
         throw new Error("Insufficient stock quantity")
@@ -104,8 +119,11 @@ export class StockTransactionUseCases {
     // Reverse the transaction effect on stock quantity
     const stockItem = await this.stockItemRepository.findById(transaction.stockItem.stock_item_id)
     if (stockItem) {
-      const reversalEffect = transaction.type === "in" ? -transaction.quantity : transaction.quantity
-      const newQuantity = stockItem.current_quantity + reversalEffect
+      const currentQuantity = Number(stockItem.current_quantity)
+      const transactionQuantity = Number(transaction.quantity)
+
+      const reversalEffect = transaction.type === "in" ? -transactionQuantity : transactionQuantity
+      const newQuantity = currentQuantity + reversalEffect
 
       if (newQuantity >= 0) {
         await this.stockItemRepository.updateQuantity(transaction.stockItem.stock_item_id, newQuantity)
@@ -169,7 +187,7 @@ export class StockTransactionUseCases {
       stock_item_id: transaction.stockItem.stock_item_id,
       stock_item_name: transaction.stockItem.name,
       type: transaction.type,
-      quantity: transaction.quantity,
+      quantity: Number(transaction.quantity), // Ensure it's a number
       user_id: transaction.admin.id,
       user_name: transaction.admin.fullName,
       shift_id: transaction.shift.shift_id,
