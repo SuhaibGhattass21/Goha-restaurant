@@ -24,7 +24,7 @@ export class OpenShiftDTO {
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => AddShiftWorkerDto)
-    workers!: AddShiftWorkerDto[];
+    workers?: AddShiftWorkerDto[];
 }
 
 export class UpdateShiftTypeDTO {
