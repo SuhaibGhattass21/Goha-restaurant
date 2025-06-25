@@ -3,11 +3,11 @@ import type { StockTransaction } from "../../database/models/StockTransaction.mo
 import type {
   CreateStockTransactionDto,
   UpdateStockTransactionDto,
-} from "../../../application/dtos/StockTransaction/stock-transaction.dto"
-import type { IStockTransactionRepository } from "@domain/repositories/StockTransaction/stock-transaction.repository.interface"
+} from "../../../application/dtos/Stock/stock-transaction.dto"
+import type { IStockTransactionRepository } from "@domain/repositories/Stock/stock-transaction.repository.interface"
 
 export class StockTransactionRepositoryImpl implements IStockTransactionRepository {
-  constructor(private stockTransactionRepository: Repository<StockTransaction>) {}
+  constructor(private stockTransactionRepository: Repository<StockTransaction>) { }
 
   async create(transactionData: CreateStockTransactionDto): Promise<StockTransaction> {
     const transaction = this.stockTransactionRepository.create({

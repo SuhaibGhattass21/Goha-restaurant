@@ -1,4 +1,4 @@
-import type { IStockItemRepository } from "@domain/repositories/SrockItem/stock-item.repository.interface"
+import type { IStockItemRepository } from "@domain/repositories/Stock/stock-item.repository.interface"
 import type { StockItem } from "../../../infrastructure/database/models/StockItem.model"
 import type {
   CreateStockItemDto,
@@ -6,10 +6,10 @@ import type {
   StockItemListResponseDto,
   UpdateStockItemDto,
   LowStockItemDto,
-} from "@application/dtos/StockItem/stock-item.dto"
+} from "@application/dtos/Stock/stock-item.dto"
 
 export class StockItemUseCases {
-  constructor(private stockItemRepository: IStockItemRepository) {}
+  constructor(private stockItemRepository: IStockItemRepository) { }
 
   async createStockItem(stockItemData: CreateStockItemDto): Promise<StockItemResponseDto> {
     // Check if stock item with same name already exists

@@ -616,4 +616,157 @@ export const swaggerSchemas = {
             },
         },
     },
+    CreateStockItemDto: {
+        type: "object",
+        required: ["name", "type", "unit", "current_quantity", "minimum_value", "status"],
+        properties: {
+            name: { type: "string" },
+            type: { type: "string", enum: ["ingredient", "product", "supply"] }, // adjust enum values as needed
+            unit: { type: "string" },
+            current_quantity: { type: "number", format: "decimal", minimum: 0 },
+            minimum_value: { type: "number", format: "decimal", minimum: 0 },
+            status: { type: "string", enum: ["active", "inactive"] } // adjust enum values as needed
+        }
+    },
+
+    UpdateStockItemDto: {
+        type: "object",
+        properties: {
+            name: { type: "string" },
+            type: { type: "string", enum: ["ingredient", "product", "supply"] },
+            unit: { type: "string" },
+            current_quantity: { type: "number", format: "decimal", minimum: 0 },
+            minimum_value: { type: "number", format: "decimal", minimum: 0 },
+            status: { type: "string", enum: ["active", "inactive"] }
+        }
+    },
+
+    StockItemResponseDto: {
+        type: "object",
+        properties: {
+            stock_item_id: { type: "string", format: "uuid" },
+            name: { type: "string" },
+            type: { type: "string", enum: ["ingredient", "product", "supply"] },
+            unit: { type: "string" },
+            current_quantity: { type: "number", format: "decimal" },
+            minimum_value: { type: "number", format: "decimal" },
+            status: { type: "string", enum: ["active", "inactive"] },
+            last_updated_at: { type: "string", format: "date-time" },
+            transactions: {
+                type: "array",
+                items: { $ref: "#/components/schemas/StockTransactionDto" }
+            }
+        }
+    },
+
+    StockItemListResponseDto: {
+        type: "object",
+        properties: {
+            stockItems: {
+                type: "array",
+                items: { $ref: "#/components/schemas/StockItemResponseDto" }
+            },
+            total: { type: "integer", minimum: 0 },
+            page: { type: "integer", minimum: 1 },
+            limit: { type: "integer", minimum: 1 }
+        }
+    },
+
+    LowStockItemDto: {
+        type: "object",
+        properties: {
+            stock_item_id: { type: "string", format: "uuid" },
+            name: { type: "string" },
+            current_quantity: { type: "number", format: "decimal" },
+            minimum_value: { type: "number", format: "decimal" },
+            unit: { type: "string" }
+        }
+    },
+
+    StockTransactionDto: {
+        type: "object",
+        properties: {
+            transaction_id: { type: "string", format: "uuid" },
+            type: { type: "string", enum: ["in", "out"] },
+            quantity: { type: "number", format: "decimal" },
+            timestamp: { type: "string", format: "date-time" }
+        }
+    },
+
+    CreateStockTransactionDto: {
+        type: "object",
+        required: ["stock_item_id", "type", "quantity", "user_id", "shift_id"],
+        properties: {
+            stock_item_id: { type: "string", format: "uuid" },
+            type: { type: "string", enum: ["in", "out"] },
+            quantity: { type: "number", format: "decimal", minimum: 0 },
+            user_id: { type: "string", format: "uuid" },
+            shift_id: { type: "string", format: "uuid" }
+        }
+    },
+
+    UpdateStockTransactionDto: {
+        type: "object",
+        properties: {
+            stock_item_id: { type: "string", format: "uuid" },
+            type: { type: "string", enum: ["in", "out"] },
+            quantity: { type: "number", format: "decimal", minimum: 0 },
+            user_id: { type: "string", format: "uuid" },
+            shift_id: { type: "string", format: "uuid" }
+        }
+    },
+
+    StockTransactionResponseDto: {
+        type: "object",
+        properties: {
+            transaction_id: { type: "string", format: "uuid" },
+            stock_item_id: { type: "string", format: "uuid" },
+            stock_item_name: { type: "string" },
+            type: { type: "string", enum: ["in", "out"] },
+            quantity: { type: "number", format: "decimal" },
+            user_id: { type: "string", format: "uuid" },
+            user_name: { type: "string" },
+            shift_id: { type: "string", format: "uuid" },
+            timestamp: { type: "string", format: "date-time" }
+        }
+    },
+
+    StockTransactionListResponseDto: {
+        type: "object",
+        properties: {
+            transactions: {
+                type: "array",
+                items: { $ref: "#/components/schemas/StockTransactionResponseDto" }
+            },
+            total: { type: "integer", minimum: 0 },
+            page: { type: "integer", minimum: 1 },
+            limit: { type: "integer", minimum: 1 }
+        }
+    },
+
+    StockTransactionStatsDto: {
+        type: "object",
+        properties: {
+            stock_item_id: { type: "string", format: "uuid" },
+            stock_item_name: { type: "string" },
+            total_in: { type: "number", format: "decimal" },
+            total_out: { type: "number", format: "decimal" },
+            net_change: { type: "number", format: "decimal" },
+            transaction_count: { type: "integer" }
+        }
+    },
+
+    ShiftTransactionSummaryDto: {
+        type: "object",
+        properties: {
+            shift_id: { type: "string", format: "uuid" },
+            total_transactions: { type: "integer" },
+            total_in_quantity: { type: "number", format: "decimal" },
+            total_out_quantity: { type: "number", format: "decimal" },
+            transactions: {
+                type: "array",
+                items: { $ref: "#/components/schemas/StockTransactionResponseDto" }
+            }
+        }
+    }
 };

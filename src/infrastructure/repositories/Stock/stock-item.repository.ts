@@ -1,10 +1,10 @@
 import type { Repository } from "typeorm"
 import type { StockItem } from "../../database/models/StockItem.model"
-import type { CreateStockItemDto, UpdateStockItemDto } from "../../../application/dtos/StockItem/stock-item.dto"
-import type { IStockItemRepository } from "@domain/repositories/SrockItem/stock-item.repository.interface"
+import type { CreateStockItemDto, UpdateStockItemDto } from "../../../application/dtos/Stock/stock-item.dto"
+import type { IStockItemRepository } from "@domain/repositories/Stock/stock-item.repository.interface"
 
 export class StockItemRepositoryImpl implements IStockItemRepository {
-  constructor(private stockItemRepository: Repository<StockItem>) {}
+  constructor(private stockItemRepository: Repository<StockItem>) { }
 
   async create(stockItemData: CreateStockItemDto): Promise<StockItem> {
     const stockItem = this.stockItemRepository.create({

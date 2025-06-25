@@ -1,14 +1,8 @@
 import { Router } from "express"
-import type { StockTransactionController } from "../../controllers/StockTransaction/stock-transaction.controller"
-import { StockTransactionValidator } from "../../validators/StockTransaction/stock-transaction.validator"
+import type { StockTransactionController } from "../../controllers/Stock/stock-transaction.controller"
+import { StockTransactionValidator } from "../../validators/Stock/stock-transaction.validator"
 
 export class StockTransactionRoutes {
-  /**
-   * @swagger
-   * tags:
-   *   name: Stock Transactions
-   *   description: Stock transaction management for inventory tracking
-   */
 
   private router: Router
   private stockTransactionController: StockTransactionController

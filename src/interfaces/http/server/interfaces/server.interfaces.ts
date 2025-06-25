@@ -9,8 +9,8 @@ import { UserRoutes } from "../../routes/user.routes"
 import { PermissionRoutes } from "../../routes/permission.routes"
 import { WorkerRoutes } from "../../routes/Shift/worker.routes"
 import { ShiftWorkerRoutes } from "../../routes/Shift/shiftWorker.routes"
-import type { StockItemRoutes } from "../../routes/StockItem/stock-item.routes"
-import type { StockTransactionRoutes } from "../../routes/StockTransaction/stock-transaction.routes"
+import type { StockItemRoutes } from "../../routes/Stock/stock-item.routes"
+import type { StockTransactionRoutes } from "../../routes/Stock/stock-transaction.routes"
 
 
 export interface AppDependencies {

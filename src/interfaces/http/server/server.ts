@@ -40,10 +40,10 @@ import { PermissionUseCases } from '../../../application/use-cases/permission.us
 import { PermissionService } from '../../../domain/services/Permission.service';
 import { PermissionController } from '../controllers/permission.controller';
 import { PermissionRoutes } from '../routes/permission.routes';
-import { StockItemRepositoryImpl } from "../../../infrastructure/repositories/StockItem/stock-item.repository"
-import { StockItemUseCases } from "../../../application/use-cases/StockItem/stock-item.use-cases"
-import { StockItemController } from "../controllers/StockItem/stock-item.controller"
-import { StockItemRoutes } from "../routes/StockItem/stock-item.routes"
+import { StockItemRepositoryImpl } from "../../../infrastructure/repositories/Stock/stock-item.repository"
+import { StockItemUseCases } from "../../../application/use-cases/Stock/stock-item.use-cases"
+import { StockItemController } from "../controllers/Stock/stock-item.controller"
+import { StockItemRoutes } from "../routes/Stock/stock-item.routes"
 import { ShiftWorkerRepositoryImpl } from '../../../infrastructure/repositories/Shift/shiftWorker.repository.impl';
 import { ShiftWorkerUseCase } from '../../../application/use-cases/Shift/shiftWorker.use-case';
 import { ShiftWorkerService } from '../../../domain/services/Shift/ShiftWorker.service';
@@ -52,10 +52,10 @@ import { ShiftWorkerRoutes } from '../routes/Shift/shiftWorker.routes';
 import { WorkerRepositoryImpl } from '../../../infrastructure/repositories/Shift/worker.repository.impl';
 import { WorkerUseCases } from '../../../application/use-cases/Shift/worker.use-case'
 import { WorkerService } from '../../../domain/services/Shift/Worker.service';
-import { StockTransactionController } from "../controllers/StockTransaction/stock-transaction.controller"
-import { StockTransactionRoutes } from "../routes/StockTransaction/stock-transaction.routes"
-import { StockTransactionRepositoryImpl } from "../../../infrastructure/repositories/StockTransaction/stock-transaction.repository.impl"
-import { StockTransactionUseCases } from "../../../application/use-cases/StockTransaction/stock-transaction.use-cases"
+import { StockTransactionController } from "../controllers/Stock/stock-transaction.controller"
+import { StockTransactionRoutes } from "../routes/Stock/stock-transaction.routes"
+import { StockTransactionRepositoryImpl } from "../../../infrastructure/repositories/Stock/stock-transaction.repository.impl"
+import { StockTransactionUseCases } from "../../../application/use-cases/Stock/stock-transaction.use-cases"
 import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker, ShiftWorker, StockItem, StockTransaction } from '../../../infrastructure/database/models';
 import { AuthController } from '../controllers/auth.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';

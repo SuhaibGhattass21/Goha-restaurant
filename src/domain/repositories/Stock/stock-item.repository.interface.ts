@@ -1,4 +1,4 @@
-import type { CreateStockItemDto, UpdateStockItemDto } from "@application/dtos/StockItem/stock-item.dto"
+import type { CreateStockItemDto, UpdateStockItemDto } from "@application/dtos/Stock/stock-item.dto"
 import type { StockItem } from "@infrastructure/database/models"
 
 export interface IStockItemRepository {

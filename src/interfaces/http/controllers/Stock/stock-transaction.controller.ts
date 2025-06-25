@@ -1,13 +1,12 @@
 import type { Request, Response } from "express"
 import { validationResult } from "express-validator"
-import type { StockItemUseCases } from "../../../../application/use-cases/StockItem/stock-item.use-cases"
+import type { StockTransactionUseCases } from "../../../../application/use-cases/Stock/stock-transaction.use-cases"
 
-export class StockItemController {
-  constructor(private stockItemUseCases: StockItemUseCases) {}
+export class StockTransactionController {
+  constructor(private stockTransactionUseCases: StockTransactionUseCases) { }
 
-  async createStockItem(req: Request, res: Response): Promise<void> {
+  async createStockTransaction(req: Request, res: Response): Promise<void> {
     try {
-      // Check for validation errors
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         res.status(400).json({
@@ -18,17 +17,17 @@ export class StockItemController {
         return
       }
 
-      const stockItemData = req.body
-      const stockItem = await this.stockItemUseCases.createStockItem(stockItemData)
+      const transactionData = req.body
+      const transaction = await this.stockTransactionUseCases.createStockTransaction(transactionData)
 
       res.status(201).json({
         success: true,
-        message: "Stock item created successfully",
-        data: stockItem,
+        message: "Stock transaction created successfully",
+        data: transaction,
       })
     } catch (error: any) {
-      if (error.message === "Stock item with this name already exists") {
-        res.status(409).json({
+      if (error.message === "Stock item not found" || error.message === "Insufficient stock quantity") {
+        res.status(400).json({
           success: false,
           message: error.message,
         })
@@ -43,7 +42,7 @@ export class StockItemController {
     }
   }
 
-  async getStockItemById(req: Request, res: Response): Promise<void> {
+  async getStockTransactionById(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -56,19 +55,19 @@ export class StockItemController {
       }
 
       const { id } = req.params
-      const stockItem = await this.stockItemUseCases.getStockItemById(id)
+      const transaction = await this.stockTransactionUseCases.getStockTransactionById(id)
 
-      if (!stockItem) {
+      if (!transaction) {
         res.status(404).json({
           success: false,
-          message: "Stock item not found",
+          message: "Stock transaction not found",
         })
         return
       }
 
       res.status(200).json({
         success: true,
-        data: stockItem,
+        data: transaction,
       })
     } catch (error: any) {
       res.status(500).json({
@@ -79,7 +78,7 @@ export class StockItemController {
     }
   }
 
-  async getAllStockItems(req: Request, res: Response): Promise<void> {
+  async getAllStockTransactions(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -94,7 +93,7 @@ export class StockItemController {
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
 
-      const result = await this.stockItemUseCases.getAllStockItems(page, limit)
+      const result = await this.stockTransactionUseCases.getAllStockTransactions(page, limit)
 
       res.status(200).json({
         success: true,
@@ -109,7 +108,7 @@ export class StockItemController {
     }
   }
 
-  async updateStockItem(req: Request, res: Response): Promise<void> {
+  async updateStockTransaction(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -122,26 +121,26 @@ export class StockItemController {
       }
 
       const { id } = req.params
-      const stockItemData = req.body
+      const transactionData = req.body
 
-      const stockItem = await this.stockItemUseCases.updateStockItem(id, stockItemData)
+      const transaction = await this.stockTransactionUseCases.updateStockTransaction(id, transactionData)
 
-      if (!stockItem) {
+      if (!transaction) {
         res.status(404).json({
           success: false,
-          message: "Stock item not found",
+          message: "Stock transaction not found",
         })
         return
       }
 
       res.status(200).json({
         success: true,
-        message: "Stock item updated successfully",
-        data: stockItem,
+        message: "Stock transaction updated successfully",
+        data: transaction,
       })
     } catch (error: any) {
-      if (error.message === "Stock item with this name already exists") {
-        res.status(409).json({
+      if (error.message === "Stock item not found" || error.message === "Insufficient stock quantity") {
+        res.status(400).json({
           success: false,
           message: error.message,
         })
@@ -156,7 +155,7 @@ export class StockItemController {
     }
   }
 
-  async deleteStockItem(req: Request, res: Response): Promise<void> {
+  async deleteStockTransaction(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -169,19 +168,19 @@ export class StockItemController {
       }
 
       const { id } = req.params
-      const deleted = await this.stockItemUseCases.deleteStockItem(id)
+      const deleted = await this.stockTransactionUseCases.deleteStockTransaction(id)
 
       if (!deleted) {
         res.status(404).json({
           success: false,
-          message: "Stock item not found",
+          message: "Stock transaction not found",
         })
         return
       }
 
       res.status(200).json({
         success: true,
-        message: "Stock item deleted successfully",
+        message: "Stock transaction deleted successfully",
       })
     } catch (error: any) {
       res.status(500).json({
@@ -192,24 +191,7 @@ export class StockItemController {
     }
   }
 
-  async getLowStockItems(req: Request, res: Response): Promise<void> {
-    try {
-      const lowStockItems = await this.stockItemUseCases.getLowStockItems()
-
-      res.status(200).json({
-        success: true,
-        data: lowStockItems,
-      })
-    } catch (error: any) {
-      res.status(500).json({
-        success: false,
-        message: "Internal server error",
-        error: error.message,
-      })
-    }
-  }
-
-  async getStockItemsByType(req: Request, res: Response): Promise<void> {
+  async getTransactionsByStockItem(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -221,12 +203,12 @@ export class StockItemController {
         return
       }
 
-      const { type } = req.params
-      const stockItems = await this.stockItemUseCases.getStockItemsByType(type)
+      const { stockItemId } = req.params
+      const transactions = await this.stockTransactionUseCases.getTransactionsByStockItem(stockItemId)
 
       res.status(200).json({
         success: true,
-        data: stockItems,
+        data: transactions,
       })
     } catch (error: any) {
       res.status(500).json({
@@ -237,7 +219,7 @@ export class StockItemController {
     }
   }
 
-  async updateStockQuantity(req: Request, res: Response): Promise<void> {
+  async getTransactionsByShift(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -249,23 +231,76 @@ export class StockItemController {
         return
       }
 
-      const { id } = req.params
-      const { quantity } = req.body
+      const { shiftId } = req.params
+      const summary = await this.stockTransactionUseCases.getTransactionsByShift(shiftId)
 
-      const stockItem = await this.stockItemUseCases.updateStockQuantity(id, quantity)
+      res.status(200).json({
+        success: true,
+        data: summary,
+      })
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      })
+    }
+  }
 
-      if (!stockItem) {
+  async getTransactionsByUser(req: Request, res: Response): Promise<void> {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        })
+        return
+      }
+
+      const { userId } = req.params
+      const transactions = await this.stockTransactionUseCases.getTransactionsByUser(userId)
+
+      res.status(200).json({
+        success: true,
+        data: transactions,
+      })
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      })
+    }
+  }
+
+  async getStockItemStats(req: Request, res: Response): Promise<void> {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        })
+        return
+      }
+
+      const { stockItemId } = req.params
+      const stats = await this.stockTransactionUseCases.getStockItemStats(stockItemId)
+
+      if (!stats) {
         res.status(404).json({
           success: false,
-          message: "Stock item not found",
+          message: "No transactions found for this stock item",
         })
         return
       }
 
       res.status(200).json({
         success: true,
-        message: "Stock quantity updated successfully",
-        data: stockItem,
+        data: stats,
       })
     } catch (error: any) {
       res.status(500).json({

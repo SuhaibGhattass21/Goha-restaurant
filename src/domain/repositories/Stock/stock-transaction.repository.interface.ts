@@ -1,7 +1,7 @@
 import type {
   CreateStockTransactionDto,
   UpdateStockTransactionDto,
-} from "@application/dtos/StockTransaction/stock-transaction.dto"
+} from "@application/dtos/Stock/stock-transaction.dto"
 import type { StockTransaction } from "@infrastructure/database/models"
 
 export interface IStockTransactionRepository {

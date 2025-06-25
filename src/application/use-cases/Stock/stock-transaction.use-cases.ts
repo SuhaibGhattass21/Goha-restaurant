@@ -1,5 +1,5 @@
-import type { IStockTransactionRepository } from "@domain/repositories/StockTransaction/stock-transaction.repository.interface"
-import type { IStockItemRepository } from "@domain/repositories/SrockItem/stock-item.repository.interface"
+import type { IStockTransactionRepository } from "@domain/repositories/Stock/stock-transaction.repository.interface"
+import type { IStockItemRepository } from "@domain/repositories/Stock/stock-item.repository.interface"
 import type { StockTransaction } from "../../../infrastructure/database/models/StockTransaction.model"
 import type {
   CreateStockTransactionDto,
@@ -8,13 +8,13 @@ import type {
   UpdateStockTransactionDto,
   StockTransactionStatsDto,
   ShiftTransactionSummaryDto,
-} from "@application/dtos/StockTransaction/stock-transaction.dto"
+} from "@application/dtos/Stock/stock-transaction.dto"
 
 export class StockTransactionUseCases {
   constructor(
     private stockTransactionRepository: IStockTransactionRepository,
     private stockItemRepository: IStockItemRepository,
-  ) {}
+  ) { }
 
   async createStockTransaction(transactionData: CreateStockTransactionDto): Promise<StockTransactionResponseDto> {
     // Verify stock item exists
