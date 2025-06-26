@@ -56,10 +56,17 @@ jobs:
           fi
         done
     
-    - name: Verify pushed images
+    - name: Verify repository existence
       run: |
-        echo "Checking DockerHub for pushed images..."
-        curl -s https://hub.docker.com/v2/repositories/apdo60311/restaurant_system/tags/ | jq .
+        echo "Verifying DockerHub repository existence..."
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://hub.docker.com/v2/repositories/apdo60311/restaurant_system/)
+        if [ "$response" -ne 200 ]; then
+          echo "Repository apdo60311/restaurant_system does not exist on DockerHub."
+          echo "Please create the repository manually or check your DockerHub account permissions."
+          exit 1
+        else
+          echo "Repository exists. Workflow will proceed."
+        fi
     
     - name: Image digest
       run: |
