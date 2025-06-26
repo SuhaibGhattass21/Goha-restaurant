@@ -25,26 +25,65 @@ jobs:
     
     - name: Build and push all services
       run: |
-        services=$(docker compose config --services)
+        docker compose build
         
-        docker compose build app
-        docker compose build db
+        built_images=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep "restaurant_system-" | grep -v "<none>" || true)
         
-        for service in $services; do
-          echo "Processing service: $service"
+        if [ -z "$built_images" ]; then
+          echo "No custom images were built. Checking for services with build context..."
+          services_with_build=$(docker compose config | grep -A 5 "build:" | grep -B 5 "context\|dockerfile" | grep "^  [a-zA-Z]" | sed 's/:$//' | sed 's/^  //' || true)
           
-          docker tag ${service} apdo60311/restaurant_system:${service}-${{ github.sha }}
-          
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            docker tag ${service} apdo60311/restaurant_system:${service}-latest
+          if [ -z "$services_with_build" ]; then
+            echo "No services found with build context. Exiting."
+            exit 0
           fi
           
-          docker push apdo60311/restaurant_system:${service}-${{ github.sha }}
+          for service in $services_with_build; do
+            echo "Processing service with build context: $service"
+            
+            if docker images | grep -q "restaurant_system-${service}"; then
+              docker tag restaurant_system-${service} apdo60311/restaurant_system:${service}-${{ github.sha }}
+              
+              if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+                docker tag restaurant_system-${service} apdo60311/restaurant_system:${service}-latest
+              fi
+              
+              docker push apdo60311/restaurant_system:${service}-${{ github.sha }}
+              
+              if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+                docker push apdo60311/restaurant_system:${service}-latest
+              fi
+              
+              echo "Successfully pushed $service"
+            else
+              echo "Warning: Image restaurant_system-${service} not found, skipping..."
+            fi
+          done
+        else
+          echo "Found built images:"
+          echo "$built_images"
           
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            docker push apdo60311/restaurant_system:${service}-latest
-          fi
-        done
+          echo "$built_images" | while read -r image; do
+            if [ -n "$image" ] && [[ "$image" == restaurant_system-* ]]; then
+              service=$(echo "$image" | sed 's/restaurant_system-//' | sed 's/:latest//')
+              echo "Processing built service: $service"
+              
+              docker tag "$image" apdo60311/restaurant_system:${service}-${{ github.sha }}
+              
+              if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+                docker tag "$image" apdo60311/restaurant_system:${service}-latest
+              fi
+              
+              docker push apdo60311/restaurant_system:${service}-${{ github.sha }}
+              
+              if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+                docker push apdo60311/restaurant_system:${service}-latest
+              fi
+              
+              echo "Successfully pushed $service"
+            fi
+          done
+        fi
     
     - name: Image digest
       run: |
