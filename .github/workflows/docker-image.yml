@@ -56,6 +56,11 @@ jobs:
           fi
         done
     
+    - name: Verify pushed images
+      run: |
+        echo "Checking DockerHub for pushed images..."
+        curl -s https://hub.docker.com/v2/repositories/apdo60311/restaurant_system/tags/ | jq .
+    
     - name: Image digest
       run: |
         echo "Images pushed successfully!"
