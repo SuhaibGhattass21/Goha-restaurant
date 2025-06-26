@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Shift } from "./Shift.model";
 import { User } from "./user.model";
 import { Order } from "./Order.model";
-import { OrderPaymentMethod } from "@domain/enums/Order.enums";
+import { OrderPaymentMethod } from "../../../domain/enums/Order.enums";
 
 @Entity("external_receipts")
 export class ExternalReceipt {
