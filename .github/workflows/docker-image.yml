@@ -27,7 +27,7 @@ jobs:
       run: |
         services=$(docker compose config --services)
         
-        docker compose up --build
+        docker compose build
         
         for service in $services; do
           echo "Processing service: $service"
