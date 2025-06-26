@@ -32,10 +32,10 @@ jobs:
         for service in $services; do
           echo "Processing service: $service"
           
-          docker tag restaurant_system-${service} apdo60311/restaurant_system:${service}-${{ github.sha }}
+          docker tag ${service} apdo60311/restaurant_system:${service}-${{ github.sha }}
           
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            docker tag restaurant_system-${service} apdo60311/restaurant_system:${service}-latest
+            docker tag ${service} apdo60311/restaurant_system:${service}-latest
           fi
           
           docker push apdo60311/restaurant_system:${service}-${{ github.sha }}
