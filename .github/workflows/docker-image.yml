@@ -27,7 +27,8 @@ jobs:
       run: |
         services=$(docker compose config --services)
         
-        docker compose build
+        docker compose build app
+        docker compose build db
         
         for service in $services; do
           echo "Processing service: $service"
