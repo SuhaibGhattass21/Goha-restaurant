@@ -20,7 +20,7 @@ jobs:
         password: ${{ secrets.DOCKER_TOKEN }}
 
     - name: Build
-      run: docker compose build --tag apdo60311/restaurant_system:${{ github.sha }}
+      run: docker compose build 
     
     - name: Push
       run: docker push apdo60311/restaurant_system:${{ github.sha }}
