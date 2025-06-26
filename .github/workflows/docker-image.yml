@@ -23,25 +23,36 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
     
-    - name: Build and push all services
+    - name: Build all services
+      run: docker compose build
+    
+    - name: Push built services
       run: |
         services=$(docker compose config --services)
-        
-        docker compose build
         
         for service in $services; do
           echo "Processing service: $service"
           
-          docker tag restaurant_system-${service} apdo60311/restaurant_system:${service}-${{ github.sha }}
+          # Get the actual image name from docker-compose
+          image_name=$(docker compose config | grep -A 5 "^  $service:" | grep "image:" | awk '{print $2}' | tr -d '"')
           
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            docker tag restaurant_system-${service} apdo60311/restaurant_system:${service}-latest
-          fi
-          
-          docker push apdo60311/restaurant_system:${service}-${{ github.sha }}
-          
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            docker push apdo60311/restaurant_system:${service}-latest
+          # Check if this is a service we build (not an external image)
+          if docker images | grep -q "restaurant_system-$service"; then
+            echo "Service $service is built locally, tagging and pushing"
+            
+            docker tag restaurant_system-${service} apdo60311/restaurant_system:${service}-${{ github.sha }}
+            
+            if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+              docker tag restaurant_system-${service} apdo60311/restaurant_system:${service}-latest
+            fi
+            
+            docker push apdo60311/restaurant_system:${service}-${{ github.sha }}
+            
+            if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+              docker push apdo60311/restaurant_system:${service}-latest
+            fi
+          else
+            echo "Service $service uses external image or has a different naming pattern, skipping"
           fi
         done
     
