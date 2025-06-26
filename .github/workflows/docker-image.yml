@@ -23,94 +23,27 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
     
-    - name: Build and push custom services
+    - name: Build and push all services
       run: |
-        # Build all services first
+        services=$(docker compose config --services)
+        
         docker compose build
         
-        # Get list of all built images (excluding external images like postgres, redis, etc.)
-        built_images=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep -E "^[^/]*restaurant_system|^restaurant_system" | grep -v "<none>" || true)
-        
-        if [ -z "$built_images" ]; then
-          echo "No custom built images found. Checking for images with different naming pattern..."
-          # Alternative: get images by checking what was actually built
-          docker images --format "table {{.Repository}}:{{.Tag}}" | head -10
+        for service in $services; do
+          echo "Processing service: $service"
           
-          # Try to find images that contain the project directory name
-          project_name=$(basename $(pwd) | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]//g')
-          built_images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "$project_name" | grep -v "<none>" || true)
-        fi
-        
-        echo "Built images found:"
-        echo "$built_images"
-        
-        # Process each built image
-        for image_tag in $built_images; do
-          # Extract just the image name without tag
-          image_name=$(echo $image_tag | cut -d':' -f1)
-          
-          # Get the service name (remove project prefix if present)  
-          service_name=$(echo $image_name | sed 's/.*[_-]//')
-          
-          echo "Processing image: $image_tag -> service: $service_name"
-          
-          # Tag with commit SHA
-          docker tag $image_tag apdo60311/restaurant_system:${service_name}-${{ github.sha }}
-          
-          # Tag with latest (only for main branch)
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            docker tag $image_tag apdo60311/restaurant_system:${service_name}-latest
-          fi
-          
-          # Push all tags for this service
-          docker push apdo60311/restaurant_system:${service_name}-${{ github.sha }}
+          docker tag restaurant_system-${service} apdo60311/restaurant_system:${service}-${{ github.sha }}
           
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            docker push apdo60311/restaurant_system:${service_name}-latest
+            docker tag restaurant_system-${service} apdo60311/restaurant_system:${service}-latest
           fi
           
-          echo "Successfully pushed $service_name"
+          docker push apdo60311/restaurant_system:${service}-${{ github.sha }}
+          
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            docker push apdo60311/restaurant_system:${service}-latest
+          fi
         done
-        
-        # If no images were found, try individual service building
-        if [ -z "$built_images" ]; then
-          echo "No images found with automatic detection. Trying individual service approach..."
-          services=$(docker compose config --services)
-          
-          for service in $services; do
-            echo "Checking if service $service builds an image..."
-            
-            # Check if service has a build context
-            build_context=$(docker compose config | grep -A 10 "^  $service:" | grep "build:" || true)
-            
-            if [ ! -z "$build_context" ]; then
-              echo "Building and pushing service: $service"
-              
-              # Build specific service
-              docker compose build $service
-              
-              # Find the built image
-              service_image=$(docker compose images $service | tail -n +2 | awk '{print $2":"$3}' | head -1)
-              
-              if [ ! -z "$service_image" ] && [ "$service_image" != ":" ]; then
-                # Tag and push
-                docker tag $service_image apdo60311/restaurant_system:${service}-${{ github.sha }}
-                docker push apdo60311/restaurant_system:${service}-${{ github.sha }}
-                
-                if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-                  docker tag $service_image apdo60311/restaurant_system:${service}-latest
-                  docker push apdo60311/restaurant_system:${service}-latest
-                fi
-                
-                echo "Successfully pushed $service"
-              else
-                echo "Service $service doesn't build a custom image, skipping..."
-              fi
-            else
-              echo "Service $service doesn't have a build context, skipping..."
-            fi
-          done
-        fi
     
     - name: Image digest
       run: |
