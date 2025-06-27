@@ -1,10 +1,10 @@
 import type { Repository } from "typeorm"
 import type { CancelledOrder } from "../../database/models/CancelledOrder.model"
 import type { CreateCancelledOrderDto } from "../../../application/dtos/Orders/cancelled-order.dto"
-import type { ICancelledOrderRepository } from "@domain/repositories/Orders/cancelled-order.repository.interface"
+import type { ICancelledOrderRepository } from "../../../domain/repositories/Orders/cancelled-order.repository.interface"
 
 export class CancelledOrderRepositoryImpl implements ICancelledOrderRepository {
-  constructor(private cancelledOrderRepository: Repository<CancelledOrder>) {}
+  constructor(private cancelledOrderRepository: Repository<CancelledOrder>) { }
 
   async create(cancelledOrderData: CreateCancelledOrderDto): Promise<CancelledOrder> {
     const cancelledOrder = this.cancelledOrderRepository.create({

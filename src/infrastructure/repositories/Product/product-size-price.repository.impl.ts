@@ -4,7 +4,7 @@ import type {
   CreateProductSizePriceDto,
   UpdateProductSizePriceDto,
 } from "../../../application/dtos/Product/product-size-price.dto"
-import type { IProductSizePriceRepository } from "@domain/repositories/Product/product-size-price.repository.interface"
+import type { IProductSizePriceRepository } from "../../../domain/repositories/Product/product-size-price.repository.interface"
 
 export class ProductSizePriceRepositoryImpl implements IProductSizePriceRepository {
   constructor(private productSizePriceRepository: Repository<ProductSizePrice>) { }

@@ -9,7 +9,7 @@ import type {
   UpdateOrderDto,
   OrderSummaryDto,
   OrderStatsDto,
-} from "@application/dtos/Orders/order.dto"
+} from "../../../application/dtos/Orders/order.dto"
 import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums" // Declare the variable here
 import type { CancelledOrderUseCases } from "./cancelled-order.use-cases"
 
@@ -19,7 +19,7 @@ export class OrderUseCases {
     private orderItemRepository: IOrderItemRepository,
     private orderItemExtraRepository: IOrderItemExtraRepository,
     private cancelledOrderUseCases: CancelledOrderUseCases, // Add this line
-  ) {}
+  ) { }
 
   async createOrder(orderData: CreateOrderDto): Promise<OrderResponseDto> {
     // Create the order first
@@ -192,18 +192,18 @@ export class OrderUseCases {
       order_id: order.order_id,
       cashier: order.cashier
         ? {
-            id: order.cashier.id,
-            username: order.cashier.username,
-            fullName: order.cashier.fullName,
-          }
+          id: order.cashier.id,
+          username: order.cashier.username,
+          fullName: order.cashier.fullName,
+        }
         : undefined,
       shift: order.shift
         ? {
-            shift_id: order.shift.shift_id,
-            shift_type: order.shift.shift_type,
-            start_time: order.shift.start_time?.toISOString() || "", // Add defensive check
-            status: order.shift.status,
-          }
+          shift_id: order.shift.shift_id,
+          shift_type: order.shift.shift_type,
+          start_time: order.shift.start_time?.toISOString() || "", // Add defensive check
+          status: order.shift.status,
+        }
         : undefined,
       table_number: order.table_number,
       order_type: order.order_type,
@@ -240,11 +240,11 @@ export class OrderUseCases {
       order_id: item.order?.order_id || "",
       product_size: item.product_size
         ? {
-            product_size_id: item.product_size.product_size_id,
-            product_name: item.product_size.product?.name || "",
-            size_name: item.product_size.size?.size_name || "",
-            price: Number(item.product_size.price),
-          }
+          product_size_id: item.product_size.product_size_id,
+          product_name: item.product_size.product?.name || "",
+          size_name: item.product_size.size?.size_name || "",
+          price: Number(item.product_size.price),
+        }
         : undefined,
       quantity: item.quantity,
       unit_price: Number(item.unit_price),
@@ -255,10 +255,10 @@ export class OrderUseCases {
           order_item_id: extra.orderItem?.order_item_id || "",
           extra: extra.extra
             ? {
-                extra_id: extra.extra.extra_id,
-                name: extra.extra.name,
-                price: Number(extra.extra.price),
-              }
+              extra_id: extra.extra.extra_id,
+              name: extra.extra.name,
+              price: Number(extra.extra.price),
+            }
             : undefined,
           price: Number(extra.price),
         })) || [],

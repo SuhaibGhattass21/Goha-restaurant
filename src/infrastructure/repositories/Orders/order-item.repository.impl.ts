@@ -1,10 +1,10 @@
 import type { Repository } from "typeorm"
 import type { OrderItem } from "../../database/models/OrderItem.model"
 import type { CreateOrderItemDto, UpdateOrderItemDto } from "../../../application/dtos/Orders/order-item.dto"
-import type { IOrderItemRepository } from "@domain/repositories/Orders/order-item.repository.interface"
+import type { IOrderItemRepository } from "../../../domain/repositories/Orders/order-item.repository.interface"
 
 export class OrderItemRepositoryImpl implements IOrderItemRepository {
-  constructor(private orderItemRepository: Repository<OrderItem>) {}
+  constructor(private orderItemRepository: Repository<OrderItem>) { }
 
   async create(orderItemData: CreateOrderItemDto): Promise<OrderItem> {
     const orderItem = this.orderItemRepository.create({

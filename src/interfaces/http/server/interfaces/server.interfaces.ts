@@ -9,8 +9,11 @@ import { UserRoutes } from "../../routes/user.routes"
 import { PermissionRoutes } from "../../routes/permission.routes"
 import { WorkerRoutes } from "../../routes/Shift/worker.routes"
 import { ShiftWorkerRoutes } from "../../routes/Shift/shiftWorker.routes"
-import type { StockItemRoutes } from "../../routes/Stock/stock-item.routes"
-import type { StockTransactionRoutes } from "../../routes/Stock/stock-transaction.routes"
+import { StockItemRoutes } from "../../routes/Stock/stock-item.routes"
+import { StockTransactionRoutes } from "../../routes/Stock/stock-transaction.routes"
+import { OrderRoutes } from "@interfaces/http/routes/Orders/order.routes"
+import { OrderItemRoutes } from "@interfaces/http/routes/Orders/order-item.routes"
+import { CancelledOrderRoutes } from "@interfaces/http/routes/Orders/cancelled-order.routes"
 
 
 export interface AppDependencies {
@@ -27,4 +30,7 @@ export interface AppDependencies {
   shiftWorkerRoutes: ShiftWorkerRoutes
   stockItemRoutes: StockItemRoutes
   stockTransactionRoutes: StockTransactionRoutes
+  orderRoutes: OrderRoutes
+  orderItemRoutes: OrderItemRoutes
+  cancelledOrderRoutes: CancelledOrderRoutes
 }

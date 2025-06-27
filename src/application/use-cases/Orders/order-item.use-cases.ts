@@ -1,5 +1,5 @@
-import type { IOrderItemRepository } from "@domain/repositories/Orders/order-item.repository.interface"
-import type { IOrderItemExtraRepository } from "@domain/repositories/Orders/order-item-extra.repository.interface"
+import type { IOrderItemRepository } from "../../../domain/repositories/Orders/order-item.repository.interface"
+import type { IOrderItemExtraRepository } from "../../../domain/repositories/Orders/order-item-extra.repository.interface"
 import type { OrderItem } from "../../../infrastructure/database/models/OrderItem.model"
 import type {
   CreateOrderItemDto,
@@ -7,13 +7,13 @@ import type {
   OrderItemListResponseDto,
   UpdateOrderItemDto,
   OrderItemExtraResponseDto,
-} from "@application/dtos/Orders/order-item.dto"
+} from "../../../application/dtos/Orders/order-item.dto"
 
 export class OrderItemUseCases {
   constructor(
     private orderItemRepository: IOrderItemRepository,
     private orderItemExtraRepository: IOrderItemExtraRepository,
-  ) {}
+  ) { }
 
   async createOrderItem(orderItemData: CreateOrderItemDto): Promise<OrderItemResponseDto> {
     // Create the order item first
@@ -106,14 +106,14 @@ export class OrderItemUseCases {
       order_id: orderItem.order?.order_id || "",
       product_size: orderItem.product_size
         ? {
-            product_size_id: orderItem.product_size.product_size_id,
-            product_name: orderItem.product_size.product?.name || "",
-            size_name: orderItem.product_size.size?.size_name || "",
-            price: Number(orderItem.product_size.price),
-            category_name: orderItem.product_size.product?.category?.name || "",
-            product_description: orderItem.product_size.product?.description,
-            category_description: orderItem.product_size.product?.category?.description,
-          }
+          product_size_id: orderItem.product_size.product_size_id,
+          product_name: orderItem.product_size.product?.name || "",
+          size_name: orderItem.product_size.size?.size_name || "",
+          price: Number(orderItem.product_size.price),
+          category_name: orderItem.product_size.product?.category?.name || "",
+          product_description: orderItem.product_size.product?.description,
+          category_description: orderItem.product_size.product?.category?.description,
+        }
         : undefined,
       quantity: orderItem.quantity,
       unit_price: Number(orderItem.unit_price),
@@ -129,11 +129,11 @@ export class OrderItemUseCases {
       order_item_id: extra.orderItem?.order_item_id || "",
       extra: extra.extra
         ? {
-            extra_id: extra.extra.extra_id, // Fixed: using extra_id
-            name: extra.extra.name,
-            price: Number(extra.extra.price),
-            category_name: extra.extra.category?.name || "",
-          }
+          extra_id: extra.extra.extra_id, // Fixed: using extra_id
+          name: extra.extra.name,
+          price: Number(extra.extra.price),
+          category_name: extra.extra.category?.name || "",
+        }
         : undefined,
       price: Number(extra.price),
     }

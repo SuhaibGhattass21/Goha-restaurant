@@ -56,7 +56,20 @@ import { StockTransactionController } from "../controllers/Stock/stock-transacti
 import { StockTransactionRoutes } from "../routes/Stock/stock-transaction.routes"
 import { StockTransactionRepositoryImpl } from "../../../infrastructure/repositories/Stock/stock-transaction.repository.impl"
 import { StockTransactionUseCases } from "../../../application/use-cases/Stock/stock-transaction.use-cases"
-import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker, ShiftWorker, StockItem, StockTransaction } from '../../../infrastructure/database/models';
+import { OrderController } from "../controllers/Orders/order.controller"
+import { OrderRoutes } from "../routes/Orders/order.routes"
+import { OrderRepositoryImpl } from "../../../infrastructure/repositories/Orders/order.repository.impl"
+import { OrderUseCases } from "../../../application/use-cases/Orders/order.use-cases"
+import { OrderItemController } from "../controllers/Orders/order-item.controller"
+import { OrderItemRoutes } from "../routes/Orders/order-item.routes"
+import { OrderItemRepositoryImpl } from "../../../infrastructure/repositories/Orders/order-item.repository.impl"
+import { OrderItemExtraRepositoryImpl } from '../../../infrastructure/repositories/Orders/order-item-extra.repository.impl';
+import { OrderItemUseCases } from "../../../application/use-cases/Orders/order-item.use-cases"
+import { CancelledOrderController } from "../controllers/Orders/cancelled-order.controller"
+import { CancelledOrderRoutes } from "../routes/Orders/cancelled-order.routes"
+import { CancelledOrderRepositoryImpl } from "../../../infrastructure/repositories/Orders/cancelled-order.repository.impl"
+import { CancelledOrderUseCases } from "../../../application/use-cases/Orders/cancelled-order.use-cases"
+import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker, ShiftWorker, StockItem, StockTransaction, OrderItem, Order, CancelledOrder, OrderItemExtra } from '../../../infrastructure/database/models';
 import { AuthController } from '../controllers/auth.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { AuthRoutes } from '../routes/auth.routes';
@@ -120,6 +133,10 @@ export class Server {
       const workerRepo = AppDataSource.getRepository(Worker)
       const shiftWorkerRepo = AppDataSource.getRepository(ShiftWorker)
       const stockTransactionRepo = AppDataSource.getRepository(StockTransaction)
+      const orderItemRepo = AppDataSource.getRepository(OrderItem)
+      const orderRepo = AppDataSource.getRepository(Order)
+      const cancelledOrderRepo = AppDataSource.getRepository(CancelledOrder)
+      const orderItemExtraRepo = AppDataSource.getRepository(OrderItemExtra)
 
       // Setup Category module
       const categoryRepository = new CategoryRepositoryImpl(categoryRepo)
@@ -209,6 +226,25 @@ export class Server {
       const shiftWorkerController = new ShiftWorkerController(shiftWorkerService)
       const shiftWorkerRoutes = new ShiftWorkerRoutes(shiftWorkerController)
 
+      // Order module
+      const orderRepository = new OrderRepositoryImpl(orderRepo)
+      const orderItemRepository = new OrderItemRepositoryImpl(orderItemRepo)
+      const orderItemExtraRepository = new OrderItemExtraRepositoryImpl(orderItemExtraRepo)
+      const cancelledOrderRepository = new CancelledOrderRepositoryImpl(cancelledOrderRepo)
+      const cancelledOrderUseCases = new CancelledOrderUseCases(cancelledOrderRepository)
+      const orderUseCases = new OrderUseCases(
+        orderRepository,
+        orderItemRepository,
+        orderItemExtraRepository,
+        cancelledOrderUseCases,
+      )
+      const orderController = new OrderController(orderUseCases)
+      const orderRoutes = new OrderRoutes(orderController)
+      const orderItemUseCases = new OrderItemUseCases(orderItemRepository, orderItemExtraRepository)
+      const orderItemController = new OrderItemController(orderItemUseCases)
+      const orderItemRoutes = new OrderItemRoutes(orderItemController)
+      const cancelledOrderController = new CancelledOrderController(cancelledOrderUseCases)
+      const cancelledOrderRoutes = new CancelledOrderRoutes(cancelledOrderController)
 
       return {
         authRoutes,
@@ -224,6 +260,9 @@ export class Server {
         shiftWorkerRoutes,
         stockItemRoutes,
         stockTransactionRoutes,
+        orderRoutes,
+        orderItemRoutes,
+        cancelledOrderRoutes,
       }
     } catch (error) {
       console.error("Error initializing dependencies:", error)
@@ -248,6 +287,9 @@ export class Server {
     apiV1.use("/shift-workers", dependencies.shiftWorkerRoutes.getRouter())
     apiV1.use("/stock-items", dependencies.stockItemRoutes.getRouter())
     apiV1.use("/stock-transactions", dependencies.stockTransactionRoutes.getRouter())
+    apiV1.use("/orders", dependencies.orderRoutes.getRouter())
+    apiV1.use("/order-items", dependencies.orderItemRoutes.getRouter())
+    apiV1.use("/cancelled-orders", dependencies.cancelledOrderRoutes.getRouter())
 
     this.app.use("/api/v1", apiV1)
     this.app.use("/api/v1", apiV1)

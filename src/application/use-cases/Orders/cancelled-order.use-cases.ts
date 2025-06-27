@@ -1,14 +1,14 @@
-import type { ICancelledOrderRepository } from "@domain/repositories/Orders/cancelled-order.repository.interface"
+import type { ICancelledOrderRepository } from "../../../domain/repositories/Orders/cancelled-order.repository.interface"
 import type { CancelledOrder } from "../../../infrastructure/database/models/CancelledOrder.model"
 import type {
   CreateCancelledOrderDto,
   CancelledOrderResponseDto,
   CancelledOrderListResponseDto,
-} from "@application/dtos/Orders/cancelled-order.dto"
-import type { OrderResponseDto, CashierInfoDto, ShiftInfoDto } from "@application/dtos/Orders/order.dto"
+} from "../../../application/dtos/Orders/cancelled-order.dto"
+import type { OrderResponseDto, CashierInfoDto, ShiftInfoDto } from "../../../application/dtos/Orders/order.dto"
 
 export class CancelledOrderUseCases {
-  constructor(private cancelledOrderRepository: ICancelledOrderRepository) {}
+  constructor(private cancelledOrderRepository: ICancelledOrderRepository) { }
 
   async createCancelledOrder(cancelledOrderData: CreateCancelledOrderDto): Promise<CancelledOrderResponseDto> {
     const cancelledOrder = await this.cancelledOrderRepository.create(cancelledOrderData)
@@ -64,18 +64,18 @@ export class CancelledOrderUseCases {
       order_id: cancelledOrder.order.order_id,
       cashier: cancelledOrder.order.cashier
         ? {
-            id: cancelledOrder.order.cashier.id,
-            username: cancelledOrder.order.cashier.username,
-            fullName: cancelledOrder.order.cashier.fullName,
-          }
+          id: cancelledOrder.order.cashier.id,
+          username: cancelledOrder.order.cashier.username,
+          fullName: cancelledOrder.order.cashier.fullName,
+        }
         : undefined,
       shift: cancelledOrder.order.shift
         ? {
-            shift_id: cancelledOrder.order.shift.shift_id,
-            shift_type: cancelledOrder.order.shift.shift_type,
-            start_time: cancelledOrder.order.shift.start_time?.toISOString() || "", // Add defensive check
-            status: cancelledOrder.order.shift.status,
-          }
+          shift_id: cancelledOrder.order.shift.shift_id,
+          shift_type: cancelledOrder.order.shift.shift_type,
+          start_time: cancelledOrder.order.shift.start_time?.toISOString() || "", // Add defensive check
+          status: cancelledOrder.order.shift.status,
+        }
         : undefined,
       table_number: cancelledOrder.order.table_number,
       order_type: cancelledOrder.order.order_type,

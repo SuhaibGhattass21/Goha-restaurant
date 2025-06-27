@@ -768,5 +768,207 @@ export const swaggerSchemas = {
                 items: { $ref: "#/components/schemas/StockTransactionResponseDto" }
             }
         }
-    }
+    },
+    CreateOrderDto: {
+        type: "object",
+        required: ["cashier_id", "shift_id", "order_type", "items"],
+        properties: {
+            cashier_id: { type: "string", format: "uuid" },
+            shift_id: { type: "string", format: "uuid" },
+            table_number: { type: "string" },
+            order_type: { type: "string", enum: ["dine_in", "takeaway", "delivery"] },
+            customer_name: { type: "string" },
+            customer_phone: { type: "string" },
+            items: {
+                type: "array",
+                items: { $ref: "#/components/schemas/CreateOrderItemDto" },
+            },
+        },
+    },
+
+    UpdateOrderDto: {
+        type: "object",
+        properties: {
+            table_number: { type: "string" },
+            order_type: { type: "string", enum: ["dine_in", "takeaway", "delivery"] },
+            status: { type: "string", enum: ["pending", "completed", "cancelled"] },
+            customer_name: { type: "string" },
+            customer_phone: { type: "string" },
+        },
+    },
+
+    OrderResponseDto: {
+        type: "object",
+        properties: {
+            order_id: { type: "string", format: "uuid" },
+            cashier: { $ref: "#/components/schemas/CashierInfoDto" },
+            shift: { $ref: "#/components/schemas/ShiftInfoDto" },
+            table_number: { type: "string" },
+            order_type: { type: "string", enum: ["dine_in", "takeaway", "delivery"] },
+            status: { type: "string", enum: ["pending", "completed", "cancelled"] },
+            total_price: { type: "number", format: "decimal" },
+            customer_name: { type: "string" },
+            customer_phone: { type: "string" },
+            created_at: { type: "string", format: "date-time" },
+            items: {
+                type: "array",
+                items: { $ref: "#/components/schemas/OrderItemResponseDto" },
+            },
+            items_count: { type: "integer", minimum: 0 },
+        },
+    },
+
+    CashierInfoDto: {
+        type: "object",
+        properties: {
+            id: { type: "string", format: "uuid" },
+            username: { type: "string" },
+            fullName: { type: "string" },
+        },
+    },
+
+    ShiftInfoDto: {
+        type: "object",
+        properties: {
+            shift_id: { type: "string", format: "uuid" },
+            shift_type: { type: "string" },
+            start_time: { type: "string", format: "date-time" },
+            status: { type: "string" },
+        },
+    },
+
+    OrderSummaryDto: {
+        type: "object",
+        properties: {
+            order_id: { type: "string", format: "uuid" },
+            table_number: { type: "string" },
+            order_type: { type: "string" },
+            status: { type: "string" },
+            total_price: { type: "number", format: "decimal" },
+            customer_name: { type: "string" },
+            created_at: { type: "string", format: "date-time" },
+            items_count: { type: "integer" },
+        },
+    },
+
+    OrderStatsDto: {
+        type: "object",
+        properties: {
+            total_orders: { type: "integer", minimum: 0 },
+            active_orders: { type: "integer", minimum: 0 },
+            completed_orders: { type: "integer", minimum: 0 },
+            cancelled_orders: { type: "integer", minimum: 0 },
+            total_revenue: { type: "number", format: "decimal" },
+            average_order_value: { type: "number", format: "decimal" },
+        },
+    },
+    CreateOrderItemDto: {
+        type: "object",
+        required: ["order_id", "product_size_id", "quantity", "unit_price"],
+        properties: {
+            order_id: { type: "string", format: "uuid" },
+            product_size_id: { type: "string", format: "uuid" },
+            quantity: { type: "integer", minimum: 1 },
+            unit_price: { type: "number", format: "decimal", minimum: 0 },
+            special_instructions: { type: "string" },
+            extras: {
+                type: "array",
+                items: { $ref: "#/components/schemas/CreateOrderItemExtraDto" },
+            },
+        },
+    },
+
+    OrderItemResponseDto: {
+        type: "object",
+        properties: {
+            order_item_id: { type: "string", format: "uuid" },
+            order_id: { type: "string", format: "uuid" },
+            product_size: { $ref: "#/components/schemas/ProductSizeInfoDto" },
+            quantity: { type: "integer", minimum: 1 },
+            unit_price: { type: "number", format: "decimal" },
+            special_instructions: { type: "string" },
+            extras: {
+                type: "array",
+                items: { $ref: "#/components/schemas/OrderItemExtraResponseDto" },
+            },
+            total_price: { type: "number", format: "decimal" },
+        },
+    },
+
+    ProductSizeInfoDto: {
+        type: "object",
+        properties: {
+            product_size_id: { type: "string", format: "uuid" },
+            product_name: { type: "string" },
+            size_name: { type: "string" },
+            price: { type: "number", format: "decimal" },
+            category_name: { type: "string" },
+            product_description: { type: "string" },
+            category_description: { type: "string" },
+        },
+    },
+
+    CreateOrderItemExtraDto: {
+        type: "object",
+        required: ["extra_id", "price"],
+        properties: {
+            extra_id: { type: "string", format: "uuid" },
+            price: { type: "number", format: "decimal" },
+        },
+    },
+
+    OrderItemExtraResponseDto: {
+        type: "object",
+        properties: {
+            order_item_extra_id: { type: "string", format: "uuid" },
+            order_item_id: { type: "string", format: "uuid" },
+            extra: { $ref: "#/components/schemas/CategoryExtraInfoDto" },
+            price: { type: "number", format: "decimal" },
+        },
+    },
+
+    CategoryExtraInfoDto: {
+        type: "object",
+        properties: {
+            extra_id: { type: "string", format: "uuid" },
+            name: { type: "string" },
+            price: { type: "number", format: "decimal" },
+            category_name: { type: "string" },
+        },
+    },
+    CreateCancelledOrderDto: {
+        type: "object",
+        required: ["order_id", "cancelled_by", "shift_id"],
+        properties: {
+            order_id: { type: "string", format: "uuid" },
+            cancelled_by: { type: "string", format: "uuid" },
+            shift_id: { type: "string", format: "uuid" },
+            reason: { type: "string" },
+        },
+    },
+
+    CancelledOrderResponseDto: {
+        type: "object",
+        properties: {
+            cancelled_order_id: { type: "string", format: "uuid" },
+            order: { $ref: "#/components/schemas/OrderResponseDto" },
+            cancelled_by: { $ref: "#/components/schemas/CashierInfoDto" },
+            shift: { $ref: "#/components/schemas/ShiftInfoDto" },
+            reason: { type: "string" },
+            cancelled_at: { type: "string", format: "date-time" },
+        },
+    },
+
+    CancelledOrderListResponseDto: {
+        type: "object",
+        properties: {
+            cancelled_orders: {
+                type: "array",
+                items: { $ref: "#/components/schemas/CancelledOrderResponseDto" },
+            },
+            total: { type: "integer", minimum: 0 },
+            page: { type: "integer", minimum: 1 },
+            limit: { type: "integer", minimum: 1 },
+        },
+    },
 };

@@ -1,5 +1,5 @@
-import type { CreateOrderItemExtraDto } from "@application/dtos/Orders/order-item.dto"
-import type { OrderItemExtra } from "@infrastructure/database/models"
+import type { CreateOrderItemExtraDto } from "../../../application/dtos/Orders/order-item.dto"
+import type { OrderItemExtra } from "../../../infrastructure/database/models"
 
 export interface IOrderItemExtraRepository {
   create(orderItemExtraData: CreateOrderItemExtraDto & { order_item_id: string }): Promise<OrderItemExtra>

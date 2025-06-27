@@ -1,5 +1,5 @@
-import type { CreateOrderDto, UpdateOrderDto, OrderStatsDto } from "@application/dtos/Orders/order.dto"
-import type { Order } from "@infrastructure/database/models"
+import type { CreateOrderDto, UpdateOrderDto, OrderStatsDto } from "../../../application/dtos/Orders/order.dto"
+import type { Order } from "../../../infrastructure/database/models"
 import type { OrderStatus, OrderType } from "../../enums/Order.enums"
 
 export interface IOrderRepository {

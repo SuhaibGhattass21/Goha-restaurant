@@ -1,7 +1,7 @@
 import type { Repository } from "typeorm"
 import type { Product } from "../../database/models/Product.model"
 import type { CreateProductDto, UpdateProductDto } from "../../../application/dtos/Product/product.dto"
-import type { IProductRepository } from "@domain/repositories/Product/product.repository.interface"
+import type { IProductRepository } from "../../../domain/repositories/Product/product.repository.interface"
 
 export class ProductRepositoryImpl implements IProductRepository {
   constructor(private productRepository: Repository<Product>) { }

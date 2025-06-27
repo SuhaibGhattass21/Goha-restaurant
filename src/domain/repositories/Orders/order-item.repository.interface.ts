@@ -1,5 +1,5 @@
-import type { CreateOrderItemDto, UpdateOrderItemDto } from "@application/dtos/Orders/order-item.dto"
-import type { OrderItem } from "@infrastructure/database/models"
+import type { CreateOrderItemDto, UpdateOrderItemDto } from "../../../application/dtos/Orders/order-item.dto"
+import type { OrderItem } from "../../../infrastructure/database/models"
 
 export interface IOrderItemRepository {
   create(orderItemData: CreateOrderItemDto): Promise<OrderItem>

@@ -1,8 +1,8 @@
-import type { CreateUserDto, UpdateUserDto, UserResponseDto } from '@application/dtos/user.dto';
-import { UserUseCases } from '@application/use-cases/user.use-case';
+import type { CreateUserDto, UpdateUserDto, UserResponseDto } from '../../application/dtos/user.dto';
+import { UserUseCases } from '../../application/use-cases/user.use-case';
 
 export class UserService {
-  constructor(private userUseCase: UserUseCases) {}
+  constructor(private userUseCase: UserUseCases) { }
 
   createUser(data: CreateUserDto): Promise<UserResponseDto> {
     return this.userUseCase.createUser(data);

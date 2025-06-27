@@ -1,5 +1,5 @@
-import type { CreateCancelledOrderDto } from "@application/dtos/Orders/cancelled-order.dto"
-import type { CancelledOrder } from "@infrastructure/database/models"
+import type { CreateCancelledOrderDto } from "../../../application/dtos/Orders/cancelled-order.dto"
+import type { CancelledOrder } from "../../../infrastructure/database/models"
 
 export interface ICancelledOrderRepository {
   create(cancelledOrderData: CreateCancelledOrderDto): Promise<CancelledOrder>
