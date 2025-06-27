@@ -14,7 +14,7 @@ import { StockTransactionRoutes } from "../../routes/Stock/stock-transaction.rou
 import { OrderRoutes } from "@interfaces/http/routes/Orders/order.routes"
 import { OrderItemRoutes } from "@interfaces/http/routes/Orders/order-item.routes"
 import { CancelledOrderRoutes } from "@interfaces/http/routes/Orders/cancelled-order.routes"
-
+import { ExternalReceiptRoutes } from "../../routes/Orders/external-receipt.routes"
 
 export interface AppDependencies {
   categoryRoutes: CategoryRoutes
@@ -33,4 +33,5 @@ export interface AppDependencies {
   orderRoutes: OrderRoutes
   orderItemRoutes: OrderItemRoutes
   cancelledOrderRoutes: CancelledOrderRoutes
+  externalReceiptRoutes: ExternalReceiptRoutes
 }

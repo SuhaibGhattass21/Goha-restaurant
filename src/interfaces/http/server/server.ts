@@ -69,7 +69,11 @@ import { CancelledOrderController } from "../controllers/Orders/cancelled-order.
 import { CancelledOrderRoutes } from "../routes/Orders/cancelled-order.routes"
 import { CancelledOrderRepositoryImpl } from "../../../infrastructure/repositories/Orders/cancelled-order.repository.impl"
 import { CancelledOrderUseCases } from "../../../application/use-cases/Orders/cancelled-order.use-cases"
-import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker, ShiftWorker, StockItem, StockTransaction, OrderItem, Order, CancelledOrder, OrderItemExtra } from '../../../infrastructure/database/models';
+import { ExternalReceiptController } from "../controllers/Orders/external-receipt.controller"
+import { ExternalReceiptRoutes } from "../routes/Orders/external-receipt.routes"
+import { ExternalReceiptRepositoryImpl } from "../../../infrastructure/repositories/Orders/external-receipt.repository.impl"
+import { ExternalReceiptUseCases } from "../../../application/use-cases/Orders/external-receipt.use-case"
+import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker, ShiftWorker, StockItem, StockTransaction, OrderItem, Order, CancelledOrder, OrderItemExtra, ExternalReceipt } from '../../../infrastructure/database/models';
 import { AuthController } from '../controllers/auth.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { AuthRoutes } from '../routes/auth.routes';
@@ -137,6 +141,7 @@ export class Server {
       const orderRepo = AppDataSource.getRepository(Order)
       const cancelledOrderRepo = AppDataSource.getRepository(CancelledOrder)
       const orderItemExtraRepo = AppDataSource.getRepository(OrderItemExtra)
+      const externalReceiptRepo = AppDataSource.getRepository(ExternalReceipt)
 
       // Setup Category module
       const categoryRepository = new CategoryRepositoryImpl(categoryRepo)
@@ -246,6 +251,12 @@ export class Server {
       const cancelledOrderController = new CancelledOrderController(cancelledOrderUseCases)
       const cancelledOrderRoutes = new CancelledOrderRoutes(cancelledOrderController)
 
+      // External Receipt
+      const externalReceiptRepository = new ExternalReceiptRepositoryImpl(externalReceiptRepo)
+      const externalReceiptUseCases = new ExternalReceiptUseCases(externalReceiptRepository)
+      const externalReceiptController = new ExternalReceiptController(externalReceiptUseCases)
+      const externalReceiptRoutes = new ExternalReceiptRoutes(externalReceiptController)
+
       return {
         authRoutes,
         categoryRoutes,
@@ -263,6 +274,7 @@ export class Server {
         orderRoutes,
         orderItemRoutes,
         cancelledOrderRoutes,
+        externalReceiptRoutes
       }
     } catch (error) {
       console.error("Error initializing dependencies:", error)
@@ -290,6 +302,7 @@ export class Server {
     apiV1.use("/orders", dependencies.orderRoutes.getRouter())
     apiV1.use("/order-items", dependencies.orderItemRoutes.getRouter())
     apiV1.use("/cancelled-orders", dependencies.cancelledOrderRoutes.getRouter())
+    apiV1.use("/external-receipts", dependencies.externalReceiptRoutes.getRouter())
 
     this.app.use("/api/v1", apiV1)
     this.app.use("/api/v1", apiV1)

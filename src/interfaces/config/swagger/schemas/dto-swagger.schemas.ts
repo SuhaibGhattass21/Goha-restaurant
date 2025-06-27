@@ -971,4 +971,40 @@ export const swaggerSchemas = {
             limit: { type: "integer", minimum: 1 },
         },
     },
+    ExternalReceiptDto: {
+        type: "object",
+        properties: {
+            receipt_id: { type: "string", format: "uuid" },
+            order_id: { type: "string", format: "uuid" },
+            shift_id: { type: "string", format: "uuid" },
+            cashier_id: { type: "string", format: "uuid" },
+            total_amount: { type: "number", format: "decimal" },
+            payment_method: {
+                type: "string",
+                enum: ["cash", "card", "wallet"],
+            },
+            image_url: { type: "string" },
+            is_printed: { type: "boolean" },
+            notes: { type: "string" },
+            created_at: { type: "string", format: "date-time" },
+        },
+    },
+
+    CreateExternalReceiptDto: {
+        type: "object",
+        required: ["order_id", "shift_id", "cashier_id", "total_amount", "payment_method"],
+        properties: {
+            order_id: { type: "string", format: "uuid" },
+            shift_id: { type: "string", format: "uuid" },
+            cashier_id: { type: "string", format: "uuid" },
+            total_amount: { type: "number", format: "decimal" },
+            payment_method: {
+                type: "string",
+                enum: ["cash", "card", "wallet"],
+            },
+            image_url: { type: "string" },
+            is_printed: { type: "boolean" },
+            notes: { type: "string" },
+        },
+    }
 };
