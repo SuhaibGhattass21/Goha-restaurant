@@ -10,6 +10,10 @@ export class CreateProductDto {
   description?: string
 
   @IsOptional()
+  @IsString()
+  image_url?: string
+
+  @IsOptional()
   @IsBoolean()
   is_active?: boolean
 
@@ -25,6 +29,10 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   description?: string
+
+  @IsOptional()
+  @IsString()
+  image_url?: string
 
   @IsOptional()
   @IsBoolean()
@@ -45,6 +53,10 @@ export class ProductResponseDto {
   @IsOptional()
   @IsString()
   description?: string
+
+  @IsOptional()
+  @IsString()
+  image_url?: string
 
   @IsBoolean()
   is_active!: boolean

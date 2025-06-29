@@ -112,6 +112,7 @@ export class ProductUseCases {
       product_id: product.product_id,
       name: product.name,
       description: product.description,
+      image_url: product.image_url,
       is_active: product.is_active,
       category: product.category
         ? {
