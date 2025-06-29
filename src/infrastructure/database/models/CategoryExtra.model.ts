@@ -19,7 +19,7 @@ export class CategoryExtra {
     @Column({ type: "decimal", precision: 10, scale: 2 })
     price!: number;
 
-    @ManyToOne(() => Category, (category) => category.extras)
+    @ManyToOne(() => Category, (category) => category.extras, { onDelete: "CASCADE" })
     @JoinColumn({ name: "category_id" })
     category!: Category;
 }

@@ -17,11 +17,11 @@ export class ProductSizePrice {
     @Column({ type: "decimal", precision: 10, scale: 2 })
     price!: number;
 
-    @ManyToOne(() => Product, (product) => product.sizePrices)
+    @ManyToOne(() => Product, (product) => product.sizePrices, { onDelete: "CASCADE" })
     @JoinColumn({ name: "product_id" })
     product!: Product;
 
-    @ManyToOne(() => CategorySize, (size) => size.sizePrices)
+    @ManyToOne(() => CategorySize, (size) => size.sizePrices, { onDelete: "CASCADE" })
     @JoinColumn({ name: "size_id" })
     size!: CategorySize;
 }

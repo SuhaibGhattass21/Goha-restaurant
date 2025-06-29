@@ -18,7 +18,7 @@ export class CategorySize {
     @Column({ type: "text" })
     size_name!: string;
 
-    @ManyToOne(() => Category, (category) => category.sizes)
+    @ManyToOne(() => Category, (category) => category.sizes, { onDelete: "CASCADE" })
     @JoinColumn({ name: "category_id" })
     category!: Category;
 

@@ -27,7 +27,7 @@ export class Product {
     @Column({ type: "boolean", default: true })
     is_active: boolean = true;
 
-    @ManyToOne(() => Category, (category) => category.products)
+    @ManyToOne(() => Category, (category) => category.products, { onDelete: "CASCADE" })
     @JoinColumn({ name: "category_id" })
     category!: Category;
 

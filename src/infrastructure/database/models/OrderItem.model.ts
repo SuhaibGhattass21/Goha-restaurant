@@ -16,7 +16,7 @@ export class OrderItem {
     @PrimaryGeneratedColumn("uuid")
     order_item_id: string = uuidv4().toString();
 
-    @ManyToOne(() => Order, (order) => order.items)
+    @ManyToOne(() => Order, (order) => order.items, { onDelete: "CASCADE" })
     @JoinColumn({ name: "order_id" })
     order!: Order;
 
