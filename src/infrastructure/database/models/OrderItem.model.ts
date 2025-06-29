@@ -20,7 +20,7 @@ export class OrderItem {
     @JoinColumn({ name: "order_id" })
     order!: Order;
 
-    @ManyToOne(() => ProductSizePrice)
+    @ManyToOne(() => ProductSizePrice, (product_size) => product_size.product, { onDelete: "CASCADE" })
     @JoinColumn({ name: "product_size_id" })
     product_size!: ProductSizePrice;
 
@@ -33,6 +33,6 @@ export class OrderItem {
     @Column({ type: "text" })
     special_instructions?: string;
 
-    @OneToMany(() => OrderItemExtra, (extra) => extra.orderItem)
+    @OneToMany(() => OrderItemExtra, (extra) => extra.orderItem, { cascade: true, orphanedRowAction: 'delete' })
     extras!: OrderItemExtra[];
 }

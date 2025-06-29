@@ -22,6 +22,6 @@ export class CategorySize {
     @JoinColumn({ name: "category_id" })
     category!: Category;
 
-    @OneToMany(() => ProductSizePrice, (psp) => psp.size)
+    @OneToMany(() => ProductSizePrice, (psp) => psp.size, { cascade: true, orphanedRowAction: 'delete' })
     sizePrices!: ProductSizePrice[];
 }

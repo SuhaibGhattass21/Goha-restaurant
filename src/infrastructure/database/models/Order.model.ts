@@ -47,6 +47,6 @@ export class Order {
     @CreateDateColumn({ type: "timestamptz" })
     created_at!: Date;
 
-    @OneToMany(() => OrderItem, (item) => item.order)
+    @OneToMany(() => OrderItem, (item) => item.order, { cascade: true, orphanedRowAction: 'delete' })
     items!: OrderItem[];
 }
