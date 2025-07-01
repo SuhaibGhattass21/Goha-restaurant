@@ -1,5 +1,7 @@
 import type { Request, Response } from 'express';
-import type { ShiftService } from '@domain/services/Shift/Shift.service';
+import { plainToInstance } from "class-transformer";
+import type { ShiftService } from '../../../../domain/services/Shift/Shift.service';
+import { FilterShiftByStatusDto } from '../../../../application/dtos/Shift/Shift.dto';
 
 export class ShiftController {
     constructor(private readonly shiftService: ShiftService) { }
@@ -145,6 +147,18 @@ export class ShiftController {
                 message: 'Internal server error',
                 error: error.message,
             });
+        }
+    }
+
+    async getShiftsByStatus(req: Request, res: Response): Promise<void> {
+        try {
+            const dto = plainToInstance(FilterShiftByStatusDto, { status: req.params.status });
+
+            const shifts = await this.shiftService.getShiftsByStatus(dto);
+            res.status(200).json(shifts);
+        } catch (error) {
+            console.error("Error fetching shifts by status:", error);
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 

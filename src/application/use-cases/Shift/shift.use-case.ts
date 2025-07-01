@@ -7,6 +7,7 @@ import type {
     ShiftResponseDto
 } from '@application/dtos/Shift/Shift.dto';
 import type { Shift } from '@infrastructure/database/models/Shift.model';
+import { ShiftStatus } from '../../../domain/enums/Shift.enums';
 
 export class ShiftUseCases {
     constructor(private repo: IShiftRepository) { }
@@ -29,6 +30,10 @@ export class ShiftUseCases {
     async approveClose(dto: ApproveCloseShiftDTO): Promise<ShiftResponseDto | null> {
         const shift = await this.repo.approveClose(dto);
         return shift ? this.mapToDto(shift) : null;
+    }
+
+    async getShiftsByStatus(status: ShiftStatus): Promise<Shift[]> {
+        return this.repo.getShiftsByStatus(status);
     }
 
     async getById(id: string): Promise<ShiftResponseDto | null> {

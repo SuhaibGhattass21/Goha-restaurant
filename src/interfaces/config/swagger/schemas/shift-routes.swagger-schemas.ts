@@ -129,7 +129,24 @@
  *       200:
  *         description: List of shifts by cashier
  */
-
+/**
+ * @swagger
+ * /shifts/status/{status}:
+ *   get:
+ *     summary: Get shifts by status
+ *     tags: [Shifts]
+ *     parameters:
+ *       - in: path
+ *         name: status
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [opened, closed]
+ *         description: Status of the shift to filter
+ *     responses:
+ *       200:
+ *         description: List of shifts by status
+ */
 /**
  * @swagger
  * /shifts/{id}/summary:

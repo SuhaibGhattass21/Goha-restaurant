@@ -10,7 +10,7 @@ export class CreateUserDto {
     fullName!: string;
 
     @IsNumber()
-    hourRate!: number;
+    hourRate?: number;
 
     @IsString()
     @IsNotEmpty()

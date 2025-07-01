@@ -5,8 +5,9 @@ import type {
     UpdateShiftTypeDTO,
     RequestCloseShiftDTO,
     ApproveCloseShiftDTO,
-} from '@application/dtos/Shift/Shift.dto'
-import { IShiftRepository } from '@domain/repositories/Shift/shift.repository.interface'
+} from '../../../application/dtos/Shift/Shift.dto'
+import { IShiftRepository } from '../../../domain/repositories/Shift/shift.repository.interface'
+import { ShiftStatus } from '../../../domain/enums/Shift.enums'
 
 export class ShiftRepositoryImpl implements IShiftRepository {
     constructor(private repo: Repository<Shift>) { }
@@ -64,6 +65,13 @@ export class ShiftRepositoryImpl implements IShiftRepository {
     async delete(id: string): Promise<boolean> {
         const result = await this.repo.delete(id);
         return result.affected !== 0;
+    }
+
+    async getShiftsByStatus(status: ShiftStatus): Promise<Shift[]> {
+        return this.repo.find({
+            where: { status },
+            relations: ["opened_by", "closed_by", "shiftWorkers"],
+        });
     }
 
     async getShiftSummary(shiftId: string): Promise<any> {

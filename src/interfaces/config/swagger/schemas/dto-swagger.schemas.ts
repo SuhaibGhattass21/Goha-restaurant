@@ -98,24 +98,35 @@ export const swaggerSchemas = {
     },
     CreateProductDTO: {
         type: "object",
-        required: ["name", "price", "category_id"],
+        required: ["name", "category_id"],
         properties: {
             name: {
                 type: "string",
                 description: "Name of the product",
+                example: "Nike Running Shoes"
             },
-            price: {
-                type: "number",
-                format: "decimal",
-                minimum: 0,
-                description: "Price of the product",
+            description: {
+                type: "string",
+                description: "Detailed description of the product",
+                example: "Lightweight and breathable running shoes"
+            },
+            image_url: {
+                type: "string",
+                description: "URL of the product image",
+                example: "https://example.com/images/product1.jpg"
+            },
+            is_active: {
+                type: "boolean",
+                description: "Whether the product is active or visible",
+                example: true
             },
             category_id: {
                 type: "string",
                 format: "uuid",
-                description: "ID of the category to which the product belongs",
-            },
-        },
+                description: "UUID of the product category",
+                example: "9f1b4d8b-8b3a-4a38-bb3c-5e1e0eabb36f"
+            }
+        }
     },
     UpdateProductDTO: {
         type: "object",
@@ -123,20 +134,32 @@ export const swaggerSchemas = {
             name: {
                 type: "string",
                 description: "Updated name of the product",
+                example: "Adidas Sports Shoes"
             },
-            price: {
-                type: "number",
-                format: "decimal",
-                minimum: 0,
-                description: "Updated price of the product",
+            description: {
+                type: "string",
+                description: "Updated description of the product",
+                example: "New collection with enhanced sole grip"
+            },
+            image_url: {
+                type: "string",
+                description: "Updated image URL",
+                example: "https://example.com/images/product2.jpg"
+            },
+            is_active: {
+                type: "boolean",
+                description: "Updated active status of the product",
+                example: false
             },
             category_id: {
                 type: "string",
                 format: "uuid",
-                description: "Updated ID of the category to which the product belongs",
-            },
-        },
+                description: "Updated category UUID",
+                example: "a5d2c1d3-f781-4b3a-9eaa-6bcfbb33df60"
+            }
+        }
     },
+
     CreateProductSizePriceDTO: {
         type: "object",
         required: ["product_id", "size_id", "price"],
@@ -182,7 +205,7 @@ export const swaggerSchemas = {
     },
     CreateShiftDTO: {
         type: "object",
-        required: ["opened_by", "shift_type", "workers"],
+        required: ["opened_by", "shift_type"],
         properties: {
             opened_by: {
                 type: "string",
@@ -258,41 +281,151 @@ export const swaggerSchemas = {
     },
     CreateUserDTO: {
         type: "object",
-        required: ["username", "email", "password"],
+        required: ["username", "fullName", "password"],
         properties: {
             username: {
                 type: "string",
                 description: "Username of the user",
+                example: "suhaib"
             },
-            email: {
+            fullName: {
                 type: "string",
-                format: "email",
-                description: "Email of the user",
+                description: "Full name of the user",
+                example: "Suhaib Tharwat"
+            },
+            hourRate: {
+                type: "number",
+                description: "Hourly rate for the user",
+                example: 50
             },
             password: {
                 type: "string",
                 description: "Password of the user",
+                example: "P@ssw0rd123"
             },
-        },
+            phone: {
+                type: "string",
+                description: "Phone number of the user in international format",
+                example: "+201234567890"
+            },
+            userPermissions: {
+                type: "array",
+                description: "List of user permission UUIDs",
+                items: {
+                    type: "string",
+                    format: "uuid"
+                },
+                example: [
+                    "550e8400-e29b-41d4-a716-446655440000",
+                    "123e4567-e89b-12d3-a456-426614174000"
+                ]
+            }
+        }
     },
+
     UpdateUserDTO: {
         type: "object",
         properties: {
-            username: {
+            fullName: {
                 type: "string",
-                description: "Updated username of the user",
+                description: "Updated full name of the user",
+                example: "Anas Tharwat"
             },
-            email: {
-                type: "string",
-                format: "email",
-                description: "Updated email of the user",
+            hourRate: {
+                type: "number",
+                description: "Updated hourly rate",
+                example: 60
             },
             password: {
                 type: "string",
-                description: "Updated password of the user",
+                description: "Updated password",
+                example: "NewP@ss123"
             },
-        },
+            phone: {
+                type: "string",
+                description: "Updated phone number in international format",
+                example: "+201234567891"
+            },
+            isActive: {
+                type: "boolean",
+                description: "Whether the user is active",
+                example: true
+            },
+            userPermissions: {
+                type: "array",
+                description: "Updated list of user permission UUIDs",
+                items: {
+                    type: "string",
+                    format: "uuid"
+                },
+                example: [
+                    "550e8400-e29b-41d4-a716-446655440000"
+                ]
+            }
+        }
     },
+
+    UserResponseDTO: {
+        type: "object",
+        properties: {
+            id: {
+                type: "string",
+                format: "uuid",
+                description: "Unique identifier of the user",
+                example: "bcb59477-5f41-43e2-810f-8b80b5b7cf43"
+            },
+            username: {
+                type: "string",
+                description: "Username of the user",
+                example: "suhaib"
+            },
+            fullName: {
+                type: "string",
+                description: "Full name of the user",
+                example: "Suhaib Tharwat"
+            },
+            hourRate: {
+                type: "number",
+                description: "Hourly rate of the user",
+                example: 50
+            },
+            phone: {
+                type: "string",
+                description: "Phone number of the user",
+                example: "+201234567890"
+            },
+            createdAt: {
+                type: "string",
+                format: "date-time",
+                description: "User creation timestamp",
+                example: "2025-06-30T10:30:00.000Z"
+            },
+            isActive: {
+                type: "boolean",
+                description: "Whether the user is active",
+                example: true
+            },
+            userPermissions: {
+                type: "array",
+                description: "List of user permission UUIDs",
+                items: {
+                    type: "string",
+                    format: "uuid"
+                },
+                example: [
+                    "550e8400-e29b-41d4-a716-446655440000",
+                    "123e4567-e89b-12d3-a456-426614174000"
+                ]
+            },
+            worker_id: {
+                type: "string",
+                format: "uuid",
+                description: "Associated worker ID (optional)",
+                example: "c8c19f57-e99a-4f62-a0fd-d93f2b2036de"
+            }
+        }
+    },
+
     CreatePermissionDTO: {
         type: "object",
         required: ["name", "description"],

@@ -1,5 +1,5 @@
 import { body, param } from 'express-validator';
-import { ShiftType } from '../../../../domain/enums/Shift.enums';
+import { ShiftType, ShiftStatus } from '../../../../domain/enums/Shift.enums';
 
 export class ShiftValidator {
     static open() {
@@ -32,6 +32,13 @@ export class ShiftValidator {
         ];
     }
 
+    static getByStatus() {
+        return [
+            param("status")
+                .isIn(Object.values(ShiftStatus))
+                .withMessage(`Status must be one of: ${Object.values(ShiftStatus).join(", ")}`),
+        ];
+    }
     static getById() {
         return [param('id').isUUID()];
     }

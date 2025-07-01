@@ -1,5 +1,6 @@
-import { Shift } from '@infrastructure/database/models';
-import { OpenShiftDTO, UpdateShiftTypeDTO, RequestCloseShiftDTO, ApproveCloseShiftDTO } from '@application/dtos/Shift/Shift.dto';
+import { Shift } from '../../../infrastructure/database/models';
+import { ShiftStatus } from '../../../domain/enums/Shift.enums';
+import { OpenShiftDTO, UpdateShiftTypeDTO, RequestCloseShiftDTO, ApproveCloseShiftDTO } from '../../../application/dtos/Shift/Shift.dto';
 
 export interface IShiftRepository {
     create(data: OpenShiftDTO): Promise<Shift>;
@@ -9,6 +10,7 @@ export interface IShiftRepository {
     requestClose(data: RequestCloseShiftDTO): Promise<Shift | null>;
     approveClose(data: ApproveCloseShiftDTO): Promise<Shift | null>;
     delete(id: string): Promise<boolean>;
+    getShiftsByStatus(status: ShiftStatus): Promise<Shift[]>;
     getShiftSummary(shiftId: string): Promise<any>;
     getAllShiftSummaries(): Promise<any[]>;
 }

@@ -1,5 +1,5 @@
 export enum ShiftStatus {
-    OPENED = 'open',
+    OPENED = 'opened',
     CLOSED = 'closed',
 }
 

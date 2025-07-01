@@ -3,9 +3,10 @@ import type {
     UpdateShiftTypeDTO,
     RequestCloseShiftDTO,
     ApproveCloseShiftDTO,
-    ShiftResponseDto
+    ShiftResponseDto,
+    FilterShiftByStatusDto
 } from '@application/dtos/Shift/Shift.dto';
-import { ShiftUseCases } from '@application/use-cases/Shift/shift.use-case';
+import { ShiftUseCases } from '../../../application/use-cases/Shift/shift.use-case';
 
 export class ShiftService {
     constructor(private useCases: ShiftUseCases) { }
@@ -24,6 +25,10 @@ export class ShiftService {
 
     approveClose(dto: ApproveCloseShiftDTO) {
         return this.useCases.approveClose(dto);
+    }
+
+    getShiftsByStatus(dto: FilterShiftByStatusDto) {
+        return this.useCases.getShiftsByStatus(dto.status);
     }
 
     getById(id: string) {
