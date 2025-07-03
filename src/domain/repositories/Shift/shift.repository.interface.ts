@@ -11,6 +11,7 @@ export interface IShiftRepository {
     approveClose(data: ApproveCloseShiftDTO): Promise<Shift | null>;
     delete(id: string): Promise<boolean>;
     getShiftsByStatus(status: ShiftStatus): Promise<Shift[]>;
+    getRequestedCloseShifts(): Promise<Shift[]>;
     getShiftSummary(shiftId: string): Promise<any>;
     getAllShiftSummaries(): Promise<any[]>;
 }

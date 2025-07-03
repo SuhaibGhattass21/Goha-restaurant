@@ -7,6 +7,7 @@ import type {
     FilterShiftByStatusDto
 } from '@application/dtos/Shift/Shift.dto';
 import { ShiftUseCases } from '../../../application/use-cases/Shift/shift.use-case';
+import { Shift } from '../../../infrastructure/database/models/Shift.model';
 
 export class ShiftService {
     constructor(private useCases: ShiftUseCases) { }
@@ -30,6 +31,10 @@ export class ShiftService {
     getShiftsByStatus(dto: FilterShiftByStatusDto) {
         return this.useCases.getShiftsByStatus(dto.status);
     }
+    async getRequestedCloseShifts(): Promise<ShiftResponseDto[]> {
+        const shifts = await this.useCases.getRequestedCloseShifts();
+        return shifts.map(shift => this.toResponseDto(shift));
+    }
 
     getById(id: string) {
         return this.useCases.getById(id);
@@ -49,5 +54,22 @@ export class ShiftService {
 
     delete(id: string) {
         return this.useCases.delete(id);
+    }
+
+    private toResponseDto(shift: Shift): ShiftResponseDto {
+        return {
+            shift_id: shift.shift_id,
+            shift_type: shift.shift_type,
+            status: shift.status,
+            is_closed: shift.is_closed,
+            is_started_by_cashier: shift.is_started_by_cashier,
+            is_close_requested: shift.is_close_requested,
+            start_time: shift.start_time,
+            end_time: shift.end_time,
+            opened_by: shift.opened_by?.id ?? "",
+            closed_by: shift.closed_by?.id ?? "",
+            approved_by_admin_id: shift.approved_by_admin_id?.id ?? "",
+            created_at: shift.created_at,
+        };
     }
 }

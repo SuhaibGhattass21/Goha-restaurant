@@ -36,6 +36,10 @@ export class ShiftUseCases {
         return this.repo.getShiftsByStatus(status);
     }
 
+    async getRequestedCloseShifts(): Promise<Shift[]> {
+        return this.repo.getRequestedCloseShifts();
+    }
+
     async getById(id: string): Promise<ShiftResponseDto | null> {
         const shift = await this.repo.findById(id);
         return shift ? this.mapToDto(shift) : null;

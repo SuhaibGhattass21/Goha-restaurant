@@ -162,6 +162,16 @@ export class ShiftController {
         }
     }
 
+    async getRequestedCloseShifts(req: Request, res: Response): Promise<void> {
+        try {
+            const shifts = await this.shiftService.getRequestedCloseShifts();
+            res.status(200).json(shifts);
+        } catch (error) {
+            console.error("Error getting requested-close shifts:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
     async getShiftSummary(req: Request, res: Response): Promise<void> {
         try {
             const summary = await this.shiftService.getSummary(req.params.id);

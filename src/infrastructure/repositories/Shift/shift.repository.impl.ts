@@ -74,6 +74,14 @@ export class ShiftRepositoryImpl implements IShiftRepository {
         });
     }
 
+    async getRequestedCloseShifts(): Promise<Shift[]> {
+        return this.repo.find({
+            where: { is_close_requested: true },
+            relations: ["opened_by", "closed_by", "approved_by_admin_id", "shiftWorkers"],
+            order: { start_time: "DESC" },
+        });
+    }
+
     async getShiftSummary(shiftId: string): Promise<any> {
         const result = await this.repo.query(`SELECT * FROM shift_summary_view WHERE shift_id = $1`, [shiftId]);
         return result[0] ?? null;

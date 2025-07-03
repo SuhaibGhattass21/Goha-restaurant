@@ -147,6 +147,18 @@
  *       200:
  *         description: List of shifts by status
  */
+
+/**
+ * @swagger
+ * /shifts/close-requested:
+ *   get:
+ *     summary: Get all shifts that have a close request
+ *     tags: [Shifts]
+ *     responses:
+ *       200:
+ *         description: List of close-requested shifts
+ */
+
 /**
  * @swagger
  * /shifts/{id}/summary:
