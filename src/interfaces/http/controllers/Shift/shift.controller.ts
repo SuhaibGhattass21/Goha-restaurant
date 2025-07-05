@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { plainToInstance } from "class-transformer";
 import type { ShiftService } from '../../../../domain/services/Shift/Shift.service';
 import { FilterShiftByStatusDto } from '../../../../application/dtos/Shift/Shift.dto';
+import { ShiftType } from '../../../../domain/enums/Shift.enums';
 
 export class ShiftController {
     constructor(private readonly shiftService: ShiftService) { }
@@ -171,6 +172,29 @@ export class ShiftController {
             res.status(500).json({ message: "Internal server error" });
         }
     }
+
+    async getShiftsByType(req: Request, res: Response): Promise<void> {
+        try {
+            const type = req.params.type as ShiftType;
+            const shifts = await this.shiftService.getShiftsByType(type);
+            res.status(200).json(shifts);
+        } catch (error) {
+            console.error("Error fetching shifts by type:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    async getShiftsByDate(req: Request, res: Response): Promise<void> {
+        try {
+            const date = new Date(req.query.date as string);
+            const shifts = await this.shiftService.getShiftsByDate(date);
+            res.status(200).json(shifts);
+        } catch (error) {
+            console.error("Error fetching shifts by date:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
 
     async getShiftSummary(req: Request, res: Response): Promise<void> {
         try {

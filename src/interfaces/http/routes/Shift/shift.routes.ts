@@ -18,6 +18,8 @@ export class ShiftRoutes {
         this.router.get("/status/:status", ShiftValidator.getByStatus(), this.controller.getShiftsByStatus.bind(this.controller));
         this.router.get("/close-requested", this.controller.getRequestedCloseShifts.bind(this.controller));
         this.router.get('/cashier/:cashierId', ShiftValidator.getByCashier(), this.controller.getShiftsByCashier.bind(this.controller));
+        this.router.get("/type/:type", this.controller.getShiftsByType.bind(this.controller));
+        this.router.get("/by-date", this.controller.getShiftsByDate.bind(this.controller));
         this.router.get('/:id/summary', this.controller.getShiftSummary.bind(this.controller));
         this.router.get('/summaries/all', this.controller.getAllSummaries.bind(this.controller));
         this.router.delete('/:id', ShiftValidator.getById(), this.controller.delete.bind(this.controller));

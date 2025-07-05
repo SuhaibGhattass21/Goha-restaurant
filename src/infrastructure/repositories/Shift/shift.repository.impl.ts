@@ -1,4 +1,4 @@
-import type { Repository } from 'typeorm'
+import { Repository, Between } from 'typeorm'
 import type { Shift } from '@infrastructure/database/models/Shift.model'
 import type {
     OpenShiftDTO,
@@ -7,7 +7,7 @@ import type {
     ApproveCloseShiftDTO,
 } from '../../../application/dtos/Shift/Shift.dto'
 import { IShiftRepository } from '../../../domain/repositories/Shift/shift.repository.interface'
-import { ShiftStatus } from '../../../domain/enums/Shift.enums'
+import { ShiftStatus, ShiftType } from '../../../domain/enums/Shift.enums'
 
 export class ShiftRepositoryImpl implements IShiftRepository {
     constructor(private repo: Repository<Shift>) { }
@@ -79,6 +79,27 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             where: { is_close_requested: true },
             relations: ["opened_by", "closed_by", "approved_by_admin_id", "shiftWorkers"],
             order: { start_time: "DESC" },
+        });
+    }
+
+    async findByType(type: ShiftType): Promise<Shift[]> {
+        return await this.repo.find({
+            where: { shift_type: type },
+            order: { start_time: 'DESC' },
+        });
+    }
+
+    async findByDate(date: Date): Promise<Shift[]> {
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(date);
+        end.setHours(23, 59, 59, 999);
+
+        return await this.repo.find({
+            where: {
+                start_time: Between(start, end),
+            },
+            order: { start_time: 'DESC' },
         });
     }
 

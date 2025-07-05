@@ -7,7 +7,7 @@ import type {
     ShiftResponseDto
 } from '@application/dtos/Shift/Shift.dto';
 import type { Shift } from '@infrastructure/database/models/Shift.model';
-import { ShiftStatus } from '../../../domain/enums/Shift.enums';
+import { ShiftStatus, ShiftType } from '../../../domain/enums/Shift.enums';
 
 export class ShiftUseCases {
     constructor(private repo: IShiftRepository) { }
@@ -53,6 +53,15 @@ export class ShiftUseCases {
     async delete(id: string): Promise<boolean> {
         return await this.repo.delete(id);
     }
+
+    async getShiftsByType(shift_type: ShiftType): Promise<Shift[]> {
+        return this.repo.findByType(shift_type);
+    }
+
+    async getShiftsByDate(date: Date): Promise<Shift[]> {
+        return this.repo.findByDate(date);
+    }
+
 
     async getSummary(id: string): Promise<any> {
         return this.repo.getShiftSummary(id);

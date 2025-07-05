@@ -158,6 +158,41 @@
  *       200:
  *         description: List of close-requested shifts
  */
+/**
+ * @swagger
+ * /shifts/type/{type}:
+ *   get:
+ *     summary: Get shifts by type
+ *     tags: [Shifts]
+ *     parameters:
+ *       - in: path
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [morning, night]
+ *     responses:
+ *       200:
+ *         description: Shifts by type returned
+ */
+
+/**
+ * @swagger
+ * /shifts/by-date:
+ *   get:
+ *     summary: Get shifts by date
+ *     tags: [Shifts]
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Shifts for the specified date
+ */
 
 /**
  * @swagger

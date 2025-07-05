@@ -8,6 +8,7 @@ import type {
 } from '@application/dtos/Shift/Shift.dto';
 import { ShiftUseCases } from '../../../application/use-cases/Shift/shift.use-case';
 import { Shift } from '../../../infrastructure/database/models/Shift.model';
+import { ShiftType } from '../../../domain/enums/Shift.enums';
 
 export class ShiftService {
     constructor(private useCases: ShiftUseCases) { }
@@ -43,6 +44,17 @@ export class ShiftService {
     getByCashierId(cashierId: string) {
         return this.useCases.getByCashierId(cashierId);
     }
+
+    async getShiftsByType(type: ShiftType): Promise<ShiftResponseDto[]> {
+        const shifts = await this.useCases.getShiftsByType(type);
+        return shifts.map(this.toResponseDto);
+    }
+
+    async getShiftsByDate(date: Date): Promise<ShiftResponseDto[]> {
+        const shifts = await this.useCases.getShiftsByDate(date);
+        return shifts.map(this.toResponseDto);
+    }
+
 
     getSummary(id: string) {
         return this.useCases.getSummary(id);
