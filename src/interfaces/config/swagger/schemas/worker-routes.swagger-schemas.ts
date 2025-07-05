@@ -2,7 +2,7 @@
  * @swagger
  * tags:
  *   name: Workers
- *   description: Manage restaurant shift workers
+ *   description: Manage restaurant workers
  */
 
 /**

@@ -223,7 +223,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateShiftWorkerDto'
+ *             $ref: '#/components/schemas/AddShiftWorkerDto'
  *     responses:
  *       201:
  *         description: Shift worker created successfully

@@ -504,7 +504,7 @@ export const swaggerSchemas = {
             },
         },
     },
-    CreateWorkerDTO: {
+    CreateWorkerDto: {
         type: "object",
         required: ["full_name", "status", "base_hourly_rate"],
         properties: {
@@ -544,7 +544,7 @@ export const swaggerSchemas = {
         },
     },
 
-    UpdateWorkerDTO: {
+    UpdateWorkerDto: {
         type: "object",
         properties: {
             full_name: {
@@ -587,7 +587,7 @@ export const swaggerSchemas = {
         },
     },
 
-    WorkerResponseDTO: {
+    WorkerResponseDto: {
         type: "object",
         properties: {
             worker_id: {

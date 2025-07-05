@@ -61,7 +61,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateStockItemDTO'
+ *             $ref: '#/components/schemas/CreateStockItemDto'
  *     responses:
  *       201:
  *         description: Stock item created
@@ -83,7 +83,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateStockItemDTO'
+ *             $ref: '#/components/schemas/UpdateStockItemDto'
  *     responses:
  *       200:
  *         description: Stock item updated
@@ -145,7 +145,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateStockTransactionDTO'
+ *             $ref: '#/components/schemas/CreateStockTransactionDto'
  *     responses:
  *       201:
  *         description: Stock transaction created successfully
@@ -287,7 +287,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateStockTransactionDTO'
+ *             $ref: '#/components/schemas/UpdateStockTransactionDto'
  *     responses:
  *       200:
  *         description: Stock transaction updated

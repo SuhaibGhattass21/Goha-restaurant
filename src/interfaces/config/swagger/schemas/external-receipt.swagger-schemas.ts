@@ -16,7 +16,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateExternalReceiptDTO'
+ *             $ref: '#/components/schemas/CreateExternalReceiptDto'
  *     responses:
  *       201:
  *         description: External receipt created successfully
@@ -39,7 +39,7 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/ExternalReceiptResponseDTO'
+ *                 $ref: '#/components/schemas/ExternalReceiptResponseDto'
  *       500:
  *         description: Internal server error
  *//**
@@ -62,7 +62,7 @@
 *         content:
 *           application/json:
 *             schema:
-*               $ref: '#/components/schemas/ExternalReceiptResponseDTO'
+*               $ref: '#/components/schemas/ExternalReceiptResponseDto'
 *       404:
 *         description: External receipt not found
 *       500:

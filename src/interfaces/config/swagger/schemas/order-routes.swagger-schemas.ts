@@ -16,7 +16,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateOrderDTO'
+ *             $ref: '#/components/schemas/CreateOrderDto'
  *     responses:
  *       201:
  *         description: Order created successfully
@@ -161,7 +161,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateOrderDTO'
+ *             $ref: '#/components/schemas/UpdateOrderDto'
  *     responses:
  *       200:
  *         description: Order updated
@@ -235,7 +235,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateOrderItemDTO'
+ *             $ref: '#/components/schemas/CreateOrderItemDto'
  *     responses:
  *       201:
  *         description: Order item created
@@ -337,7 +337,7 @@
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateCancelledOrderDTO'
+ *             $ref: '#/components/schemas/CreateCancelledOrderDto'
  *     responses:
  *       201:
  *         description: Cancelled order recorded
