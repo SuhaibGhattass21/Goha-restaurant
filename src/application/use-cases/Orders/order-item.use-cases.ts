@@ -111,6 +111,7 @@ export class OrderItemUseCases {
           size_name: orderItem.product_size.size?.size_name || "",
           price: Number(orderItem.product_size.price),
           category_name: orderItem.product_size.product?.category?.name || "",
+          category_id: orderItem.product_size.product?.category?.category_id || "",
           product_description: orderItem.product_size.product?.description,
           category_description: orderItem.product_size.product?.category?.description,
         }

@@ -115,6 +115,9 @@ export class ProductSizeInfoDto {
   @IsString()
   category_name!: string
 
+  @IsUUID()
+  category_id!: string
+
   @IsOptional()
   @IsString()
   product_description?: string
