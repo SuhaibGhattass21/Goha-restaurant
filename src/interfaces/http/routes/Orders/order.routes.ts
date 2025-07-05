@@ -67,9 +67,9 @@ export class OrderRoutes {
     // PUT /orders/:id - Update order
     this.router.put("/:id", OrderValidator.updateOrder(), this.orderController.updateOrder.bind(this.orderController))
 
-    // PATCH /orders/:id/status - Update order status
+    // PATCH /orders/:id/:status - Update order status
     this.router.patch(
-      "/:id/status",
+      "/:id/:status",
       OrderValidator.updateOrderStatus(),
       this.orderController.updateOrderStatus.bind(this.orderController),
     )
