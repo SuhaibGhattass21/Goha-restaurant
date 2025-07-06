@@ -1,6 +1,7 @@
-import type { CreateOrderDto, UpdateOrderDto, OrderStatsDto } from "../../../application/dtos/Orders/order.dto"
-import type { Order } from "../../../infrastructure/database/models"
-import type { OrderStatus, OrderType } from "../../enums/Order.enums"
+import { CreateOrderDto, UpdateOrderDto, OrderStatsDto } from "../../../application/dtos/Orders/order.dto"
+import { Order } from "../../../infrastructure/database/models"
+import { OrderStatus, OrderType } from "../../enums/Order.enums"
+import { ShiftType } from "../../enums/Shift.enums"
 
 export interface IOrderRepository {
   create(orderData: Omit<CreateOrderDto, "items">): Promise<Order>
@@ -20,5 +21,6 @@ export interface IOrderRepository {
   updateStatus(id: string, status: OrderStatus): Promise<Order | null>
   delete(id: string): Promise<boolean>
   getOrderStats(shiftId?: string, startDate?: Date, endDate?: Date): Promise<OrderStatsDto>
+  getOrdersByShiftTypeAndDate(shiftType: ShiftType, date: string): Promise<Order[]>;
   calculateOrderTotal(orderId: string): Promise<number>
 }

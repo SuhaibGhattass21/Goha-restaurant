@@ -1,8 +1,10 @@
-import type { Repository } from "typeorm"
+import { Repository, Between } from "typeorm"
 import type { Order } from "../../database/models/Order.model"
 import type { CreateOrderDto, UpdateOrderDto, OrderStatsDto } from "../../../application/dtos/Orders/order.dto"
 import type { IOrderRepository } from "../../../domain/repositories/Orders/order.repository.interface"
 import type { OrderStatus, OrderType } from "../../../domain/enums/Order.enums"
+import type { ShiftType } from "../../../domain/enums/Shift.enums"
+import { startOfDay, endOfDay } from "date-fns"
 
 export class OrderRepositoryImpl implements IOrderRepository {
   constructor(private orderRepository: Repository<Order>) { }
@@ -156,6 +158,21 @@ export class OrderRepositoryImpl implements IOrderRepository {
     stats.average_order_value = stats.completed_orders > 0 ? stats.total_revenue / stats.completed_orders : 0
 
     return stats
+  }
+
+  async getOrdersByShiftTypeAndDate(shiftType: ShiftType, dateStr: string): Promise<Order[]> {
+    const start = startOfDay(new Date(dateStr));
+    const end = endOfDay(new Date(dateStr));
+
+    return this.orderRepository.find({
+      where: {
+        shift: {
+          shift_type: shiftType,
+          start_time: Between(start, end),
+        },
+      },
+      relations: ['shift', 'cashier', 'items', 'items.product_size'],
+    });
   }
 
   async calculateOrderTotal(orderId: string): Promise<number> {

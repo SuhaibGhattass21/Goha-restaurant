@@ -2,9 +2,11 @@ import type { Request, Response } from "express"
 import { validationResult } from "express-validator"
 import type { OrderUseCases } from "../../../../application/use-cases/Orders/order.use-cases"
 import type { OrderStatus, OrderType } from "../../../../domain/enums/Order.enums"
+import { plainToInstance } from "class-transformer"
+import { FilterOrdersByShiftTypeAndDateDto } from "../../../../application/dtos/Orders/order.dto"
 
 export class OrderController {
-  constructor(private orderUseCases: OrderUseCases) {}
+  constructor(private orderUseCases: OrderUseCases) { }
 
   async createOrder(req: Request, res: Response): Promise<void> {
     try {
@@ -225,6 +227,21 @@ export class OrderController {
         message: "Internal server error",
         error: error.message,
       })
+    }
+  }
+
+  async getOrdersByShiftTypeAndDate(req: Request, res: Response): Promise<void> {
+    try {
+      const dto = plainToInstance(FilterOrdersByShiftTypeAndDateDto, {
+        shift_type: req.query.shift_type,
+        date: req.query.date,
+      });
+
+      const orders = await this.orderUseCases.getOrdersByShiftTypeAndDate(dto);
+      res.status(200).json(orders);
+    } catch (error) {
+      console.error("Error in getOrdersByShiftTypeAndDate:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   }
 

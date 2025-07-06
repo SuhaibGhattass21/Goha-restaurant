@@ -13,7 +13,7 @@ import {
 import { Type } from "class-transformer"
 import { OrderStatus, OrderType } from "../../../domain/enums/Order.enums"
 import { CreateOrderItemDto, OrderItemResponseDto } from "./order-item.dto"
-
+import { ShiftType } from "../../../domain/enums/Shift.enums"
 export class CreateOrderDto {
   @IsUUID()
   cashier_id!: string
@@ -205,4 +205,12 @@ export class OrderStatsDto {
 
   @IsNumber({ maxDecimalPlaces: 2 })
   average_order_value!: number
+}
+
+export class FilterOrdersByShiftTypeAndDateDto {
+  @IsEnum(ShiftType)
+  shift_type!: ShiftType;
+
+  @IsDateString()
+  date!: string; // e.g., "2024-06-09"
 }

@@ -9,6 +9,7 @@ import type {
   UpdateOrderDto,
   OrderSummaryDto,
   OrderStatsDto,
+  FilterOrdersByShiftTypeAndDateDto,
 } from "../../../application/dtos/Orders/order.dto"
 import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums" // Declare the variable here
 import type { CancelledOrderUseCases } from "./cancelled-order.use-cases"
@@ -116,6 +117,10 @@ export class OrderUseCases {
       page,
       limit,
     }
+  }
+
+  async getOrdersByShiftTypeAndDate(dto: FilterOrdersByShiftTypeAndDateDto) {
+    return this.orderRepository.getOrdersByShiftTypeAndDate(dto.shift_type, dto.date);
   }
 
   async getAllOrders(page = 1, limit = 10): Promise<OrderListResponseDto> {

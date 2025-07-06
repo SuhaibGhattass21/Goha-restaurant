@@ -64,6 +64,12 @@ export class OrderRoutes {
     // GET /orders/:id - Get order by ID
     this.router.get("/:id", OrderValidator.getOrderById(), this.orderController.getOrderById.bind(this.orderController))
 
+    // interfaces/http/routes/Orders/order.routes.ts
+    this.router.get(
+      '/shift-type/date',
+      this.orderController.getOrdersByShiftTypeAndDate.bind(this.orderController),
+    );
+
     // PUT /orders/:id - Update order
     this.router.put("/:id", OrderValidator.updateOrder(), this.orderController.updateOrder.bind(this.orderController))
 

@@ -166,6 +166,29 @@
  *       200:
  *         description: Order updated
  */
+/**
+ * @swagger
+ * /orders/shift-type/date:
+ *   get:
+ *     summary: Get orders by shift type and date
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: query
+ *         name: shift_type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [morning, night]
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Orders retrieved by shift type and date
+ */
 
 /**
  * @swagger
