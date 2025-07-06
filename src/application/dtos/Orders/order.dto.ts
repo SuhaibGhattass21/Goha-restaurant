@@ -64,6 +64,31 @@ export class UpdateOrderDto {
   customer_phone?: string
 }
 
+export class CashierInfoDto {
+  @IsUUID()
+  id!: string
+
+  @IsString()
+  username!: string
+
+  @IsString()
+  fullName!: string
+}
+
+export class ShiftInfoDto {
+  @IsUUID()
+  shift_id!: string
+
+  @IsEnum(OrderType)
+  shift_type!: string
+
+  @IsDateString()
+  start_time!: string
+
+  @IsString()
+  status!: string
+}
+
 export class OrderResponseDto {
   @IsUUID()
   order_id!: string
@@ -155,31 +180,6 @@ export class OrderSummaryDto {
 
   @IsInt()
   items_count!: number
-}
-
-export class CashierInfoDto {
-  @IsUUID()
-  id!: string
-
-  @IsString()
-  username!: string
-
-  @IsString()
-  fullName!: string
-}
-
-export class ShiftInfoDto {
-  @IsUUID()
-  shift_id!: string
-
-  @IsEnum(OrderType)
-  shift_type!: string
-
-  @IsDateString()
-  start_time!: string
-
-  @IsString()
-  status!: string
 }
 
 // Order Statistics DTOs

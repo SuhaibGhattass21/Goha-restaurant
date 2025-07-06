@@ -47,6 +47,34 @@ export class UpdateOrderItemDto {
   special_instructions?: string
 }
 
+export class ProductSizeInfoDto {
+  @IsUUID()
+  product_size_id!: string
+
+  @IsString()
+  product_name!: string
+
+  @IsString()
+  size_name!: string
+
+  @IsNumber({ maxDecimalPlaces: 2 })
+  price!: number
+
+  @IsString()
+  category_name!: string
+
+  @IsUUID()
+  category_id!: string
+
+  @IsOptional()
+  @IsString()
+  product_description?: string
+
+  @IsOptional()
+  @IsString()
+  category_description?: string
+}
+
 export class OrderItemResponseDto {
   @IsUUID()
   order_item_id!: string
@@ -99,34 +127,6 @@ export class OrderItemListResponseDto {
   limit!: number
 }
 
-export class ProductSizeInfoDto {
-  @IsUUID()
-  product_size_id!: string
-
-  @IsString()
-  product_name!: string
-
-  @IsString()
-  size_name!: string
-
-  @IsNumber({ maxDecimalPlaces: 2 })
-  price!: number
-
-  @IsString()
-  category_name!: string
-
-  @IsUUID()
-  category_id!: string
-
-  @IsOptional()
-  @IsString()
-  product_description?: string
-
-  @IsOptional()
-  @IsString()
-  category_description?: string
-}
-
 // OrderItemExtra DTOs - FIXED: Using correct field name
 export class CreateOrderItemExtraDto {
   @IsUUID()
@@ -135,6 +135,20 @@ export class CreateOrderItemExtraDto {
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   price!: number
+}
+
+export class CategoryExtraInfoDto {
+  @IsUUID()
+  extra_id!: string // Matches your CategoryExtra model
+
+  @IsString()
+  name!: string
+
+  @IsNumber({ maxDecimalPlaces: 2 })
+  price!: number
+
+  @IsString()
+  category_name!: string
 }
 
 export class OrderItemExtraResponseDto {
@@ -153,16 +167,3 @@ export class OrderItemExtraResponseDto {
   price!: number
 }
 
-export class CategoryExtraInfoDto {
-  @IsUUID()
-  extra_id!: string // Matches your CategoryExtra model
-
-  @IsString()
-  name!: string
-
-  @IsNumber({ maxDecimalPlaces: 2 })
-  price!: number
-
-  @IsString()
-  category_name!: string
-}
