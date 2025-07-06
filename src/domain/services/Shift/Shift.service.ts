@@ -73,6 +73,7 @@ export class ShiftService {
             shift_id: shift.shift_id,
             shift_type: shift.shift_type,
             status: shift.status,
+            intial_balance: shift.initial_balance,
             is_closed: shift.is_closed,
             is_started_by_cashier: shift.is_started_by_cashier,
             is_close_requested: shift.is_close_requested,

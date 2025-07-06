@@ -29,6 +29,9 @@ export class Shift {
     @Column({ type: "enum", default: ShiftStatus.OPENED, enum: ShiftStatus })
     status!: ShiftStatus;
 
+    @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+    initial_balance!: number;
+
     @ManyToOne(() => User, { onDelete: "CASCADE" })
     @JoinColumn({ name: "opened_by" })
     opened_by!: User;

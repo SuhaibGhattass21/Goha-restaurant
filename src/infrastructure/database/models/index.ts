@@ -18,3 +18,4 @@ export { User } from "./user.model";
 export { Permissions } from "./userPersmissions.model";
 export { Worker } from "./Worker.model";
 export { CancelledOrder } from "./CancelledOrder.model";
+export { Expense } from "./Expense.model"

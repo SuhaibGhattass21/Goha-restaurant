@@ -1,14 +1,13 @@
 export enum StockItemType {
-    INGREDIENT = 'ingredient',
-    EQUIPMENT = 'equipment',
-    MATERIAL = 'material',
-    VEGETABLE = 'vegetable',
-    FRUIT = 'fruit',
-    MEAT = 'meat',
-    CHICKEN = 'chicken',
-    FISH = 'fish',
-    DRINK = 'drink',
-    OTHER = 'other'
+    INGREDIENT = 'مكونات',
+    EQUIPMENT = 'ادوات',
+    VEGETABLE = 'خضراوات',
+    FRUIT = 'فاكهة',
+    MEAT = 'لحم',
+    CHICKEN = 'فراخ',
+    FISH = 'سمك',
+    DRINK = 'مشروبات',
+    OTHER = 'اخري'
 }
 
 export enum StockItemStatus {

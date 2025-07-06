@@ -8,6 +8,7 @@ import {
     IsNumber,
     IsBoolean,
     IsDate,
+    Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ShiftType } from '../../../domain/enums/Shift.enums';
@@ -20,6 +21,10 @@ export class OpenShiftDTO {
 
     @IsEnum(ShiftType)
     shift_type!: ShiftType;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0)
+    intial_balance!: number;
 
     @IsArray()
     @ValidateNested({ each: true })
@@ -68,6 +73,10 @@ export class ShiftResponseDto {
 
     @IsEnum(ShiftStatus)
     status!: ShiftStatus;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0)
+    intial_balance!: number;
 
     @IsBoolean()
     is_closed!: boolean;

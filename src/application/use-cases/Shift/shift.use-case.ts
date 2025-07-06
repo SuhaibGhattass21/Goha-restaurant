@@ -76,6 +76,7 @@ export class ShiftUseCases {
             shift_id: shift.shift_id,
             shift_type: shift.shift_type,
             status: shift.status,
+            intial_balance: shift.initial_balance,
             start_time: shift.start_time,
             end_time: shift.end_time,
             is_closed: shift.is_closed,

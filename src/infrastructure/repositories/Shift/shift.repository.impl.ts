@@ -15,6 +15,8 @@ export class ShiftRepositoryImpl implements IShiftRepository {
     async create(data: OpenShiftDTO): Promise<Shift> {
         const shift = this.repo.create({
             shift_type: data.shift_type,
+            initial_balance: data.intial_balance,
+            status: ShiftStatus.OPENED,
             start_time: new Date(),
             end_time: new Date(),
             opened_by: { id: data.opened_by } as any,
