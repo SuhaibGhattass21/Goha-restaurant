@@ -15,8 +15,11 @@ export class Expense {
     @PrimaryGeneratedColumn('uuid')
     expense_id: string = uuidv4().toString();
 
-    @Column({ type: 'text' })
-    description!: string;
+    @Column({ type: "text" })
+    title!: string;
+
+    @Column({ type: "text", nullable: true })
+    description?: string;
 
     @Column({ type: 'numeric', precision: 10, scale: 2 })
     amount!: number;

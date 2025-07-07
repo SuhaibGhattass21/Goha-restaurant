@@ -1139,5 +1139,59 @@ export const swaggerSchemas = {
             is_printed: { type: "boolean" },
             notes: { type: "string" },
         },
+    },
+
+    CreateExpenseDTO: {
+        type: "object",
+        required: ["title", "amount", "created_by", "shift_id"],
+        properties: {
+            title: {
+                type: "string",
+                description: "Title or description of the expense"
+            },
+            amount: {
+                type: "number",
+                format: "decimal",
+                description: "Amount spent"
+            },
+            created_by: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the user (admin) who recorded the expense"
+            },
+            shift_id: {
+                type: "string",
+                format: "uuid",
+                description: "Associated shift ID"
+            }
+        }
+    },
+
+    UpdateExpenseDTO: {
+        type: "object",
+        properties: {
+            title: {
+                type: "string",
+                description: "Updated title of the expense"
+            },
+            amount: {
+                type: "number",
+                format: "decimal",
+                description: "Updated amount"
+            }
+        }
+    },
+
+    ExpenseResponseDTO: {
+        type: "object",
+        properties: {
+            expense_id: { type: "string", format: "uuid" },
+            title: { type: "string" },
+            amount: { type: "number", format: "decimal" },
+            created_by: { type: "string", format: "uuid" },
+            shift_id: { type: "string", format: "uuid" },
+            created_at: { type: "string", format: "date-time" }
+        }
     }
+
 };

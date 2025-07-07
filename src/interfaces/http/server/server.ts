@@ -74,7 +74,12 @@ import { ExternalReceiptController } from "../controllers/Orders/external-receip
 import { ExternalReceiptRoutes } from "../routes/Orders/external-receipt.routes"
 import { ExternalReceiptRepositoryImpl } from "../../../infrastructure/repositories/Orders/external-receipt.repository.impl"
 import { ExternalReceiptUseCases } from "../../../application/use-cases/Orders/external-receipt.use-case"
-import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker, ShiftWorker, StockItem, StockTransaction, OrderItem, Order, CancelledOrder, OrderItemExtra, ExternalReceipt } from '../../../infrastructure/database/models';
+import { ExpenseService } from '../../../domain/services/Shift/Expense.service';
+import { ExpenseController } from '../controllers/Shift/expense.controller';
+import { ExpenseRoutes } from '../routes/Shift/expense.routes';
+import { ExpenseUseCases } from '../../../application/use-cases/Shift/expense.use-case';
+import { ExpenseRepositoryImpl } from '../../../infrastructure/repositories/Shift/expense.repository.impl';
+import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker, ShiftWorker, StockItem, StockTransaction, OrderItem, Order, CancelledOrder, OrderItemExtra, ExternalReceipt, Expense } from '../../../infrastructure/database/models';
 import { AuthController } from '../controllers/auth.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { AuthRoutes } from '../routes/auth.routes';
@@ -258,6 +263,13 @@ export class Server {
       const externalReceiptController = new ExternalReceiptController(externalReceiptUseCases)
       const externalReceiptRoutes = new ExternalReceiptRoutes(externalReceiptController)
 
+      // Expense module
+      const expenseRepository = new ExpenseRepositoryImpl(AppDataSource.getRepository(Expense))
+      const expenseUseCases = new ExpenseUseCases(expenseRepository)
+      const expenseService = new ExpenseService(expenseUseCases)
+      const expenseController = new ExpenseController(expenseService)
+      const expenseRoutes = new ExpenseRoutes(expenseController)
+
       return {
         authRoutes,
         categoryRoutes,
@@ -275,7 +287,8 @@ export class Server {
         orderRoutes,
         orderItemRoutes,
         cancelledOrderRoutes,
-        externalReceiptRoutes
+        externalReceiptRoutes,
+        expenseRoutes
       }
     } catch (error) {
       console.error("Error initializing dependencies:", error)
