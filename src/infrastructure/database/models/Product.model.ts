@@ -27,10 +27,10 @@ export class Product {
     @Column({ type: "boolean", default: true })
     is_active: boolean = true;
 
-    @ManyToOne(() => Category, (category) => category.products, { onDelete: "CASCADE" })
+    @ManyToOne(() => Category, (category: Category) => category.products, { onDelete: "CASCADE" })
     @JoinColumn({ name: "category_id" })
     category!: Category;
 
-    @OneToMany(() => ProductSizePrice, (psp) => psp.product, { cascade: true, orphanedRowAction: 'delete' })
+    @OneToMany(() => ProductSizePrice, (psp: ProductSizePrice) => psp.product, { onDelete: "CASCADE" })
     sizePrices!: ProductSizePrice[];
 }
