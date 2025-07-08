@@ -71,7 +71,7 @@ export const swaggerSchemas = {
         type: "object",
         required: ["name", "category_id"],
         properties: {
-            name: {
+            size_name: {
                 type: "string",
                 description: "Name of the category size",
             },
@@ -85,7 +85,7 @@ export const swaggerSchemas = {
     UpdateCategorySizeDTO: {
         type: "object",
         properties: {
-            name: {
+            size_name: {
                 type: "string",
                 description: "Updated name of the category size",
             },
