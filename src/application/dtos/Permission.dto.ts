@@ -1,4 +1,4 @@
-import { IsString, IsUUID, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsUUID, IsOptional, IsBoolean, IsArray, IsObject } from 'class-validator';
 /**
  * @swagger
  * components:
@@ -56,9 +56,6 @@ export class CreatePermissionDto {
     @IsOptional()
     @IsString()
     description?: string;
-
-    @IsUUID()
-    granted_by!: string;
 }
 
 export class UpdatePermissionDto {
@@ -86,11 +83,105 @@ export class PermissionResponseDto {
     @IsString()
     description?: string;
 
+    created_at!: Date;
+}
+
+export class AssignPermissionsDto {
+    @IsUUID()
+    userId!: string;
+
+    @IsArray()
+    @IsUUID('all', { each: true })
+    permissionIds!: string[];
+
+    @IsUUID()
+    grantedBy!: string;
+}
+
+export class RevokePermissionsDto {
+    @IsUUID()
+    userId!: string;
+
+    @IsArray()
+    @IsUUID('all', { each: true })
+    permissionIds!: string[];
+}
+
+export class CheckMultiplePermissionsDto {
+    @IsArray()
+    @IsString({ each: true })
+    permissionNames!: string[];
+}
+
+export class BatchAssignPermissionDto {
+    @IsUUID()
+    permissionId!: string;
+
+    @IsArray()
+    @IsUUID('all', { each: true })
+    userIds!: string[];
+
     @IsUUID()
     granted_by!: string;
+}
+
+export class UserPermissionsResponseDto {
+    @IsArray()
+    @IsString({ each: true })
+    permissions!: string[];
+}
+
+export class PermissionCheckResponseDto {
+    @IsBoolean()
+    hasPermission!: boolean;
+}
+
+export class MultiplePermissionCheckResponseDto {
+    @IsObject()
+    permissions!: Record<string, boolean>;
+}
+
+export class UserPermissionDetailDto {
+    @IsUUID()
+    id!: string;
+
+    @IsString()
+    name!: string;
+
+    @IsOptional()
+    @IsString()
+    description?: string;
 
     granted_at!: Date;
 
+    @IsString()
+    granted_by_name!: string;
+
     @IsBoolean()
     is_revoked!: boolean;
+}
+
+export class UserWithPermissionDto {
+    @IsUUID()
+    id!: string;
+
+    @IsString()
+    username!: string;
+
+    @IsString()
+    fullName!: string;
+
+    granted_at!: Date;
+
+    @IsString()
+    granted_by_name!: string;
+}
+
+export class PermissionCheckResultDto {
+    @IsBoolean()
+    hasAll!: boolean;
+
+    @IsArray()
+    @IsString({ each: true })
+    missing!: string[];
 }

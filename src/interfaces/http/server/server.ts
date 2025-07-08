@@ -79,7 +79,7 @@ import { ExpenseController } from '../controllers/Shift/expense.controller';
 import { ExpenseRoutes } from '../routes/Shift/expense.routes';
 import { ExpenseUseCases } from '../../../application/use-cases/Shift/expense.use-case';
 import { ExpenseRepositoryImpl } from '../../../infrastructure/repositories/Shift/expense.repository.impl';
-import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker, ShiftWorker, StockItem, StockTransaction, OrderItem, Order, CancelledOrder, OrderItemExtra, ExternalReceipt, Expense } from '../../../infrastructure/database/models';
+import { Category, CategoryExtra, CategorySize, Product, ProductSizePrice, Shift, Permissions, User, Worker, ShiftWorker, StockItem, StockTransaction, OrderItem, Order, CancelledOrder, OrderItemExtra, ExternalReceipt, Expense, UserPermission } from '../../../infrastructure/database/models';
 import { AuthController } from '../controllers/auth.controller';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { AuthRoutes } from '../routes/auth.routes';
@@ -139,6 +139,7 @@ export class Server {
       const stockItemRepo = AppDataSource.getRepository(StockItem)
       const shiftRepo = AppDataSource.getRepository(Shift)
       const permissionRepo = AppDataSource.getRepository(Permissions)
+      const userPermissionRepo = AppDataSource.getRepository(UserPermission)
       const userRepo = AppDataSource.getRepository(User)
       const workerRepo = AppDataSource.getRepository(Worker)
       const shiftWorkerRepo = AppDataSource.getRepository(ShiftWorker)
@@ -210,7 +211,7 @@ export class Server {
       const userRoutes = new UserRoutes(userController)
 
       // Setup Permission module
-      const permissionRepository = new PermissionRepositoryImpl(permissionRepo);
+      const permissionRepository = new PermissionRepositoryImpl(permissionRepo, userPermissionRepo, userRepo);
       const permissionUseCases = new PermissionUseCases(permissionRepository);
       const permissionService = new PermissionService(permissionUseCases);
       const permissionController = new PermissionController(permissionService);

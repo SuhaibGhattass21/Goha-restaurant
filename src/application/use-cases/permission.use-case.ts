@@ -1,5 +1,5 @@
-import { CreatePermissionDto, PermissionResponseDto, UpdatePermissionDto } from '../dtos/Permission.dto';
-import { Permissions } from '../../infrastructure/database/models/userPersmissions.model';
+import { AssignPermissionsDto, CreatePermissionDto, PermissionResponseDto, UpdatePermissionDto, BatchAssignPermissionDto, CheckMultiplePermissionsDto, UserPermissionDetailDto, UserPermissionsResponseDto, PermissionCheckResponseDto, MultiplePermissionCheckResponseDto, PermissionCheckResultDto } from '../dtos/Permission.dto';
+import { Permissions } from '../../infrastructure/database/models/permissions.model';
 import { IPermissionRepository } from '../../domain/repositories/permission.repository.interface';
 
 export class PermissionUseCases {
@@ -32,22 +32,135 @@ export class PermissionUseCases {
         return this.permissionRepository.delete(id);
     }
 
+    async assignPermissionsToUser(userId: string, permissionIds: string[], grantedBy: string): Promise<void> {
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
+
+        if (!permissionIds || permissionIds.length === 0) {
+            throw new Error('At least one permission ID is required');
+        }
+
+        if (!grantedBy) {
+            throw new Error('Granted by user ID is required');
+        }
+
+        for (const permissionId of permissionIds) {
+            const permission = await this.permissionRepository.findById(permissionId);
+            if (!permission) {
+                throw new Error(`Permission with id ${permissionId} not found`);
+            }
+        }
+
+        return this.permissionRepository.assignPermissionsToUser(userId, permissionIds, grantedBy);
+    }
+
+    async revokePermissionsFromUser(userId: string, permissionIds: string[]): Promise<void> {
+
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
+        if (!permissionIds || permissionIds.length === 0) {
+            throw new Error('At least one permission ID is required');
+        }
+
+        for (const permissionId of permissionIds) {
+            const permission = await this.permissionRepository.findById(permissionId);
+            if (!permission) {
+                throw new Error(`Permission with id ${permissionId} not found`);
+            }
+        }
+
+        return this.permissionRepository.revokePermissionsFromUser(userId, permissionIds);
+    }
+
+    async getUserPermissions(userId: string): Promise<string[]> {
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
+
+        return this.permissionRepository.getUserPermissions(userId);
+    }
+
+    async checkUserHasPermission(userId: string, permissionName: string): Promise<boolean> {
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
+        if (!permissionName) {
+            throw new Error('Permission name is required');
+        }
+        const permission = await this.permissionRepository.findByName(permissionName);
+        if (!permission) {
+            return false;
+        }
+
+        return this.permissionRepository.isPermissionAssignedToUser(userId, permission.id);
+    }
+
+    async getAllPermissionsForUser(userId: string): Promise<any[]> {
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
+        return this.permissionRepository.getAllPermissionsForUser(userId);
+    }
+
+    async getAllUsersWithPermission(permissionId: string): Promise<any[]> {
+        if (!permissionId) {
+            throw new Error('Permission ID is required');
+        }
+        const permission = await this.permissionRepository.findById(permissionId);
+        if (!permission) {
+            throw new Error(`Permission with id ${permissionId} not found`);
+        }
+
+        return this.permissionRepository.getAllUsersWithPermission(permissionId);
+    }
+
+    async checkMultiplePermissions(userId: string, permissionNames: string[]): Promise<{
+        hasAll: boolean;
+        missing: string[];
+    }> {
+        const userPermissions = await this.permissionRepository.getUserPermissions(userId);
+        const userPermissionsSet = new Set(userPermissions);
+
+        const missing = permissionNames.filter(name => !userPermissionsSet.has(name));
+
+        return {
+            hasAll: missing.length === 0,
+            missing
+        };
+    }
+
+    async batchAssignPermission(permissionId: string, userIds: string[], grantedBy: string): Promise<void> {
+
+        if (!permissionId) {
+            throw new Error('Permission ID is required');
+        }
+
+        if (!userIds || userIds.length === 0) {
+            throw new Error('At least one user ID is required');
+        }
+
+        if (!grantedBy) {
+            throw new Error('Granted by user ID is required');
+        }
+
+        const permission = await this.permissionRepository.findById(permissionId);
+        if (!permission) {
+            throw new Error(`Permission with id ${permissionId} not found`);
+        }
+
+        for (const userId of userIds) {
+            await this.permissionRepository.assignPermissionsToUser(userId, [permissionId], grantedBy);
+        }
+    }
+
     private mapToDto(permission: Permissions): PermissionResponseDto {
         return {
             id: permission.id,
             name: permission.name,
             description: permission.description,
-            granted_by: permission.granted_by.id,
-            granted_at: permission.granted_at,
-            is_revoked: permission.is_revoked,
+            created_at: permission.created_at,
         };
-    }
-
-    async getPermissionsForAdmin(adminId: string): Promise<any[]> {
-        return this.permissionRepository.getPermissionsForAdmin(adminId);
-    }
-
-    async getPermissionsForShift(shiftId: string): Promise<any[]> {
-        return this.permissionRepository.getPermissionsForShift(shiftId);
     }
 }

@@ -1,4 +1,4 @@
-import { Permissions } from '../../infrastructure/database/models/userPersmissions.model';
+import { Permissions } from '../../infrastructure/database/models/permissions.model';
 import { CreatePermissionDto, UpdatePermissionDto } from '../../application/dtos/Permission.dto';
 
 export interface IPermissionRepository {
@@ -8,6 +8,10 @@ export interface IPermissionRepository {
     update(id: string, data: UpdatePermissionDto): Promise<Permissions | null>;
     delete(id: string): Promise<boolean>;
     findAll(): Promise<Permissions[]>;
-    getPermissionsForAdmin(adminId: string): Promise<any[]>;
-    getPermissionsForShift(shiftId: string): Promise<any[]>;
+    assignPermissionsToUser(userId: string, permissions: string[], grantedBy: string, isRevoked?: boolean): Promise<void>;
+    revokePermissionsFromUser(userId: string, permissions: string[]): Promise<void>;
+    getUserPermissions(userId: string): Promise<string[]>;
+    isPermissionAssignedToUser(userId: string, permissionId: string): Promise<boolean>;
+    getAllPermissionsForUser(userId: string): Promise<any[]>;
+    getAllUsersWithPermission(permissionId: string): Promise<any[]>;
 }
