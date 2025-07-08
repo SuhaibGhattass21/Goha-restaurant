@@ -1018,6 +1018,8 @@ export const swaggerSchemas = {
             order_id: { type: "string", format: "uuid" },
             product_size: { $ref: "#/components/schemas/ProductSizeInfoDto" },
             quantity: { type: "integer", minimum: 1 },
+            category_id: { type: "string", format: "uuid" },
+            category_name: { type: "string" },
             unit_price: { type: "number", format: "decimal" },
             special_instructions: { type: "string" },
             extras: {

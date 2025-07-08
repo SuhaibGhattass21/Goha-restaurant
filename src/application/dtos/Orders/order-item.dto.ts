@@ -63,9 +63,6 @@ export class ProductSizeInfoDto {
   @IsString()
   category_name!: string
 
-  @IsUUID()
-  category_id!: string
-
   @IsOptional()
   @IsString()
   product_description?: string
@@ -90,6 +87,12 @@ export class OrderItemResponseDto {
   @IsInt()
   @Min(1)
   quantity!: number
+
+  @IsUUID()
+  category_id!: string;
+
+  @IsString()
+  category_name!: string;
 
   @IsNumber({ maxDecimalPlaces: 2 })
   unit_price!: number
