@@ -3,7 +3,7 @@ import { AuthResponseDto, LoginDto, RegisterDto } from '../../application/dtos/a
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '../../infrastructure/database/models/user.model';
-import { Permissions } from '../../infrastructure/database/models';
+import { Permissions, UserPermission } from '../../infrastructure/database/models';
 
 export class AuthUseCases {
     private jwtSecret: string;
@@ -34,7 +34,7 @@ export class AuthUseCases {
 
             const token = this.generateToken(user);
 
-            const userPermissions = user.userPermissions?.map((permission: Permissions) => permission.id) || [];
+            const userPermissions = user.userPermissions?.map((permission: UserPermission) => permission.id) || [];
 
             return {
                 user: {
@@ -168,7 +168,7 @@ export class AuthUseCases {
     }
 
     private generateToken(user: User): string {
-        const permissions = user.userPermissions?.map(p => p.name) || [];
+        const permissions = user.userPermissions?.map((p: UserPermission) => p.permission.id) || [];
 
         return jwt.sign(
             {

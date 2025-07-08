@@ -16,8 +16,44 @@ export class PermissionRoutes {
         this.router.get('/:id', PermissionValidator.getById(), this.controller.getById.bind(this.controller));
         this.router.put('/:id', PermissionValidator.update(), this.controller.update.bind(this.controller));
         this.router.delete('/:id', PermissionValidator.getById(), this.controller.delete.bind(this.controller));
-        this.router.get('/admin/:adminId', PermissionValidator.getAdminId(), this.controller.getPermissionsForAdmin.bind(this.controller));
-        this.router.get('/shift/:shiftId', PermissionValidator.getShiftId(), this.controller.getPermissionsForShift.bind(this.controller));
+
+        this.router.post('/assign',
+            PermissionValidator.assignPermissions(),
+            this.controller.assignPermissionsToUser.bind(this.controller)
+        );
+
+        this.router.post('/revoke',
+            PermissionValidator.revokePermissions(),
+            this.controller.revokePermissionsFromUser.bind(this.controller)
+        );
+
+        this.router.post('/batch-assign',
+            PermissionValidator.batchAssignPermission(),
+            this.controller.batchAssignPermission.bind(this.controller)
+        );
+
+        // User permission queries
+        this.router.get('/user/:userId/permissions',
+            this.controller.getUserPermissions.bind(this.controller)
+        );
+
+        this.router.get('/user/:userId/has-permission/:permissionName',
+            this.controller.checkUserHasPermission.bind(this.controller)
+        );
+
+        this.router.post('/user/:userId/check-permissions',
+            PermissionValidator.checkMultiplePermissions(),
+            this.controller.checkMultiplePermissions.bind(this.controller)
+        );
+
+        this.router.get('/user/:userId/all-permissions',
+            this.controller.getAllPermissionsForUser.bind(this.controller)
+        );
+
+        this.router.get('/users-with-permission/:permissionId',
+            this.controller.getAllUsersWithPermission.bind(this.controller)
+        );
+
     }
 
     public getRouter(): Router {

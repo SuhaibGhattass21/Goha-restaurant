@@ -5,11 +5,13 @@ import {
     CreateDateColumn,
     ManyToMany,
     JoinTable,
-    OneToOne
+    OneToOne,
+    OneToMany
 } from 'typeorm';
 import { v4 as uuidv4 } from "uuid";
-import { Permissions } from './userPersmissions.model';
+import { Permissions } from './permissions.model';
 import { Worker } from './Worker.model';
+import { UserPermission } from './userPermissions.model';
 
 @Entity("users")
 export class User {
@@ -37,14 +39,9 @@ export class User {
     @Column({ type: "boolean", default: true, name: "is_active" })
     isActive: boolean = true;
 
-    @ManyToMany(() => Permissions, (permissions) => permissions.users)
-    @JoinTable({
-        name: "user_permissions",
-        joinColumn: { name: "user_id", referencedColumnName: "id" },
-        inverseJoinColumn: { name: "permission_id", referencedColumnName: "id" },
-    })
-    userPermissions?: Permissions[];
+    @OneToMany(() => UserPermission, (userPermission) => userPermission.user)
+    userPermissions?: UserPermission[];
 
-    @OneToOne(() => Worker, (worker) => worker.user)
+    @OneToOne(() => Worker, (worker: Worker) => worker.user)
     workerProfile?: Worker;
 }

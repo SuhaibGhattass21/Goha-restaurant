@@ -425,33 +425,379 @@ export const swaggerSchemas = {
             }
         }
     },
-
-    CreatePermissionDTO: {
+    CreatePermissionDto: {
         type: "object",
-        required: ["name", "description"],
+        required: ["name"],
         properties: {
             name: {
                 type: "string",
                 description: "Name of the permission",
+                example: "create:user"
             },
             description: {
                 type: "string",
                 description: "Description of the permission",
-            },
-        },
+                example: "Allows user to create new users in the system"
+            }
+        }
     },
-    UpdatePermissionDTO: {
+
+    UpdatePermissionDto: {
         type: "object",
         properties: {
             name: {
                 type: "string",
                 description: "Updated name of the permission",
+                example: "update:user"
             },
             description: {
                 type: "string",
                 description: "Updated description of the permission",
+                example: "Allows user to update existing users in the system"
+            }
+        }
+    },
+
+    PermissionResponseDto: {
+        type: "object",
+        properties: {
+            id: {
+                type: "string",
+                format: "uuid",
+                description: "Unique identifier of the permission",
+                example: "bcb59477-5f41-43e2-810f-8b80b5b7cf43"
             },
-        },
+            name: {
+                type: "string",
+                description: "Name of the permission",
+                example: "create:user"
+            },
+            description: {
+                type: "string",
+                description: "Description of the permission",
+                example: "Allows user to create new users in the system"
+            },
+            created_at: {
+                type: "string",
+                format: "date-time",
+                description: "Permission creation timestamp",
+                example: "2025-06-30T10:30:00.000Z"
+            }
+        }
+    },
+
+    AssignPermissionsDto: {
+        type: "object",
+        required: ["userId", "permissionIds", "granted_by"],
+        properties: {
+            userId: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the user to assign permissions to",
+                example: "bcb59477-5f41-43e2-810f-8b80b5b7cf43"
+            },
+            permissionIds: {
+                type: "array",
+                description: "Array of permission IDs to assign",
+                items: {
+                    type: "string",
+                    format: "uuid"
+                },
+                example: [
+                    "550e8400-e29b-41d4-a716-446655440000",
+                    "123e4567-e89b-12d3-a456-426614174000"
+                ]
+            },
+            granted_by: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the user granting the permissions",
+                example: "550e8400-e29b-41d4-a716-446655440000"
+            }
+        }
+    },
+
+    BatchAssignPermissionDto: {
+        type: "object",
+        required: ["permissionId", "userIds", "granted_by"],
+        properties: {
+            permissionId: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the permission to assign",
+                example: "550e8400-e29b-41d4-a716-446655440000"
+            },
+            userIds: {
+                type: "array",
+                description: "Array of user IDs to assign the permission to",
+                items: {
+                    type: "string",
+                    format: "uuid"
+                },
+                example: [
+                    "bcb59477-5f41-43e2-810f-8b80b5b7cf43",
+                    "c8c19f57-e99a-4f62-a0fd-d93f2b2036de"
+                ]
+            },
+            granted_by: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the user granting the permission",
+                example: "550e8400-e29b-41d4-a716-446655440000"
+            }
+        }
+    },
+
+    RevokePermissionsDto: {
+        type: "object",
+        required: ["userId", "permissionIds"],
+        properties: {
+            userId: {
+                type: "string",
+                format: "uuid",
+                description: "ID of the user to revoke permissions from",
+                example: "bcb59477-5f41-43e2-810f-8b80b5b7cf43"
+            },
+            permissionIds: {
+                type: "array",
+                description: "Array of permission IDs to revoke",
+                items: {
+                    type: "string",
+                    format: "uuid"
+                },
+                example: [
+                    "550e8400-e29b-41d4-a716-446655440000",
+                    "123e4567-e89b-12d3-a456-426614174000"
+                ]
+            }
+        }
+    },
+
+    CheckMultiplePermissionsDto: {
+        type: "object",
+        required: ["permissionNames"],
+        properties: {
+            permissionNames: {
+                type: "array",
+                description: "Array of permission names to check",
+                items: {
+                    type: "string"
+                },
+                example: [
+                    "create:user",
+                    "update:user",
+                    "delete:user"
+                ]
+            }
+        }
+    },
+
+    PermissionCheckResultDto: {
+        type: "object",
+        properties: {
+            hasAll: {
+                type: "boolean",
+                description: "Whether the user has all the checked permissions",
+                example: false
+            },
+            missing: {
+                type: "array",
+                description: "List of missing permission names",
+                items: {
+                    type: "string"
+                },
+                example: [
+                    "delete:user"
+                ]
+            }
+        }
+    },
+
+    UserPermissionDetailDto: {
+        type: "object",
+        properties: {
+            id: {
+                type: "string",
+                format: "uuid",
+                description: "Permission ID",
+                example: "550e8400-e29b-41d4-a716-446655440000"
+            },
+            name: {
+                type: "string",
+                description: "Permission name",
+                example: "create:user"
+            },
+            description: {
+                type: "string",
+                description: "Permission description",
+                example: "Allows user to create new users"
+            },
+            granted_at: {
+                type: "string",
+                format: "date-time",
+                description: "When the permission was granted to the user",
+                example: "2025-06-30T10:30:00.000Z"
+            },
+            granted_by_name: {
+                type: "string",
+                description: "Name of the user who granted the permission",
+                example: "System Administrator"
+            },
+            is_revoked: {
+                type: "boolean",
+                description: "Whether the permission is revoked",
+                example: false
+            }
+        }
+    },
+
+    UserWithPermissionDto: {
+        type: "object",
+        properties: {
+            id: {
+                type: "string",
+                format: "uuid",
+                description: "User ID",
+                example: "bcb59477-5f41-43e2-810f-8b80b5b7cf43"
+            },
+            username: {
+                type: "string",
+                description: "Username",
+                example: "johndoe"
+            },
+            email: {
+                type: "string",
+                description: "User email",
+                example: "john.doe@example.com"
+            },
+            fullName: {
+                type: "string",
+                description: "Full name of the user",
+                example: "John Doe"
+            },
+            granted_at: {
+                type: "string",
+                format: "date-time",
+                description: "When the permission was granted",
+                example: "2025-06-30T10:30:00.000Z"
+            },
+            granted_by_name: {
+                type: "string",
+                description: "Name of the user who granted the permission",
+                example: "System Administrator"
+            }
+        }
+    },
+
+    SinglePermissionCheckDto: {
+        type: "object",
+        properties: {
+            hasPermission: {
+                type: "boolean",
+                description: "Whether the user has the specified permission",
+                example: true
+            }
+        }
+    },
+
+    PermissionAssignmentSuccessDto: {
+        type: "object",
+        properties: {
+            message: {
+                type: "string",
+                description: "Success message",
+                example: "Permissions assigned successfully"
+            },
+            assignedCount: {
+                type: "integer",
+                description: "Number of permissions assigned",
+                example: 3
+            }
+        }
+    },
+
+    PermissionRevocationSuccessDto: {
+        type: "object",
+        properties: {
+            message: {
+                type: "string",
+                description: "Success message",
+                example: "Permissions revoked successfully"
+            },
+            revokedCount: {
+                type: "integer",
+                description: "Number of permissions revoked",
+                example: 2
+            }
+        }
+    },
+
+    BatchPermissionAssignmentSuccessDto: {
+        type: "object",
+        properties: {
+            message: {
+                type: "string",
+                description: "Success message",
+                example: "Permission assigned to users successfully"
+            },
+            affectedUsers: {
+                type: "integer",
+                description: "Number of users affected",
+                example: 5
+            },
+            permissionName: {
+                type: "string",
+                description: "Name of the assigned permission",
+                example: "view:reports"
+            }
+        }
+    },
+
+    UserPermissionsResponseDto: {
+        type: "object",
+        properties: {
+            permissions: {
+                type: "array",
+                description: "Array of permission names",
+                items: {
+                    type: "string"
+                },
+                example: [
+                    "create:user",
+                    "update:user",
+                    "view:reports"
+                ]
+            }
+        }
+    },
+
+    PermissionCheckResponseDto: {
+        type: "object",
+        properties: {
+            hasPermission: {
+                type: "boolean",
+                description: "Whether the user has the specified permission",
+                example: true
+            }
+        }
+    },
+
+    MultiplePermissionCheckResponseDto: {
+        type: "object",
+        properties: {
+            permissions: {
+                type: "object",
+                description: "Object mapping permission names to boolean values",
+                additionalProperties: {
+                    type: "boolean"
+                },
+                example: {
+                    "create:user": true,
+                    "delete:user": false,
+                    "update:user": true
+                }
+            }
+        }
     },
 
     OpenShiftDTO: {
@@ -474,33 +820,6 @@ export const swaggerSchemas = {
                     $ref: "#/components/schemas/AddShiftWorkerDTO",
                 },
                 description: "List of workers assigned to the shift",
-            },
-        },
-    },
-    CreatePermissionDto: {
-        type: "object",
-        required: ["name", "description"],
-        properties: {
-            name: {
-                type: "string",
-                description: "Name of the permission",
-            },
-            description: {
-                type: "string",
-                description: "Description of the permission",
-            },
-        },
-    },
-    UpdatePermissionDto: {
-        type: "object",
-        properties: {
-            name: {
-                type: "string",
-                description: "Updated name of the permission",
-            },
-            description: {
-                type: "string",
-                description: "Updated description of the permission",
             },
         },
     },
