@@ -235,39 +235,47 @@ export class OrderUseCases {
     }
   }
 
-  private mapItemToResponseDto(item: any): any {
-    const basePrice = Number(item.unit_price) * item.quantity
-    const extrasPrice = item.extras?.reduce((sum: number, extra: any) => sum + Number(extra.price), 0) || 0
-    const totalPrice = basePrice + extrasPrice
+ private mapItemToResponseDto(item: any): any {
+  const basePrice = Number(item.unit_price) * item.quantity
+  const extrasPrice = item.extras?.reduce((sum: number, extra: any) => sum + Number(extra.price), 0) || 0
+  const totalPrice = basePrice + extrasPrice
 
-    return {
-      order_item_id: item.order_item_id,
-      order_id: item.order?.order_id || "",
-      product_size: item.product_size
-        ? {
+  const product = item.product_size?.product
+  const category = product?.category
+
+  return {
+    order_item_id: item.order_item_id,
+    order_id: item.order?.order_id || "",
+    product_size: item.product_size
+      ? {
           product_size_id: item.product_size.product_size_id,
-          product_name: item.product_size.product?.name || "",
+          product_name: product?.name || "",
           size_name: item.product_size.size?.size_name || "",
           price: Number(item.product_size.price),
+          category_name: category?.name || "", // Optional, if you're using this
+          product_description: product?.description || "",
+          category_description: category?.description || "",
         }
-        : undefined,
-      quantity: item.quantity,
-      unit_price: Number(item.unit_price),
-      special_instructions: item.special_instructions,
-      extras:
-        item.extras?.map((extra: any) => ({
-          order_item_extra_id: extra.order_item_extra_id,
-          order_item_id: extra.orderItem?.order_item_id || "",
-          extra: extra.extra
-            ? {
+      : undefined,
+    quantity: item.quantity,
+    unit_price: Number(item.unit_price),
+    special_instructions: item.special_instructions,
+    category_id: category?.category_id || "",  // ✅ ADD THIS
+    category_name: category?.name || "",        // ✅ ADD THIS
+    extras:
+      item.extras?.map((extra: any) => ({
+        order_item_extra_id: extra.order_item_extra_id,
+        order_item_id: extra.orderItem?.order_item_id || "",
+        extra: extra.extra
+          ? {
               extra_id: extra.extra.extra_id,
               name: extra.extra.name,
               price: Number(extra.extra.price),
             }
-            : undefined,
-          price: Number(extra.price),
-        })) || [],
-      total_price: Number(totalPrice.toFixed(2)),
-    }
+          : undefined,
+        price: Number(extra.price),
+      })) || [],
+    total_price: Number(totalPrice.toFixed(2)),
   }
+}
 }

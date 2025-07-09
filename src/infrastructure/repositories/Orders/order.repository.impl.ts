@@ -31,6 +31,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
         "items",
         "items.product_size",
         "items.product_size.product",
+        "items.product_size.product.category",
         "items.product_size.size",
         "items.extras",
         "items.extras.extra",
@@ -105,7 +106,9 @@ export class OrderRepositoryImpl implements IOrderRepository {
 
   async findAll(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
     const [orders, total] = await this.orderRepository.findAndCount({
-      relations: ["cashier", "shift", "items"],
+      relations: ["cashier", "shift", "items", "items.product_size",
+  "items.product_size.product",
+  "items.product_size.product.category"],
       skip: (page - 1) * limit,
       take: limit,
       order: { created_at: "DESC" },
@@ -164,6 +167,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
     const start = startOfDay(new Date(dateStr));
     const end = endOfDay(new Date(dateStr));
 
+    
     return this.orderRepository.find({
       where: {
         shift: {
