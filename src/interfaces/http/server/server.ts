@@ -87,7 +87,10 @@ import { AuthUseCases } from '../../../application/use-cases/auth.use-case';
 import { UserRepositoryImpl } from '../../../infrastructure/repositories/user.repository.impl';
 import { UserController } from '../controllers/user.controller';
 import { UserRoutes } from '../routes/user.routes';
-
+import { StockReportController } from "../controllers/Stock/stock-report.controller"
+import { StockReportRoutes } from "../routes/Stock/stock-report.routes"
+import { StockReportRepositoryImpl } from "../../../infrastructure/repositories/Stock/stock-report.repository.impl"
+import { StockReportUseCases } from "../../../application/use-cases/Stock/stock-report.use-cases"
 export class Server {
   private app: express.Application
   private readonly PORT: number
@@ -195,7 +198,12 @@ export class Server {
       const stockTransactionUseCases = new StockTransactionUseCases(stockTransactionRepository, stockItemRepository)
       const stockTransactionController = new StockTransactionController(stockTransactionUseCases)
       const stockTransactionRoutes = new StockTransactionRoutes(stockTransactionController)
+      // Setup StockReport module
 
+      const stockReportRepository = new StockReportRepositoryImpl(stockItemRepo, stockTransactionRepo, shiftRepo)
+      const stockReportUseCases = new StockReportUseCases(stockReportRepository)
+      const stockReportController = new StockReportController(stockReportUseCases)
+      const stockReportRoutes = new StockReportRoutes(stockReportController)
       // Setup Shift module
       const shiftRepository = new ShiftRepositoryImpl(shiftRepo)
       const shiftUseCases = new ShiftUseCases(shiftRepository)
@@ -289,7 +297,8 @@ export class Server {
         orderItemRoutes,
         cancelledOrderRoutes,
         externalReceiptRoutes,
-        expenseRoutes
+        expenseRoutes,
+        stockReportRoutes,
       }
     } catch (error) {
       console.error("Error initializing dependencies:", error)
@@ -314,6 +323,7 @@ export class Server {
     apiV1.use("/shift-workers", dependencies.shiftWorkerRoutes.getRouter())
     apiV1.use("/stock-items", dependencies.stockItemRoutes.getRouter())
     apiV1.use("/stock-transactions", dependencies.stockTransactionRoutes.getRouter())
+    apiV1.use("/stock-reports", dependencies.stockReportRoutes.getRouter())
     apiV1.use("/orders", dependencies.orderRoutes.getRouter())
     apiV1.use("/order-items", dependencies.orderItemRoutes.getRouter())
     apiV1.use("/cancelled-orders", dependencies.cancelledOrderRoutes.getRouter())

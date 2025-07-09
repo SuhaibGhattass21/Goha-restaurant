@@ -55,12 +55,15 @@ export class StockItemRepositoryImpl implements IStockItemRepository {
   }
 
   async update(id: string, stockItemData: UpdateStockItemDto): Promise<StockItem | null> {
-    await this.stockItemRepository.update(id, {
+  await this.stockItemRepository.update(
+    { stock_item_id: id }, // 🔧 FIXED: Use the correct primary key field
+    {
       ...stockItemData,
       last_updated_at: new Date(),
-    })
-    return await this.findById(id)
-  }
+    }
+  )
+  return await this.findById(id)
+}
 
   async updateQuantity(id: string, quantity: number): Promise<StockItem | null> {
     await this.stockItemRepository.update(id, {
