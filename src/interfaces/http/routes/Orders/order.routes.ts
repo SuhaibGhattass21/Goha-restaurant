@@ -17,7 +17,9 @@ export class OrderRoutes {
     this.router.post("/", OrderValidator.createOrder(), this.orderController.createOrder.bind(this.orderController))
 
     // GET /orders - Get all orders with pagination
-    this.router.get("/", OrderValidator.getOrders(), this.orderController.getAllOrders.bind(this.orderController))
+    this.router.get("/cafe", OrderValidator.getOrders(), this.orderController.getAllOrdersCafe.bind(this.orderController))
+    //Get all orders exceptCafe
+    this.router.get("/except-cafe", OrderValidator.getOrders(), this.orderController.getAllOrdersExceptCafe.bind(this.orderController))
 
     // GET /orders/stats - Get order statistics
     this.router.get(
@@ -25,12 +27,24 @@ export class OrderRoutes {
       OrderValidator.getOrderStats(),
       this.orderController.getOrderStats.bind(this.orderController),
     )
+    // GET /orders/stats/cafe - Get cafe order statistics
+        this.router.get(
+      "/stats-cafe",
+      OrderValidator.getOrderStats(),
+      this.orderController.getOrderStatsCafe.bind(this.orderController),
+    )
 
-    // GET /orders/shift/:shiftId - Get orders by shift ID
+    // for goha
     this.router.get(
-      "/shift/:shiftId",
+      "/shift-goha/:shiftId",
       OrderValidator.getOrdersByShiftId(),
-      this.orderController.getOrdersByShiftId.bind(this.orderController),
+      this.orderController.getOrdersByShiftIdGoha.bind(this.orderController),
+    )
+    // for cafe
+        this.router.get(
+      "/shift-cafe/:shiftId",
+      OrderValidator.getOrdersByShiftId(),
+      this.orderController.getOrdersByShiftIdCafe.bind(this.orderController),
     )
 
     // GET /orders/cashier/:cashierId - Get orders by cashier ID

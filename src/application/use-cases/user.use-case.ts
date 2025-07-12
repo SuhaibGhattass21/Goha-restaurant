@@ -1,5 +1,7 @@
 import { CreateUserDto, UserResponseDto } from "../../application/dtos/user.dto";
 import { User } from "../../infrastructure/database/models";
+import { IUserRepository } from "../../domain/repositories/user.repository.interface";
+
 
 export class UserUseCases {
     constructor(private userRepository: IUserRepository) { }

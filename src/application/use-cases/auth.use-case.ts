@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '../../infrastructure/database/models/user.model';
 import { Permissions, UserPermission } from '../../infrastructure/database/models';
-
+import { IUserRepository } from "../../domain/repositories/user.repository.interface";
 export class AuthUseCases {
     private jwtSecret: string;
     private jwtExpiry: number;

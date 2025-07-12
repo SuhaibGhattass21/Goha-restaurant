@@ -38,12 +38,10 @@ export class OrderValidator {
         .withMessage("Special instructions must not exceed 500 characters")
         .trim(),
       body("items.*.extras").optional().isArray().withMessage("Extras must be an array"),
-      // THIS LINE WAS THE PROBLEM:
-      // It was previously 'items.*.extras.*.category_extra_id'
-      body("items.*.extras.*.extra_id") // FIXED: Changed to 'extra_id'
+      body("items.*.extras.*.extra_id") 
         .if(body("items.*.extras").exists())
         .isUUID()
-        .withMessage("Extra ID must be a valid UUID"), // Updated message
+        .withMessage("Extra ID must be a valid UUID"), 
       body("items.*.extras.*.price")
         .if(body("items.*.extras").exists())
         .isNumeric()
@@ -154,6 +152,7 @@ export class OrderValidator {
       query("endDate").optional().isISO8601().withMessage("End date must be a valid ISO 8601 date"),
     ]
   }
+  
 
   static recalculateOrderTotal(): ValidationChain[] {
     return [param("id").isUUID().withMessage("Invalid order ID format")]

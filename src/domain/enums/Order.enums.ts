@@ -7,7 +7,8 @@ export enum OrderStatus {
 export enum OrderType {
     DINE_IN = 'dine-in',
     TAKEAWAY = 'takeaway',
-    DELIVERY = 'delivery'
+    DELIVERY = 'delivery',
+    CAFE = 'cafe'
 }
 
 export enum OrderPaymentMethod {

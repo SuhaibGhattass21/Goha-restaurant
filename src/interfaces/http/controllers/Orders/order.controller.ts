@@ -73,7 +73,7 @@ export class OrderController {
     }
   }
 
-  async getOrdersByShiftId(req: Request, res: Response): Promise<void> {
+  async getOrdersByShiftIdCafe(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -86,7 +86,35 @@ export class OrderController {
       }
 
       const { shiftId } = req.params
-      const orders = await this.orderUseCases.getOrdersByShiftId(shiftId)
+      const orders = await this.orderUseCases.getOrdersByShiftIdCafe(shiftId)
+
+      res.status(200).json({
+        success: true,
+        data: orders,
+      })
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      })
+    }
+  }
+
+    async getOrdersByShiftIdGoha(req: Request, res: Response): Promise<void> {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        })
+        return
+      }
+
+      const { shiftId } = req.params
+      const orders = await this.orderUseCases.getOrdersByShiftIdGoha(shiftId)
 
       res.status(200).json({
         success: true,
@@ -245,7 +273,7 @@ export class OrderController {
     }
   }
 
-  async getAllOrders(req: Request, res: Response): Promise<void> {
+  async getAllOrdersCafe(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -260,7 +288,37 @@ export class OrderController {
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
 
-      const result = await this.orderUseCases.getAllOrders(page, limit)
+      const result = await this.orderUseCases.getAllOrdersCafe(page, limit)
+
+      res.status(200).json({
+        success: true,
+        data: result,
+      })
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      })
+    }
+  }
+
+  async getAllOrdersExceptCafe(req: Request, res: Response): Promise<void> {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        })
+        return
+      }
+
+      const page = Number.parseInt(req.query.page as string) || 1
+      const limit = Number.parseInt(req.query.limit as string) || 10
+
+      const result = await this.orderUseCases.getAllOrdersExceptCafe(page, limit)
 
       res.status(200).json({
         success: true,
@@ -404,6 +462,39 @@ export class OrderController {
       const { shiftId, startDate, endDate } = req.query
 
       const stats = await this.orderUseCases.getOrderStats(
+        shiftId as string,
+        startDate ? new Date(startDate as string) : undefined,
+        endDate ? new Date(endDate as string) : undefined,
+      )
+
+      res.status(200).json({
+        success: true,
+        data: stats,
+      })
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      })
+    }
+  }
+
+  async getOrderStatsCafe(req: Request, res: Response): Promise<void> {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        })
+        return
+      }
+
+      const { shiftId, startDate, endDate } = req.query
+
+      const stats = await this.orderUseCases.getOrderStatsCafe(
         shiftId as string,
         startDate ? new Date(startDate as string) : undefined,
         endDate ? new Date(endDate as string) : undefined,
