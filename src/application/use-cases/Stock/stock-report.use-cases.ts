@@ -5,6 +5,7 @@ import type {
   StockReportItemDto,
   StockReportFiltersDto,
   ShiftStockTransactionSummaryDto,
+  ShiftTransactionDetailDto,
 } from "@application/dtos/Stock/stock-report.dto"
 
 export class StockReportUseCases {
@@ -59,7 +60,8 @@ export class StockReportUseCases {
       shiftId,
       date,
     )
-
+    // 🆕 NEW: Get transactions directly
+    const shiftTransactions = await this.stockReportRepository.getTransactionsByShift(shiftId, date)
     // Get transaction summary for this shift
     const transactionSummary = await this.stockReportRepository.getStockTransactionsSummaryByShift(shiftId, date)
 
@@ -70,6 +72,25 @@ export class StockReportUseCases {
     // Get shift details
     const shifts = await this.stockReportRepository.getShiftsByDate(date)
     const currentShift = shifts.find((shift) => shift.shift_id === shiftId)
+    
+     const allShiftTransactions: any[] = []
+    stockItemsWithTransactions.forEach((item) => {
+      const itemTransactions = (item.transactions || []).filter((t: any) => t.shift && t.shift.shift_id === shiftId)
+      allShiftTransactions.push(...itemTransactions)
+    })
+
+    // 🆕 NEW: Map transactions to detailed format
+    const detailedTransactions: ShiftTransactionDetailDto[] = shiftTransactions.map((transaction) => ({
+    transaction_id: transaction.transaction_id,
+    stock_item_id: transaction.stockItem.stock_item_id,
+    stock_item_name: transaction.stockItem.name,
+    type: transaction.type,
+    quantity: Number.parseFloat(transaction.quantity),
+    user_id: transaction.admin.id,
+    user_name: transaction.admin.fullName,
+    timestamp: transaction.timestamp,
+  }))
+
 
     // Map stock items to report format
     const stockItems = stockItemsWithTransactions.map((item) => {
@@ -111,6 +132,7 @@ export class StockReportUseCases {
       out_of_stock_items_count: outOfStockReportItems.length,
       total_transactions: totalTransactions,
       transaction_summary: mappedTransactionSummary,
+      transactions: detailedTransactions,
       stock_items: filters.include_low_stock_only ? lowStockReportItems : stockItems,
       low_stock_items: lowStockReportItems,
       out_of_stock_items: outOfStockReportItems,

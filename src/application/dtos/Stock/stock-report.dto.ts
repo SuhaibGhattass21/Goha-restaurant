@@ -47,6 +47,31 @@ export class StockReportItemDto {
   @IsNumber({ maxDecimalPlaces: 2 })
   net_change_in_shift!: number
 }
+export class ShiftTransactionDetailDto {
+  @IsUUID()
+  transaction_id!: string
+
+  @IsUUID()
+  stock_item_id!: string
+
+  @IsString()
+  stock_item_name!: string
+
+  @IsEnum(StockTransactionType)
+  type!: StockTransactionType
+
+  @IsNumber({ maxDecimalPlaces: 2 })
+  quantity!: number
+
+  @IsUUID()
+  user_id!: string
+
+  @IsString()
+  user_name!: string
+
+  @IsDateString()
+  timestamp!: Date
+}
 
 export class ShiftStockTransactionSummaryDto {
   @IsEnum(StockTransactionType)
@@ -85,7 +110,10 @@ export class ShiftStockReportDto {
   @ValidateNested({ each: true })
   @Type(() => ShiftStockTransactionSummaryDto)
   transaction_summary!: ShiftStockTransactionSummaryDto[]
-
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ShiftTransactionDetailDto)
+  transactions!: ShiftTransactionDetailDto[]
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => StockReportItemDto)

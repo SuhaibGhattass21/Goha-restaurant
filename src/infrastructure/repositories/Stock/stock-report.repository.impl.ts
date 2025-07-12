@@ -25,6 +25,27 @@ export class StockReportRepositoryImpl implements IStockReportRepository {
       .orderBy("shift.start_time", "ASC")
       .getMany()
   }
+  // 🆕 NEW: Add this method
+async getTransactionsByShift(shiftId: string, date: Date): Promise<any[]> {
+  const startOfDay = new Date(date)
+  startOfDay.setHours(0, 0, 0, 0)
+
+  const endOfDay = new Date(date)
+  endOfDay.setHours(23, 59, 59, 999)
+
+  return await this.stockTransactionRepository
+    .createQueryBuilder("transaction")
+    .leftJoinAndSelect("transaction.stockItem", "stockItem")
+    .leftJoinAndSelect("transaction.admin", "admin")
+    .leftJoinAndSelect("transaction.shift", "shift")
+    .where("transaction.shift_id = :shiftId", { shiftId })
+    .andWhere("transaction.timestamp BETWEEN :startDate AND :endDate", {
+      startDate: startOfDay,
+      endDate: endOfDay,
+    })
+    .orderBy("transaction.timestamp", "DESC")
+    .getMany()
+}
 
   async getStockItemsWithTransactionsByShift(shiftId: string, date: Date): Promise<any[]> {
     const startOfDay = new Date(date)
