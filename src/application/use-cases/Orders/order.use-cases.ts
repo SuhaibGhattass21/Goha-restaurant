@@ -11,7 +11,7 @@ import type {
   OrderStatsDto,
   FilterOrdersByShiftTypeAndDateDto,
 } from "../../../application/dtos/Orders/order.dto"
-import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums" // Declare the variable here
+import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums" 
 import type { CancelledOrderUseCases } from "./cancelled-order.use-cases"
 
 export class OrderUseCases {
@@ -23,7 +23,6 @@ export class OrderUseCases {
   ) { }
 
   async createOrder(orderData: CreateOrderDto): Promise<OrderResponseDto> {
-    // Create the order first
     const order = await this.orderRepository.create({
       cashier_id: orderData.cashier_id,
       shift_id: orderData.shift_id,
@@ -33,7 +32,6 @@ export class OrderUseCases {
       customer_phone: orderData.customer_phone,
     })
 
-    // Create order items
     for (const itemData of orderData.items) {
       const orderItem = await this.orderItemRepository.create({
         order_id: order.order_id,
@@ -43,7 +41,6 @@ export class OrderUseCases {
         special_instructions: itemData.special_instructions,
       })
 
-      // Create extras for this item
       if (itemData.extras && itemData.extras.length > 0) {
         const extrasData = itemData.extras.map((extra) => ({
           ...extra,
@@ -53,10 +50,8 @@ export class OrderUseCases {
       }
     }
 
-    // Calculate and update total price
     await this.orderRepository.calculateOrderTotal(order.order_id)
 
-    // Fetch the complete order with all relations
     const completeOrder = await this.orderRepository.findById(order.order_id)
     if (!completeOrder) {
       throw new Error("Failed to create order")
@@ -70,8 +65,13 @@ export class OrderUseCases {
     return order ? this.mapToResponseDto(order) : null
   }
 
-  async getOrdersByShiftId(shiftId: string): Promise<OrderSummaryDto[]> {
-    const orders = await this.orderRepository.findByShiftId(shiftId)
+  async getOrdersByShiftIdGoha(shiftId: string): Promise<OrderSummaryDto[]> {
+    const orders = await this.orderRepository.findByShiftIdGoha(shiftId)
+    return orders.map((order) => this.mapToSummaryDto(order))
+  }
+
+    async getOrdersByShiftIdCafe(shiftId: string): Promise<OrderSummaryDto[]> {
+    const orders = await this.orderRepository.findByShiftIdCafe(shiftId)
     return orders.map((order) => this.mapToSummaryDto(order))
   }
 
@@ -123,8 +123,19 @@ export class OrderUseCases {
     return this.orderRepository.getOrdersByShiftTypeAndDate(dto.shift_type, dto.date);
   }
 
-  async getAllOrders(page = 1, limit = 10): Promise<OrderListResponseDto> {
-    const { orders, total } = await this.orderRepository.findAll(page, limit)
+    async getAllOrdersExceptCafe(page = 1, limit = 10): Promise<OrderListResponseDto> {
+    const { orders, total } = await this.orderRepository.findAllExceptCafe(page, limit)
+
+    return {
+      orders: orders.map((order) => this.mapToResponseDto(order)),
+      total,
+      page,
+      limit,
+    }
+  }
+
+  async getAllOrdersCafe(page = 1, limit = 10): Promise<OrderListResponseDto> {
+    const { orders, total } = await this.orderRepository.findAllCafe(page, limit)
 
     return {
       orders: orders.map((order) => this.mapToResponseDto(order)),
@@ -142,7 +153,6 @@ export class OrderUseCases {
   async updateOrderStatus(id: string, status: OrderStatus): Promise<OrderResponseDto | null> {
     const order = await this.orderRepository.updateStatus(id, status)
     if (order && status === OrderStatus.CANCELLED) {
-      // Ensure cashier and shift relations are loaded and not null
       if (!order.cashier || !order.shift) {
         console.error(
           `Error: Cannot create cancelled order for order ${id}. Missing cashier or shift information. Order details:`,
@@ -155,11 +165,10 @@ export class OrderUseCases {
         order_id: order.order_id,
         cancelled_by: order.cashier.id,
         shift_id: order.shift.shift_id,
-        reason: "Order status changed to CANCELLED automatically", // Default reason
+        reason: "Order status changed to CANCELLED automatically", 
       })
     }
     if (order) {
-      // Recalculate total if needed
       await this.orderRepository.calculateOrderTotal(id)
       const updatedOrder = await this.orderRepository.findById(id)
       return updatedOrder ? this.mapToResponseDto(updatedOrder) : null
@@ -173,20 +182,23 @@ export class OrderUseCases {
       return false
     }
 
-    // Delete all order items and their extras (cascade should handle this)
     const orderItems = await this.orderItemRepository.findByOrderId(id)
     for (const item of orderItems) {
       await this.orderItemExtraRepository.deleteByOrderItemId(item.order_item_id)
     }
     await this.orderItemRepository.deleteByOrderId(id)
 
-    // Delete the order
     return await this.orderRepository.delete(id)
   }
 
   async getOrderStats(shiftId?: string, startDate?: Date, endDate?: Date): Promise<OrderStatsDto> {
     return await this.orderRepository.getOrderStats(shiftId, startDate, endDate)
   }
+
+    async getOrderStatsCafe(shiftId?: string, startDate?: Date, endDate?: Date): Promise<OrderStatsDto> {
+    return await this.orderRepository.getOrderStatsCafe(shiftId, startDate, endDate)
+  }
+
 
   async recalculateOrderTotal(orderId: string): Promise<number> {
     return await this.orderRepository.calculateOrderTotal(orderId)
@@ -206,7 +218,7 @@ export class OrderUseCases {
         ? {
           shift_id: order.shift.shift_id,
           shift_type: order.shift.shift_type,
-          start_time: order.shift.start_time?.toISOString() || "", // Add defensive check
+          start_time: order.shift.start_time?.toISOString() || "", 
           status: order.shift.status,
         }
         : undefined,
@@ -216,7 +228,7 @@ export class OrderUseCases {
       total_price: Number(order.total_price),
       customer_name: order.customer_name,
       customer_phone: order.customer_phone,
-      created_at: order.created_at?.toISOString() || "", // Add defensive check
+      created_at: order.created_at?.toISOString() || "", 
       items: order.items?.map((item) => this.mapItemToResponseDto(item)) || [],
       items_count: order.items?.length || 0,
     }
@@ -239,7 +251,7 @@ export class OrderUseCases {
   const basePrice = Number(item.unit_price) * item.quantity
   const extrasPrice = item.extras?.reduce((sum: number, extra: any) => sum + Number(extra.price), 0) || 0
   const totalPrice = basePrice + extrasPrice
-
+  
   const product = item.product_size?.product
   const category = product?.category
 
@@ -252,7 +264,7 @@ export class OrderUseCases {
           product_name: product?.name || "",
           size_name: item.product_size.size?.size_name || "",
           price: Number(item.product_size.price),
-          category_name: category?.name || "", // Optional, if you're using this
+          category_name: category?.name || "", 
           product_description: product?.description || "",
           category_description: category?.description || "",
         }
@@ -260,8 +272,8 @@ export class OrderUseCases {
     quantity: item.quantity,
     unit_price: Number(item.unit_price),
     special_instructions: item.special_instructions,
-    category_id: category?.category_id || "",  // ✅ ADD THIS
-    category_name: category?.name || "",        // ✅ ADD THIS
+    category_id: category?.category_id || "",  
+    category_name: category?.name || "",        
     extras:
       item.extras?.map((extra: any) => ({
         order_item_extra_id: extra.order_item_extra_id,

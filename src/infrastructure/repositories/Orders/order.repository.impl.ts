@@ -2,10 +2,11 @@ import { Repository, Between } from "typeorm"
 import type { Order } from "../../database/models/Order.model"
 import type { CreateOrderDto, UpdateOrderDto, OrderStatsDto } from "../../../application/dtos/Orders/order.dto"
 import type { IOrderRepository } from "../../../domain/repositories/Orders/order.repository.interface"
-import type { OrderStatus, OrderType } from "../../../domain/enums/Order.enums"
-import type { ShiftType } from "../../../domain/enums/Shift.enums"
+import { OrderStatus, OrderType } from "../../../domain/enums/Order.enums"
+import { ShiftType } from "../../../domain/enums/Shift.enums"
 import { startOfDay, endOfDay } from "date-fns"
-
+import { Not } from "typeorm"
+import { log } from "node:console"
 export class OrderRepositoryImpl implements IOrderRepository {
   constructor(private orderRepository: Repository<Order>) { }
 
@@ -17,7 +18,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
       order_type: orderData.order_type,
       customer_name: orderData.customer_name,
       customer_phone: orderData.customer_phone,
-      total_price: 0, // Will be calculated after items are added
+      total_price: 0, 
     })
     return await this.orderRepository.save(order)
   }
@@ -39,9 +40,22 @@ export class OrderRepositoryImpl implements IOrderRepository {
     })
   }
 
-  async findByShiftId(shiftId: string): Promise<Order[]> {
+async findByShiftIdGoha(shiftId: string): Promise<Order[]> {
+  return await this.orderRepository.find({
+    where: { 
+      shift: { shift_id: shiftId },
+      order_type: Not(OrderType.CAFE)
+    },
+    relations: ["cashier", "items"],
+    order: { created_at: "DESC" },
+  })
+}
+
+    async findByShiftIdCafe(shiftId: string): Promise<Order[]> {
     return await this.orderRepository.find({
-      where: { shift: { shift_id: shiftId } },
+      where: { shift: { shift_id: shiftId }, 
+      order_type: OrderType.CAFE
+    },
       relations: ["cashier", "items"],
       order: { created_at: "DESC" },
     })
@@ -104,8 +118,9 @@ export class OrderRepositoryImpl implements IOrderRepository {
     return { orders, total }
   }
 
-  async findAll(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
+  async findAllExceptCafe(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
     const [orders, total] = await this.orderRepository.findAndCount({
+      where: { order_type: Not(OrderType.CAFE) },
       relations: ["cashier", "shift", "items", "items.product_size",
   "items.product_size.product",
   "items.product_size.product.category"],
@@ -116,6 +131,33 @@ export class OrderRepositoryImpl implements IOrderRepository {
 
     return { orders, total }
   }
+
+    async findAllCafe(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
+    const [orders, total] = await this.orderRepository.findAndCount({
+      where: { order_type: OrderType.CAFE },
+      relations: ["cashier", "shift", "items", "items.product_size",
+  "items.product_size.product",
+  "items.product_size.product.category"],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: "DESC" },
+    })
+
+    return { orders, total }
+  }
+
+  // async findAll(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
+  //   const [orders, total] = await this.orderRepository.findAndCount({
+  //     relations: ["cashier", "shift", "items", "items.product_size",
+  // "items.product_size.product",
+  // "items.product_size.product.category"],
+  //     skip: (page - 1) * limit,
+  //     take: limit,
+  //     order: { created_at: "DESC" },
+  //   })
+
+  //   return { orders, total }
+  // }
 
   async update(id: string, orderData: UpdateOrderDto): Promise<Order | null> {
     await this.orderRepository.update(id, orderData)
@@ -132,11 +174,13 @@ export class OrderRepositoryImpl implements IOrderRepository {
     return (result.affected ?? 0) > 0
   }
 
+  //for goha not for cafe
   async getOrderStats(shiftId?: string, startDate?: Date, endDate?: Date): Promise<OrderStatsDto> {
     let query = this.orderRepository.createQueryBuilder("order")
 
     if (shiftId) {
-      query = query.where("order.shift_id = :shiftId", { shiftId })
+      query = query.where("order.shift.shift_id = :shiftId", { shiftId })
+        .andWhere("order.order_type != :cafeType", { cafeType: OrderType.CAFE })
     }
 
     if (startDate && endDate) {
@@ -162,6 +206,40 @@ export class OrderRepositoryImpl implements IOrderRepository {
 
     return stats
   }
+
+    async getOrderStatsCafe(shiftId?: string, startDate?: Date, endDate?: Date): Promise<OrderStatsDto> {
+    let query = this.orderRepository.createQueryBuilder("order")
+    console.log("a7aaaaa")
+    if (shiftId) {
+      query = query.where("order.shift.shift_id = :shiftId", { shiftId })
+        .andWhere("order.order_type = :cafeType", { cafeType: OrderType.CAFE })
+    }
+
+    if (startDate && endDate) {   
+      const whereClause = shiftId ? "AND" : "WHERE"
+      query = query.andWhere(`order.created_at >= :startDate ${whereClause} order.created_at <= :endDate`, {
+        startDate,
+        endDate,
+      })
+    }
+
+    const orders = await query.getMany()
+    console.log(orders)
+
+    const stats = {
+      total_orders: orders.length,
+      active_orders: orders.filter((o) => o.status === "active").length,
+      completed_orders: orders.filter((o) => o.status === "completed").length,
+      cancelled_orders: orders.filter((o) => o.status === "cancelled").length,
+      total_revenue: orders.filter((o) => o.status === "completed").reduce((sum, o) => sum + Number(o.total_price), 0),
+      average_order_value: 0,
+    }
+
+    stats.average_order_value = stats.completed_orders > 0 ? stats.total_revenue / stats.completed_orders : 0
+
+    return stats
+  }
+
 
   async getOrdersByShiftTypeAndDate(shiftType: ShiftType, dateStr: string): Promise<Order[]> {
     const start = startOfDay(new Date(dateStr));
@@ -193,7 +271,6 @@ export class OrderRepositoryImpl implements IOrderRepository {
       return orderTotal + itemTotal + extrasTotal
     }, 0)
 
-    // Update the order total in database
     await this.orderRepository.update(orderId, { total_price: total })
 
     return total

@@ -1,4 +1,4 @@
-interface IUserRepository {
+export interface IUserRepository {
     create(data: any): Promise<any>;
     findById(id: string): Promise<any | null>;
     findBy(filter: any): Promise<any | null>;

@@ -1,6 +1,6 @@
 import { User } from "../../infrastructure/database/models";
 import { Repository } from "typeorm";
-
+import { IUserRepository } from "../../domain/repositories/user.repository.interface";
 export class UserRepositoryImpl implements IUserRepository {
     constructor(private userRepository: Repository<User>) { }
     create(data: User): Promise<User> {
