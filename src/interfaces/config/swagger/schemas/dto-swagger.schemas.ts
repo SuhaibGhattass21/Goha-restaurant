@@ -1183,44 +1183,6 @@ export const swaggerSchemas = {
         }
     },
 
-    StockTransactionListResponseDto: {
-        type: "object",
-        properties: {
-            transactions: {
-                type: "array",
-                items: { $ref: "#/components/schemas/StockTransactionResponseDto" }
-            },
-            total: { type: "integer", minimum: 0 },
-            page: { type: "integer", minimum: 1 },
-            limit: { type: "integer", minimum: 1 }
-        }
-    },
-
-    StockTransactionStatsDto: {
-        type: "object",
-        properties: {
-            stock_item_id: { type: "string", format: "uuid" },
-            stock_item_name: { type: "string" },
-            total_in: { type: "number", format: "decimal" },
-            total_out: { type: "number", format: "decimal" },
-            net_change: { type: "number", format: "decimal" },
-            transaction_count: { type: "integer" }
-        }
-    },
-
-    ShiftTransactionSummaryDto: {
-        type: "object",
-        properties: {
-            shift_id: { type: "string", format: "uuid" },
-            total_transactions: { type: "integer" },
-            total_in_quantity: { type: "number", format: "decimal" },
-            total_out_quantity: { type: "number", format: "decimal" },
-            transactions: {
-                type: "array",
-                items: { $ref: "#/components/schemas/StockTransactionResponseDto" }
-            }
-        }
-    },
     CreateOrderDto: {
         type: "object",
         required: ["cashier_id", "shift_id", "order_type", "items"],
@@ -1513,6 +1475,147 @@ export const swaggerSchemas = {
             shift_id: { type: "string", format: "uuid" },
             created_at: { type: "string", format: "date-time" }
         }
-    }
+    },
 
+    StockTransactionListResponseDto: {
+        type: "object",
+        properties: {
+            transactions: {
+                type: "array",
+                items: { $ref: "#/components/schemas/StockTransactionResponseDto" }
+            },
+            total: { type: "integer", minimum: 0 },
+            page: { type: "integer", minimum: 1 },
+            limit: { type: "integer", minimum: 1 }
+        }
+    },
+
+    StockTransactionStatsDto: {
+        type: "object",
+        properties: {
+            stock_item_id: { type: "string", format: "uuid" },
+            stock_item_name: { type: "string" },
+            total_in: { type: "number", format: "decimal" },
+            total_out: { type: "number", format: "decimal" },
+            net_change: { type: "number", format: "decimal" },
+            transaction_count: { type: "integer" }
+        }
+    },
+
+    ShiftTransactionSummaryDto: {
+        type: "object",
+        properties: {
+            shift_id: { type: "string", format: "uuid" },
+            total_transactions: { type: "integer" },
+            total_in_quantity: { type: "number", format: "decimal" },
+            total_out_quantity: { type: "number", format: "decimal" },
+            transactions: {
+                type: "array",
+                items: { $ref: "#/components/schemas/StockTransactionResponseDto" }
+            }
+        }
+    },
+    StockReportItemDto: {
+        type: "object",
+        properties: {
+            stock_item_id: { type: "string", format: "uuid" },
+            name: { type: "string" },
+            type: { type: "string" },
+            unit: { type: "string" },
+            current_quantity: { type: "number", format: "decimal" },
+            minimum_value: { type: "number", format: "decimal" },
+            status: { type: "string", enum: ["active", "inactive"] },
+            is_low_stock: { type: "boolean" },
+            quantity_used_in_shift: { type: "number", format: "decimal" },
+            quantity_added_in_shift: { type: "number", format: "decimal" },
+            net_change_in_shift: { type: "number", format: "decimal" }
+        }
+    },
+
+    ShiftTransactionDetailDto: {
+        type: "object",
+        properties: {
+            transaction_id: { type: "string", format: "uuid" },
+            stock_item_id: { type: "string", format: "uuid" },
+            stock_item_name: { type: "string" },
+            type: { type: "string", enum: ["in", "out"] },
+            quantity: { type: "number", format: "decimal" },
+            user_id: { type: "string", format: "uuid" },
+            user_name: { type: "string" },
+            timestamp: { type: "string", format: "date-time" }
+        }
+    },
+
+    ShiftStockTransactionSummaryDto: {
+        type: "object",
+        properties: {
+            type: { type: "string", enum: ["in", "out"] },
+            transaction_count: { type: "integer" },
+            total_quantity: { type: "number", format: "decimal" }
+        }
+    },
+
+    ShiftStockReportDto: {
+        type: "object",
+        properties: {
+            shift_id: { type: "string", format: "uuid" },
+            shift_date: { type: "string", format: "date-time" },
+            shift_name: { type: "string" },
+            total_stock_items: { type: "integer" },
+            low_stock_items_count: { type: "integer" },
+            out_of_stock_items_count: { type: "integer" },
+            total_transactions: { type: "integer" },
+            transaction_summary: {
+                type: "array",
+                items: { $ref: "#/components/schemas/ShiftStockTransactionSummaryDto" }
+            },
+            transactions: {
+                type: "array",
+                items: { $ref: "#/components/schemas/ShiftTransactionDetailDto" }
+            },
+            stock_items: {
+                type: "array",
+                items: { $ref: "#/components/schemas/StockReportItemDto" }
+            },
+            low_stock_items: {
+                type: "array",
+                items: { $ref: "#/components/schemas/StockReportItemDto" }
+            },
+            out_of_stock_items: {
+                type: "array",
+                items: { $ref: "#/components/schemas/StockReportItemDto" }
+            }
+        }
+    },
+
+    DailyStockReportDto: {
+        type: "object",
+        properties: {
+            report_date: { type: "string", format: "date-time" },
+            report_generated_at: { type: "string" },
+            total_shifts: { type: "integer" },
+            total_stock_items: { type: "integer" },
+            total_low_stock_items: { type: "integer" },
+            total_out_of_stock_items: { type: "integer" },
+            total_transactions: { type: "integer" },
+            shift_reports: {
+                type: "array",
+                items: { $ref: "#/components/schemas/ShiftStockReportDto" }
+            },
+            critical_stock_items: {
+                type: "array",
+                items: { $ref: "#/components/schemas/StockReportItemDto" }
+            }
+        }
+    },
+
+    StockReportFiltersDto: {
+        type: "object",
+        properties: {
+            date: { type: "string", format: "date-time" },
+            shift_id: { type: "string", format: "uuid" },
+            include_low_stock_only: { type: "boolean" },
+            stock_item_type: { type: "string" }
+        }
+    },
 };

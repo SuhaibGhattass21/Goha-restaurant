@@ -311,3 +311,86 @@
  *       200:
  *         description: Stock transaction deleted successfully
  */
+/**
+ * @swagger
+ * /stock-reports/daily:
+ *   get:
+ *     summary: Get daily stock report
+ *     tags: [Stock Reports]
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Date for the report (YYYY-MM-DD)
+ *       - in: query
+ *         name: shift_id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: false
+ *         description: Shift ID to filter
+ *       - in: query
+ *         name: include_low_stock_only
+ *         schema:
+ *           type: boolean
+ *         required: false
+ *         description: Only include low stock items
+ *       - in: query
+ *         name: stock_item_type
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filter by stock item type
+ *     responses:
+ *       200:
+ *         description: Daily stock report generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/StockTransactionListResponseDto'
+ */
+
+/**
+ * @swagger
+ * /stock-reports/shift/{shiftId}:
+ *   get:
+ *     summary: Get shift stock report
+ *     tags: [Stock Reports]
+ *     parameters:
+ *       - in: path
+ *         name: shiftId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: Shift ID
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Date for the report (YYYY-MM-DD)
+ *       - in: query
+ *         name: include_low_stock_only
+ *         schema:
+ *           type: boolean
+ *         required: false
+ *         description: Only include low stock items
+ *       - in: query
+ *         name: stock_item_type
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filter by stock item type
+ *     responses:
+ *       200:
+ *         description: Shift stock report generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ShiftTransactionSummaryDto'
+ */

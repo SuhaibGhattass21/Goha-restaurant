@@ -20,4 +20,4 @@ FROM shifts s
 LEFT JOIN orders o ON o.shift_id = s.shift_id
 LEFT JOIN shift_workers sw ON sw.shift_id = s.shift_id
 LEFT JOIN users u ON o.cashier_id = u.user_id
-GROUP BY s.shift_id;
+GROUP BY s.shift_id, s.start_time, s.end_time, s.shift_type;
