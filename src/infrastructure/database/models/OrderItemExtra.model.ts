@@ -18,7 +18,7 @@ export class OrderItemExtra {
     @JoinColumn({ name: "order_item_id" })
     orderItem!: OrderItem;
 
-    @ManyToOne(() => CategoryExtra)
+    @ManyToOne(() => CategoryExtra, { onDelete: "CASCADE" })
     @JoinColumn({ name: "category_extra_id" })
     extra!: CategoryExtra;
 

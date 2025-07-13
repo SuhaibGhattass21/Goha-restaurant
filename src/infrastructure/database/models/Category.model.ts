@@ -20,14 +20,14 @@ export class Category {
     @Column({ type: "text", nullable: true })
     description?: string;
 
-    @OneToMany(() => Product, (product: Product) => product.category, { onDelete: "CASCADE" })
+    @OneToMany(() => Product, (product: Product) => product.category)
     products!: Product[];
 
-    @OneToMany(() => CategorySize, (size: CategorySize) => size.category, { onDelete: "CASCADE" })
+    @OneToMany(() => CategorySize, (size: CategorySize) => size.category)
 
     sizes!: CategorySize[];
 
-    @OneToMany(() => CategoryExtra, (extra: CategoryExtra) => extra.category, { onDelete: "CASCADE" })
+    @OneToMany(() => CategoryExtra, (extra: CategoryExtra) => extra.category)
 
     extras!: CategoryExtra[];
 }
