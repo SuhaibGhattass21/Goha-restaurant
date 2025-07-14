@@ -7,17 +7,19 @@ A full-stack, multi-role management system built for modern restaurants and caf�
 ## 🚀 Features
 
 ### 👤 Role-Based System
-| Role       | Capabilities                                                                 |
-|------------|-------------------------------------------------------------------------------|
-| **Cashier** | - Create orders (dine-in / takeaway / delivery)  <br> - Generate receipts <br> - Shift summary reports |
+
+| Role        | Capabilities                                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Cashier** | - Create orders (dine-in / takeaway / delivery) <br> - Generate receipts <br> - Shift summary reports                          |
 | **Admin**   | - Manage shifts and staff <br> - Track inventory (stock in/out) <br> - Handle supplier invoices <br> - Cancel orders with logs |
-| **Owner**   | - Full system overview <br> - Set admin permissions <br> - Access dashboards and analytics |
+| **Owner**   | - Full system overview <br> - Set admin permissions <br> - Access dashboards and analytics                                     |
 
 ---
 
 ## 🧩 Architecture Overview
 
 ### Clean Architecture (Hexagonal / Onion)
+
 - **Domain Layer**: Core business logic and entities
 - **Application Layer**: Use-cases, DTOs, and mappers
 - **Infrastructure Layer**: PostgreSQL database, TypeORM, and migrations
@@ -27,14 +29,14 @@ A full-stack, multi-role management system built for modern restaurants and caf�
 
 ## 🛠️ Tech Stack
 
-| Layer         | Technology                        |
-|---------------|-----------------------------------|
-| Backend       | Node.js, Express, TypeScript      |
-| ORM           | TypeORM (PostgreSQL)              |
-| Desktop UI    | Electron.js (Cashier Interface)   |
-| Mobile UI     | Flutter (Admin & Owner Interfaces)|
-| Validation    | class-validator, express-validator|
-| DevOps        | Docker, docker-compose            |
+| Layer      | Technology                         |
+| ---------- | ---------------------------------- |
+| Backend    | Node.js, Express, TypeScript       |
+| ORM        | TypeORM (PostgreSQL)               |
+| Desktop UI | Electron.js (Cashier Interface)    |
+| Mobile UI  | Flutter (Admin & Owner Interfaces) |
+| Validation | class-validator, express-validator |
+| DevOps     | Docker, docker-compose             |
 
 ---
 
