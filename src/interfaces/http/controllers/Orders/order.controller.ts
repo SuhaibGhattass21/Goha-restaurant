@@ -101,7 +101,7 @@ export class OrderController {
     }
   }
 
-    async getOrdersByShiftIdGoha(req: Request, res: Response): Promise<void> {
+  async getOrdersByShiftIdGoha(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -482,15 +482,15 @@ export class OrderController {
 
   async getOrderStatsCafe(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
+      // const errors = validationResult(req)
+      // if (!errors.isEmpty()) {
+      //   res.status(400).json({
+      //     success: false,
+      //     message: "Validation failed",
+      //     errors: errors.array(),
+      //   })
+      //   return
+      // }
 
       const { shiftId, startDate, endDate } = req.query
 
