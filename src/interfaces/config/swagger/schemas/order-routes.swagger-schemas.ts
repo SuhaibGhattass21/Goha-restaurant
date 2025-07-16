@@ -2,7 +2,7 @@
  * @swagger
  * tags:
  *   name: Orders
- *   description: Manage customer orders
+ *   description: Manage customer orders (Goha & Cafe)
  */
 
 /**
@@ -24,42 +24,82 @@
 
 /**
  * @swagger
- * /orders:
+ * /orders/cafe:
  *   get:
- *     summary: Get all orders with pagination
+ *     summary: Get all cafe orders
  *     tags: [Orders]
  *     responses:
  *       200:
- *         description: List of orders
+ *         description: Cafe orders retrieved
+ */
+
+/**
+ * @swagger
+ * /orders/except-cafe:
+ *   get:
+ *     summary: Get all non-cafe orders
+ *     tags: [Orders]
+ *     responses:
+ *       200:
+ *         description: Non-cafe orders retrieved
  */
 
 /**
  * @swagger
  * /orders/stats:
  *   get:
- *     summary: Get order statistics
+ *     summary: Get order statistics for non-cafe
  *     tags: [Orders]
  *     responses:
  *       200:
- *         description: Order statistics retrieved
+ *         description: Statistics retrieved
  */
 
 /**
  * @swagger
- * /orders/shift/{shiftId}:
+ * /orders/stats-cafe:
  *   get:
- *     summary: Get orders by shift ID
+ *     summary: Get order statistics for cafe
+ *     tags: [Orders]
+ *     responses:
+ *       200:
+ *         description: Cafe statistics retrieved
+ */
+
+/**
+ * @swagger
+ * /orders/shift-goha/{shiftId}:
+ *   get:
+ *     summary: Get Goha orders by shift ID
  *     tags: [Orders]
  *     parameters:
  *       - in: path
  *         name: shiftId
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: ID of the shift
+ *         description: Shift ID
  *     responses:
  *       200:
- *         description: Orders for the shift retrieved
+ *         description: Goha orders retrieved
+ */
+
+/**
+ * @swagger
+ * /orders/shift-cafe/{shiftId}:
+ *   get:
+ *     summary: Get Cafe orders by shift ID
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: shiftId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Shift ID
+ *     responses:
+ *       200:
+ *         description: Cafe orders retrieved
  */
 
 /**
@@ -71,13 +111,13 @@
  *     parameters:
  *       - in: path
  *         name: cashierId
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: ID of the cashier
+ *         description: Cashier user ID
  *     responses:
  *       200:
- *         description: Orders by cashier retrieved
+ *         description: Orders by cashier
  */
 
 /**
@@ -89,13 +129,14 @@
  *     parameters:
  *       - in: path
  *         name: status
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: Status of the orders
+ *           enum: [active, completed, cancelled]
+ *         description: Order status
  *     responses:
  *       200:
- *         description: Orders by status retrieved
+ *         description: Orders by status
  */
 
 /**
@@ -107,13 +148,14 @@
  *     parameters:
  *       - in: path
  *         name: type
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: Type of the orders
+ *           enum: [dine-in, takeaway, delivery, cafe]
+ *         description: Order type
  *     responses:
  *       200:
- *         description: Orders by type retrieved
+ *         description: Orders by type
  */
 
 /**
@@ -122,9 +164,22 @@
  *   get:
  *     summary: Get orders by date range
  *     tags: [Orders]
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: end_date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
  *     responses:
  *       200:
- *         description: Orders in date range retrieved
+ *         description: Orders in date range
  */
 
 /**
@@ -136,36 +191,14 @@
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: Order ID
  *     responses:
  *       200:
- *         description: Order found
+ *         description: Order details retrieved
  */
 
-/**
- * @swagger
- * /orders/{id}:
- *   put:
- *     summary: Update order
- *     tags: [Orders]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UpdateOrderDto'
- *     responses:
- *       200:
- *         description: Order updated
- */
 /**
  * @swagger
  * /orders/shift-type/date:
@@ -187,12 +220,35 @@
  *           format: date
  *     responses:
  *       200:
- *         description: Orders retrieved by shift type and date
+ *         description: Orders filtered by shift type and date
  */
 
 /**
  * @swagger
- * /orders/{id}/status:
+ * /orders/{id}:
+ *   put:
+ *     summary: Update order
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateOrderDto'
+ *     responses:
+ *       200:
+ *         description: Order updated
+ */
+
+/**
+ * @swagger
+ * /orders/{id}/{status}:
  *   patch:
  *     summary: Update order status
  *     tags: [Orders]
@@ -202,6 +258,12 @@
  *         required: true
  *         schema:
  *           type: string
+ *       - in: path
+ *         name: status
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [active, completed, cancelled]
  *     responses:
  *       200:
  *         description: Status updated
@@ -228,7 +290,7 @@
  * @swagger
  * /orders/{id}:
  *   delete:
- *     summary: Delete order by ID
+ *     summary: Delete order
  *     tags: [Orders]
  *     parameters:
  *       - in: path
@@ -239,208 +301,4 @@
  *     responses:
  *       200:
  *         description: Order deleted
- */
-/**
- * @swagger
- * tags:
- *   name: Order Items
- *   description: Manage order items
- */
-
-/**
- * @swagger
- * /order-items:
- *   post:
- *     summary: Create a new order item
- *     tags: [Order Items]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateOrderItemDto'
- *     responses:
- *       201:
- *         description: Order item created
- */
-
-/**
- * @swagger
- * /order-items:
- *   get:
- *     summary: Get all order items
- *     tags: [Order Items]
- *     responses:
- *       200:
- *         description: Order items list
- */
-
-/**
- * @swagger
- * /order-items/order/{orderId}:
- *   get:
- *     summary: Get items by order ID
- *     tags: [Order Items]
- *     parameters:
- *       - name: orderId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Items found
- */
-
-/**
- * @swagger
- * /order-items/{id}:
- *   get:
- *     summary: Get order item by ID
- *     tags: [Order Items]
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Order item found
- */
-
-/**
- * @swagger
- * /order-items/{id}:
- *   put:
- *     summary: Update order item
- *     tags: [Order Items]
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Order item updated
- */
-
-/**
- * @swagger
- * /order-items/{id}:
- *   delete:
- *     summary: Delete order item
- *     tags: [Order Items]
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Order item deleted
- */
-/**
- * @swagger
- * tags:
- *   name: Cancelled Orders
- *   description: Track cancelled orders
- */
-
-/**
- * @swagger
- * /cancelled-orders:
- *   post:
- *     summary: Record a cancelled order
- *     tags: [Cancelled Orders]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateCancelledOrderDto'
- *     responses:
- *       201:
- *         description: Cancelled order recorded
- */
-
-/**
- * @swagger
- * /cancelled-orders:
- *   get:
- *     summary: Get all cancelled orders
- *     tags: [Cancelled Orders]
- *     responses:
- *       200:
- *         description: List of cancelled orders
- */
-
-/**
- * @swagger
- * /cancelled-orders/{id}:
- *   get:
- *     summary: Get cancelled order by ID
- *     tags: [Cancelled Orders]
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Cancelled order found
- */
-
-/**
- * @swagger
- * /cancelled-orders/order/{orderId}:
- *   get:
- *     summary: Get cancelled order by original order ID
- *     tags: [Cancelled Orders]
- *     parameters:
- *       - name: orderId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Cancelled order found
- */
-
-/**
- * @swagger
- * /cancelled-orders/user/{userId}:
- *   get:
- *     summary: Get cancelled orders by user
- *     tags: [Cancelled Orders]
- *     parameters:
- *       - name: userId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Cancelled orders by user found
- */
-
-/**
- * @swagger
- * /cancelled-orders/shift/{shiftId}:
- *   get:
- *     summary: Get cancelled orders by shift ID
- *     tags: [Cancelled Orders]
- *     parameters:
- *       - name: shiftId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Cancelled orders for shift found
  */
