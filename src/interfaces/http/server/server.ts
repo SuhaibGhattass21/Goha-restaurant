@@ -328,6 +328,7 @@ export class Server {
     apiV1.use("/order-items", dependencies.orderItemRoutes.getRouter())
     apiV1.use("/cancelled-orders", dependencies.cancelledOrderRoutes.getRouter())
     apiV1.use("/external-receipts", dependencies.externalReceiptRoutes.getRouter())
+    apiV1.use("/expenses", dependencies.expenseRoutes.getRouter())
 
     this.app.use("/api/v1", apiV1)
     this.app.use("/api/v1", apiV1)
