@@ -30,6 +30,7 @@ export class OrderItemUseCases {
       const extrasData = orderItemData.extras.map((extra) => ({
         extra_id: extra.extra_id, // Fixed: using extra_id
         price: extra.price,
+        quantity: extra.quantity,
         order_item_id: orderItem.order_item_id,
       }))
       await this.orderItemExtraRepository.createMany(extrasData)

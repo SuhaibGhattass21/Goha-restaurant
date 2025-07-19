@@ -130,19 +130,23 @@ export class OrderItemListResponseDto {
   limit!: number
 }
 
-// OrderItemExtra DTOs - FIXED: Using correct field name
 export class CreateOrderItemExtraDto {
   @IsUUID()
-  extra_id!: string // Changed from category_extra_id to extra_id
+  extra_id!: string 
 
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   price!: number
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  quantity?: number
 }
 
 export class CategoryExtraInfoDto {
   @IsUUID()
-  extra_id!: string // Matches your CategoryExtra model
+  extra_id!: string 
 
   @IsString()
   name!: string
