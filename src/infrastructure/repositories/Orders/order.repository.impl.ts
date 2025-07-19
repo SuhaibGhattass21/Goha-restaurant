@@ -144,15 +144,15 @@ async findByShiftIdGoha(shiftId: string): Promise<Order[]> {
     })
 
 
-      const ordersWithExtrasCount = orders.map(order => ({
-    ...order,
-    items: order.items.map(item => ({
-      ...item,
-      extrasCount: item.extras ? item.extras.length : 0
-    }))
-  }));
+  //     const ordersWithExtrasCount = orders.map(order => ({
+  //   ...order,
+  //   items: order.items.map(item => ({
+  //     ...item,
+  //     extrasCount: item.extras ? item.extras.length : 0
+  //   }))
+  // }));
 
-    return { orders: ordersWithExtrasCount, total }
+    return { orders, total }
   }
 
   // async findAll(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
