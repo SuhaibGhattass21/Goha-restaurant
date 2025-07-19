@@ -10,7 +10,7 @@ import { log } from "node:console"
 export class OrderRepositoryImpl implements IOrderRepository {
   constructor(private orderRepository: Repository<Order>) { }
 
-  async create(orderData: Omit<CreateOrderDto, "items">): Promise<Order> {
+  async create(orderData: CreateOrderDto): Promise<Order> {
     const order = this.orderRepository.create({
       cashier: { id: orderData.cashier_id },
       shift: { shift_id: orderData.shift_id },
