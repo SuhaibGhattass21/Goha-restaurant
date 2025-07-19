@@ -20,7 +20,7 @@ export interface IOrderRepository {
   ): Promise<{ orders: Order[]; total: number }>
   // findAll(page?: number, limit?: number): Promise<{ orders: Order[]; total: number }>
   findAllExceptCafe(page?: number, limit?: number): Promise<{ orders: Order[]; total: number }>
-  findAllCafe(page?: number, limit?: number): Promise<{ orders: Order[]; total: number }>
+  findAllCafe(page?: number, limit?: number): Promise<{ orders: (Order & { extrasSummary: any[] })[]; total: number }>
   update(id: string, orderData: UpdateOrderDto): Promise<Order | null>
   updateStatus(id: string, status: OrderStatus): Promise<Order | null>
   delete(id: string): Promise<boolean>

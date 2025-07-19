@@ -133,7 +133,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
     return { orders, total }
   }
 
-  async findAllCafe(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
+  async findAllCafe(page = 1, limit = 10): Promise<{ orders: (Order & { extrasSummary: any[] })[]; total: number }> {
     const [orders, total] = await this.orderRepository.findAndCount({
       where: { order_type: OrderType.CAFE },
       relations: ["cashier", "shift", "items", "items.product_size",
@@ -145,15 +145,31 @@ export class OrderRepositoryImpl implements IOrderRepository {
     })
 
 
-    const ordersWithExtrasCount = orders.map(order => ({
-      ...order,
-      items: order.items.map(item => ({
-        ...item,
-        extrasCount: item.extras ? item.extras.length : 0
-      }))
-    }));
+    const ordersWithExtrasSummary = orders.map(order => {
+      const allExtras = order.items.flatMap(item => item.extras || []);
+      const extraCountMap: Record<string, { extra_id: string, name: string, price: number, count: number }> = {};
+      allExtras.forEach(extra => {
+        const id = extra.extra?.extra_id;
+        if (!id) return;
+        if (!extraCountMap[id]) {
+          extraCountMap[id] = {
+            extra_id: id,
+            name: extra.extra?.name || "",
+            price: Number(extra.extra?.price ?? extra.price),
+            count: 1
+          };
+        } else {
+          extraCountMap[id].count += 1;
+        }
+      });
+      return {
+        ...order,
+        items: order.items,
+        extrasSummary: Object.values(extraCountMap)
+      };
+    });
 
-    return { orders: ordersWithExtrasCount, total }
+    return { orders: ordersWithExtrasSummary, total }
   }
 
   // async findAll(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
