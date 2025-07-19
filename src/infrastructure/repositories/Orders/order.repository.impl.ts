@@ -19,12 +19,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
       customer_name: orderData.customer_name,
       customer_phone: orderData.customer_phone,
       total_price: 0,
-      items: orderData.items.map(item => ({
-        product_size: { product_size_id: item.product_size_id },
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        extras: item.extras?.map(extra => ({ extra: { extra_id: extra.extra_id }, price: extra.price })) || [],
-      })),
+      items: orderData.items,
     })
     return await this.orderRepository.save(order)
   }
