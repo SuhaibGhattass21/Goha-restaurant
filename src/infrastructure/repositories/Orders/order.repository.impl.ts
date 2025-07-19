@@ -10,7 +10,7 @@ import { log } from "node:console"
 export class OrderRepositoryImpl implements IOrderRepository {
   constructor(private orderRepository: Repository<Order>) { }
 
-  async create(orderData: CreateOrderDto): Promise<Order> {
+  async create(orderData: Omit<CreateOrderDto, "extras">): Promise<Order> {
     const order = this.orderRepository.create({
       cashier: { id: orderData.cashier_id },
       shift: { shift_id: orderData.shift_id },
@@ -19,7 +19,6 @@ export class OrderRepositoryImpl implements IOrderRepository {
       customer_name: orderData.customer_name,
       customer_phone: orderData.customer_phone,
       total_price: 0,
-      items: orderData.items,
     })
     return await this.orderRepository.save(order)
   }
@@ -139,7 +138,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
       where: { order_type: OrderType.CAFE },
       relations: ["cashier", "shift", "items", "items.product_size",
         "items.product_size.product",
-        "items.product_size.product.category"],
+        "items.product_size.product.category", "items.extras"],
       skip: (page - 1) * limit,
       take: limit,
       order: { created_at: "DESC" },
