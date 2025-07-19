@@ -18,7 +18,13 @@ export class OrderRepositoryImpl implements IOrderRepository {
       order_type: orderData.order_type,
       customer_name: orderData.customer_name,
       customer_phone: orderData.customer_phone,
-      total_price: 0, 
+      total_price: 0,
+      items: orderData.items.map(item => ({
+        product_size: { product_size_id: item.product_size_id },
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        extras: item.extras?.map(extra => ({ extra: { extra_id: extra.extra_id }, price: extra.price })) || [],
+      })),
     })
     return await this.orderRepository.save(order)
   }
@@ -40,22 +46,23 @@ export class OrderRepositoryImpl implements IOrderRepository {
     })
   }
 
-async findByShiftIdGoha(shiftId: string): Promise<Order[]> {
-  return await this.orderRepository.find({
-    where: { 
-      shift: { shift_id: shiftId },
-      order_type: Not(OrderType.CAFE)
-    },
-    relations: ["cashier", "items"],
-    order: { created_at: "DESC" },
-  })
-}
-
-    async findByShiftIdCafe(shiftId: string): Promise<Order[]> {
+  async findByShiftIdGoha(shiftId: string): Promise<Order[]> {
     return await this.orderRepository.find({
-      where: { shift: { shift_id: shiftId }, 
-      order_type: OrderType.CAFE
-    },
+      where: {
+        shift: { shift_id: shiftId },
+        order_type: Not(OrderType.CAFE)
+      },
+      relations: ["cashier", "items"],
+      order: { created_at: "DESC" },
+    })
+  }
+
+  async findByShiftIdCafe(shiftId: string): Promise<Order[]> {
+    return await this.orderRepository.find({
+      where: {
+        shift: { shift_id: shiftId },
+        order_type: OrderType.CAFE
+      },
       relations: ["cashier", "items"],
       order: { created_at: "DESC" },
     })
@@ -122,8 +129,8 @@ async findByShiftIdGoha(shiftId: string): Promise<Order[]> {
     const [orders, total] = await this.orderRepository.findAndCount({
       where: { order_type: Not(OrderType.CAFE) },
       relations: ["cashier", "shift", "items", "items.product_size",
-  "items.product_size.product",
-  "items.product_size.product.category"],
+        "items.product_size.product",
+        "items.product_size.product.category"],
       skip: (page - 1) * limit,
       take: limit,
       order: { created_at: "DESC" },
@@ -132,25 +139,25 @@ async findByShiftIdGoha(shiftId: string): Promise<Order[]> {
     return { orders, total }
   }
 
-    async findAllCafe(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
+  async findAllCafe(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
     const [orders, total] = await this.orderRepository.findAndCount({
       where: { order_type: OrderType.CAFE },
       relations: ["cashier", "shift", "items", "items.product_size",
-  "items.product_size.product",
-  "items.product_size.product.category"],
+        "items.product_size.product",
+        "items.product_size.product.category"],
       skip: (page - 1) * limit,
       take: limit,
       order: { created_at: "DESC" },
     })
 
 
-  //     const ordersWithExtrasCount = orders.map(order => ({
-  //   ...order,
-  //   items: order.items.map(item => ({
-  //     ...item,
-  //     extrasCount: item.extras ? item.extras.length : 0
-  //   }))
-  // }));
+    //     const ordersWithExtrasCount = orders.map(order => ({
+    //   ...order,
+    //   items: order.items.map(item => ({
+    //     ...item,
+    //     extrasCount: item.extras ? item.extras.length : 0
+    //   }))
+    // }));
 
     return { orders, total }
   }
@@ -216,7 +223,7 @@ async findByShiftIdGoha(shiftId: string): Promise<Order[]> {
     return stats
   }
 
-    async getOrderStatsCafe(shiftId?: string, startDate?: Date, endDate?: Date): Promise<OrderStatsDto> {
+  async getOrderStatsCafe(shiftId?: string, startDate?: Date, endDate?: Date): Promise<OrderStatsDto> {
     let query = this.orderRepository.createQueryBuilder("order")
     console.log("a7aaaaa")
     if (shiftId) {
@@ -224,7 +231,7 @@ async findByShiftIdGoha(shiftId: string): Promise<Order[]> {
         .andWhere("order.order_type = :cafeType", { cafeType: OrderType.CAFE })
     }
 
-    if (startDate && endDate) {   
+    if (startDate && endDate) {
       const whereClause = shiftId ? "AND" : "WHERE"
       query = query.andWhere(`order.created_at >= :startDate ${whereClause} order.created_at <= :endDate`, {
         startDate,
@@ -254,7 +261,7 @@ async findByShiftIdGoha(shiftId: string): Promise<Order[]> {
     const start = startOfDay(new Date(dateStr));
     const end = endOfDay(new Date(dateStr));
 
-    
+
     return this.orderRepository.find({
       where: {
         shift: {
