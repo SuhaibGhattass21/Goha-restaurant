@@ -26,7 +26,7 @@ export class AddShiftWorkerDto {
     hourly_rate!: number;
 
     @IsDate()
-    start_time!: Date;
+    start_time: Date = new Date();
 
     @IsOptional()
     @IsDate()
@@ -59,6 +59,15 @@ export class UpdateShiftWorkerDto {
     @IsNumber()
     @Min(0)
     calculated_salary?: number;
+}
+
+export class UpdateShiftWorkerEndDto {
+    @IsUUID()
+    shift_worker_id!: string;
+
+    @IsDate()
+    @Type(() => Date)
+    end_time!: Date;
 }
 
 export class ShiftWorkerResponseDto {

@@ -316,6 +316,22 @@
  *       200:
  *         description: Shift worker updated
  */
+/**
+ * @swagger
+ * /shift-workers/end-time:
+ *   patch:
+ *     summary: Set end time and calculate salary for shift worker
+ *     tags: [Shift Workers]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateShiftWorkerEndDto'
+ *     responses:
+ *       200:
+ *         description: End time and salary updated successfully
+ */
 
 /**
  * @swagger

@@ -2,6 +2,7 @@ import { IShiftWorkerRepository } from "../../../domain/repositories/Shift/shift
 import { ShiftWorker } from "../../../infrastructure/database/models";
 import { Repository } from "typeorm";
 import { AddShiftWorkerDto, UpdateShiftWorkerDto } from "../../../application/dtos/Shift/ShiftWorker.dto";
+import { differenceInMinutes } from 'date-fns';
 
 export class ShiftWorkerRepositoryImpl implements IShiftWorkerRepository {
     constructor(private repo: Repository<ShiftWorker>) { }
@@ -19,6 +20,19 @@ export class ShiftWorkerRepositoryImpl implements IShiftWorkerRepository {
         return await this.repo.save(record);
     }
 
+    async updateEndTimeAndCalculateSalary(shift_worker_id: string, end_time: Date): Promise<ShiftWorker> {
+        const worker = await this.repo.findOneBy({ shift_worker_id });
+        if (!worker || !worker.start_time || !worker.hourly_rate) {
+            throw new Error('Required data missing');
+        }
+
+        worker.end_time = end_time;
+        const durationInMinutes = differenceInMinutes(end_time, worker.start_time);
+        const hours = durationInMinutes / 60;
+        worker.calculated_salary = parseFloat((hours * Number(worker.hourly_rate)).toFixed(2));
+
+        return await this.repo.save(worker);
+    }
     async delete(id: string): Promise<boolean> {
         const result = await this.repo.delete(id);
         return result.affected !== 0;

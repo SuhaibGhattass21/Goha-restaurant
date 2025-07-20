@@ -25,12 +25,12 @@ export class ShiftWorker {
     @Column({ type: "decimal", precision: 10, scale: 2 })
     hourly_rate!: number;
 
-    @Column({ type: "timestamptz" })
-    start_time: Date = new Date();;
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }) // auto-set
+    start_time!: Date;
 
-    @Column({ type: "timestamptz" })
+    @Column({ type: "timestamptz", nullable: true })
     end_time?: Date;
 
-    @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+    @Column({ type: "decimal", precision: 10, scale: 2, default: 0, nullable: false })
     calculated_salary: number = 0;
 }

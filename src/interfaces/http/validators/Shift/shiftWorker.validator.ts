@@ -14,6 +14,15 @@ export class ShiftWorkerValidator {
         return [param("id").isUUID().withMessage("Invalid ID")];
     }
 
+    static setEndTime() {
+        return [
+            body("shift_worker_id")
+                .isUUID().withMessage("shift_worker_id must be a valid UUID"),
+            body("end_time")
+                .isISO8601().withMessage("end_time must be a valid ISO8601 date")
+        ];
+    }
+
     static getById() {
         return [param("id").isUUID().withMessage("Invalid ID")];
     }

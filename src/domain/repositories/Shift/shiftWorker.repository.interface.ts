@@ -7,4 +7,5 @@ export interface IShiftWorkerRepository {
     delete(id: string): Promise<boolean>;
     findById(id: string): Promise<ShiftWorker | null>;
     findByShiftId(shiftId: string): Promise<ShiftWorker[]>;
+    updateEndTimeAndCalculateSalary(id: string, endTime: Date): Promise<ShiftWorker>;
 }

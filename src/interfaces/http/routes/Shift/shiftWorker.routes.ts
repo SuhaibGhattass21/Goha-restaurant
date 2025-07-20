@@ -15,6 +15,7 @@ export class ShiftWorkerRoutes {
         this.router.get("/:id", ShiftWorkerValidator.getById(), this.controller.getShiftWorkerById.bind(this.controller));
         this.router.get("/shift/:shiftId", ShiftWorkerValidator.getByShiftId(), this.controller.getWorkerByShiftId.bind(this.controller));
         this.router.delete("/:id", ShiftWorkerValidator.delete(), this.controller.delete.bind(this.controller));
+        this.router.patch("/end-time", ShiftWorkerValidator.setEndTime(), this.controller.setEndTime.bind(this.controller));
     }
 
     public getRouter(): Router {

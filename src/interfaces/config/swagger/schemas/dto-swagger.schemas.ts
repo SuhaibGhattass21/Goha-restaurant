@@ -1618,4 +1618,19 @@ export const swaggerSchemas = {
             stock_item_type: { type: "string" }
         }
     },
+
+    UpdateShiftWorkerEndDto: {
+        type: "object",
+        properties: {
+            shift_worker_id: {
+                type: "string",
+                format: "uuid",
+            },
+            end_time: {
+                type: "string",
+                format: "date-time",
+            },
+        },
+        required: ["shift_worker_id", "end_time"],
+    },
 };

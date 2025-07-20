@@ -1,5 +1,6 @@
-import { AddShiftWorkerDto, ShiftWorkerResponseDto, UpdateShiftWorkerDto } from "../../dtos/Shift/ShiftWorker.dto";
+import { AddShiftWorkerDto, ShiftWorkerResponseDto, UpdateShiftWorkerDto, UpdateShiftWorkerEndDto } from "../../dtos/Shift/ShiftWorker.dto";
 import { IShiftWorkerRepository } from "../../../domain/repositories/Shift/shiftWorker.repository.interface";
+import { ShiftWorker } from "@infrastructure/database/models";
 
 export class ShiftWorkerUseCase {
     constructor(private repo: IShiftWorkerRepository) { }
@@ -12,6 +13,10 @@ export class ShiftWorkerUseCase {
     async update(id: string, data: UpdateShiftWorkerDto): Promise<ShiftWorkerResponseDto | null> {
         const updated = await this.repo.update(id, data);
         return updated ? this.mapToDto(updated) : null;
+    }
+
+    async updateEndTimeAndCalculateSalary(dto: UpdateShiftWorkerEndDto): Promise<ShiftWorker> {
+        return this.repo.updateEndTimeAndCalculateSalary(dto.shift_worker_id, dto.end_time);
     }
 
     async delete(id: string): Promise<boolean> {
