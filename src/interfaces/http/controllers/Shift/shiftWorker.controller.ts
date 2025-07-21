@@ -12,16 +12,23 @@ export class ShiftWorkerController {
     async createShiftWorker(req: Request, res: Response): Promise<void> {
         const dto: AddShiftWorkerDto = req.body;
 
-        if (!dto.shift_id || !dto.worker_id || !dto.hourly_rate || !dto.start_time) {
+        if (!dto.shift_id ||
+            !dto.worker_id ||
+            dto.hourly_rate === undefined ||
+            dto.hourly_rate === null ||
+            !dto.start_time) {
             res.status(400).json({ message: "Missing required fields" });
+            return;
         }
 
         try {
             const result = await this.service.create(dto);
             res.status(201).json(result);
+            return;
         } catch (error) {
             console.error("Error creating shift worker:", error);
             res.status(500).json({ message: "Internal server error" });
+            return
         }
     }
 
