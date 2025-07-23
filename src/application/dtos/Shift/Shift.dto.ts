@@ -9,6 +9,7 @@ import {
     IsBoolean,
     IsDate,
     Min,
+    IsDateString
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ShiftType } from '../../../domain/enums/Shift.enums';
@@ -109,3 +110,61 @@ export class ShiftResponseDto {
     created_at!: Date;
 }
 
+export class CashierDto {
+    @IsUUID()
+    user_id!: string;
+
+    @IsString()
+    username!: string;
+}
+
+export class ShiftSummaryResponseDto {
+    @IsUUID()
+    shift_id!: string;
+
+    @IsEnum(ShiftType)
+    shift_type!: ShiftType;
+
+    @IsDate()
+    start_time!: Date;
+
+    @IsDate()
+    end_time!: Date;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0)
+    total_revenue!: number;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0)
+    cafe_revenue!: number;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0)
+    total_expenses!: number;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0)
+    total_salaries!: number;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0)
+    final_number!: number;
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CashierDto)
+    cashiers!: CashierDto[];
+
+    @IsNumber()
+    total_orders!: number;
+}
+
+export class ShiftSummaryFilterDto {
+    @IsEnum(ShiftType)
+    shift_type!: ShiftType;
+
+    @Type(() => Date)
+    @IsDate()
+    date!: Date;
+}

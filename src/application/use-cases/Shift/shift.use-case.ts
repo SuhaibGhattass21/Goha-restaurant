@@ -4,7 +4,9 @@ import type {
     UpdateShiftTypeDTO,
     RequestCloseShiftDTO,
     ApproveCloseShiftDTO,
-    ShiftResponseDto
+    ShiftResponseDto,
+    ShiftSummaryResponseDto,
+    ShiftSummaryFilterDto
 } from '@application/dtos/Shift/Shift.dto';
 import type { Shift } from '@infrastructure/database/models/Shift.model';
 import { ShiftStatus, ShiftType } from '../../../domain/enums/Shift.enums';
@@ -63,13 +65,17 @@ export class ShiftUseCases {
     }
 
 
-    async getSummary(id: string): Promise<any> {
-        return this.repo.getShiftSummary(id);
+    async getSummaryByShiftId(shiftId: string): Promise<ShiftSummaryResponseDto> {
+        return this.repo.getSummaryByShiftId(shiftId);
     }
 
-    async getAllSummaries(): Promise<any[]> {
-        return this.repo.getAllShiftSummaries();
+    async getSummaryByShiftTypeAndDate(filter: ShiftSummaryFilterDto): Promise<ShiftSummaryResponseDto> {
+        return this.repo.getShiftSummaryByTypeAndDate(filter);
     }
+
+    // async getAllSummaries(): Promise<any[]> {
+    //     return this.repo.getAllShiftSummaries();
+    // }
 
     private mapToDto(shift: Shift): ShiftResponseDto {
         return {

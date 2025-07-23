@@ -5,9 +5,12 @@ import type {
     UpdateShiftTypeDTO,
     RequestCloseShiftDTO,
     ApproveCloseShiftDTO,
+    ShiftSummaryResponseDto,
+    ShiftSummaryFilterDto
 } from '../../../application/dtos/Shift/Shift.dto'
 import { IShiftRepository } from '../../../domain/repositories/Shift/shift.repository.interface'
 import { ShiftStatus, ShiftType } from '../../../domain/enums/Shift.enums'
+import { startOfDay, endOfDay } from 'date-fns'
 
 export class ShiftRepositoryImpl implements IShiftRepository {
     constructor(private repo: Repository<Shift>) { }
@@ -105,12 +108,115 @@ export class ShiftRepositoryImpl implements IShiftRepository {
         });
     }
 
-    async getShiftSummary(shiftId: string): Promise<any> {
-        const result = await this.repo.query(`SELECT * FROM shift_summary_view WHERE shift_id = $1`, [shiftId]);
-        return result[0] ?? null;
+    async getSummaryByShiftId(shiftId: string): Promise<ShiftSummaryResponseDto> {
+        const shift = await this.repo.findOne({
+            where: { shift_id: shiftId },
+            relations: ['orders', 'orders.cashier', 'shiftWorkers', 'expenses', 'opened_by'],
+        });
+
+        if (!shift) throw new Error('Shift not found');
+
+        const orders = shift.orders ?? [];
+        const nonCafeOrders = orders.filter(o => o.order_type !== 'cafe');
+        const cafeOrders = orders.filter(o => o.order_type === 'cafe');
+
+        const totalOrders = orders.length;
+        const totalRevenue = nonCafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
+        const cafeRevenue = cafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
+        const totalExpenses = (shift.expenses ?? []).reduce((acc, e) => acc + Number(e.amount), 0);
+        const totalSalaries = (shift.shiftWorkers ?? []).reduce((acc, sw) => acc + Number(sw.calculated_salary), 0);
+
+        const cashiersMap = new Map<string, string>();
+
+        if (shift.opened_by) {
+            cashiersMap.set(shift.opened_by.id, shift.opened_by.username);
+        }
+
+        orders.forEach(order => {
+            if (order.cashier) {
+                cashiersMap.set(order.cashier.id, order.cashier.username);
+            }
+        });
+
+        const cashiers = [...cashiersMap.entries()].map(([user_id, username]) => ({
+            user_id,
+            username,
+        }));
+
+        return {
+            shift_id: shift.shift_id,
+            shift_type: shift.shift_type,
+            start_time: shift.start_time,
+            end_time: shift.end_time!,
+            total_orders: totalOrders,
+            total_revenue: totalRevenue,
+            cafe_revenue: cafeRevenue,
+            total_expenses: totalExpenses,
+            total_salaries: totalSalaries,
+            final_number: totalRevenue - totalExpenses - totalSalaries,
+            cashiers,
+        };
     }
 
-    async getAllShiftSummaries(): Promise<any[]> {
-        return this.repo.query(`SELECT * FROM shift_summary_view ORDER BY start_time DESC`);
+    async getShiftSummaryByTypeAndDate(filter: ShiftSummaryFilterDto): Promise<ShiftSummaryResponseDto> {
+        const { date, shift_type } = filter;
+
+        const start = startOfDay(date);
+        const end = endOfDay(date);
+
+        const shift = await this.repo.findOne({
+            where: {
+                shift_type,
+                start_time: Between(start, end),
+            },
+            relations: ['orders', 'orders.cashier', 'expenses', 'shiftWorkers', 'opened_by'],
+        });
+
+        if (!shift) throw new Error('Shift not found');
+
+        const orders = shift.orders ?? [];
+        const nonCafeOrders = orders.filter(o => o.order_type !== 'cafe');
+        const cafeOrders = orders.filter(o => o.order_type === 'cafe');
+
+        const totalOrders = orders.length;
+        const totalRevenue = nonCafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
+        const cafeRevenue = cafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
+        const totalExpenses = (shift.expenses ?? []).reduce((acc, e) => acc + Number(e.amount), 0);
+        const totalSalaries = (shift.shiftWorkers ?? []).reduce((acc, sw) => acc + Number(sw.calculated_salary), 0);
+
+        const cashiersMap = new Map<string, string>();
+
+        if (shift.opened_by) {
+            cashiersMap.set(shift.opened_by.id, shift.opened_by.username);
+        }
+
+        orders.forEach(order => {
+            if (order.cashier) {
+                cashiersMap.set(order.cashier.id, order.cashier.username);
+            }
+        });
+
+        const cashiers = [...cashiersMap.entries()].map(([user_id, username]) => ({
+            user_id,
+            username,
+        }));
+
+        return {
+            shift_id: shift.shift_id,
+            shift_type: shift.shift_type,
+            start_time: shift.start_time,
+            end_time: shift.end_time!,
+            total_orders: totalOrders,
+            total_revenue: totalRevenue,
+            cafe_revenue: cafeRevenue,
+            total_expenses: totalExpenses,
+            total_salaries: totalSalaries,
+            final_number: totalRevenue - totalExpenses - totalSalaries,
+            cashiers,
+        };
     }
+
+    // async getAllShiftSummaries(): Promise<any[]> {
+    //     return this.repo.query(`SELECT * FROM shift_summary_view ORDER BY start_time DESC`);
+    // }
 }

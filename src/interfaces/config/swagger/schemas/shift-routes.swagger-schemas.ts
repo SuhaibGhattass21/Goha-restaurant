@@ -196,32 +196,57 @@
 
 /**
  * @swagger
- * /shifts/{id}/summary:
+ * /shifts/summary/{shiftId}:
  *   get:
- *     summary: Get summary for a specific shift
+ *     summary: Get shift summary by shift ID
  *     tags: [Shifts]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: shiftId
  *         required: true
- *         description: Shift ID
  *         schema:
  *           type: string
+ *           format: uuid
+ *         description: ID of the shift
  *     responses:
  *       200:
- *         description: Shift summary retrieved
+ *         description: Shift summary retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ShiftSummaryResponseDto'
  */
 
 /**
  * @swagger
- * /shifts/summaries/all:
+ * /shifts/summary-by-date:
  *   get:
- *     summary: Get all shift summaries
+ *     summary: Get shift summary by date and type
  *     tags: [Shifts]
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: The target date
+ *       - in: query
+ *         name: shift_type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [morning, night]
+ *         description: Shift type
  *     responses:
  *       200:
- *         description: All shift summaries retrieved
+ *         description: Shift summary by type and date
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ShiftSummaryResponseDto'
  */
+
 
 /**
  * @swagger

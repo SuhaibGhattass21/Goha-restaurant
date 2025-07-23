@@ -279,6 +279,7 @@ export const swaggerSchemas = {
             },
         },
     },
+
     CreateUserDTO: {
         type: "object",
         required: ["username", "fullName", "password"],
@@ -823,6 +824,44 @@ export const swaggerSchemas = {
             },
         },
     },
+
+    ShiftSummaryFilterDto: {
+        type: "object",
+        properties: {
+            date: {
+                type: "string",
+                format: "date-time",
+            },
+            shift_type: {
+                type: "string",
+                enum: ["morning", "night"],
+            },
+        },
+        required: ["date", "shift_type"],
+    },
+
+    ShiftSummaryResponseDto: {
+        type: "object",
+        properties: {
+            shift_id: { type: "string", format: "uuid" },
+            shift_type: { type: "string", enum: ["morning", "night"] },
+            start_time: { type: "string", format: "date-time" },
+            end_time: { type: "string", format: "date-time" },
+            total_orders: { type: "integer" },
+            total_revenue: { type: "number", format: "float" },
+            cafe_revenue: { type: "number", format: "float" },
+            total_expenses: { type: "number", format: "float" },
+            total_salaries: { type: "number", format: "float" },
+            final_number: { type: "number", format: "float" },
+            cashiers: {
+                type: "array",
+                items: {
+                    type: "string",
+                },
+            },
+        },
+    },
+
     CreateWorkerDto: {
         type: "object",
         required: ["full_name", "status", "base_hourly_rate"],
@@ -1067,6 +1106,21 @@ export const swaggerSchemas = {
                 description: "Total salary earned in this shift segment",
             },
         },
+    },
+
+    UpdateShiftWorkerEndDto: {
+        type: "object",
+        properties: {
+            shift_worker_id: {
+                type: "string",
+                format: "uuid",
+            },
+            end_time: {
+                type: "string",
+                format: "date-time",
+            },
+        },
+        required: ["shift_worker_id", "end_time"],
     },
     CreateStockItemDto: {
         type: "object",
@@ -1619,18 +1673,4 @@ export const swaggerSchemas = {
         }
     },
 
-    UpdateShiftWorkerEndDto: {
-        type: "object",
-        properties: {
-            shift_worker_id: {
-                type: "string",
-                format: "uuid",
-            },
-            end_time: {
-                type: "string",
-                format: "date-time",
-            },
-        },
-        required: ["shift_worker_id", "end_time"],
-    },
 };

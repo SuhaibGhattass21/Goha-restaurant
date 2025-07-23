@@ -10,6 +10,7 @@ export const AppDataSource = new DataSource({
     url: process.env.DATABASE_URL || '',
     synchronize: true,
     logging: false,
+    // migrations: ['src/infrastructure/database/postgres/migrations/*.ts'],
     entities: [
         User,
         Product,
@@ -35,7 +36,6 @@ export const AppDataSource = new DataSource({
         CancelledOrder,
         Expense
     ],
-    migrations: [],
     subscribers: [],
 });
 

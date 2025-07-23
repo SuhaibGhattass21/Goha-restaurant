@@ -10,6 +10,8 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { User } from "./user.model";
 import { ShiftWorker } from "./ShiftWorker.model";
+import { Expense } from "./Expense.model";
+import { Order } from "./Order.model";
 import { ShiftType, ShiftStatus } from "../../../domain/enums/Shift.enums"
 
 @Entity("shifts")
@@ -55,6 +57,12 @@ export class Shift {
 
     @OneToMany(() => ShiftWorker, (sw) => sw.shift)
     shiftWorkers!: ShiftWorker[];
+
+    @OneToMany(() => Expense, (expense) => expense.shift)
+    expenses!: Expense[];
+
+    @OneToMany(() => Order, (order) => order.shift)
+    orders!: Order[];
 
     @Column({ type: "date" })
     created_at: Date = new Date();

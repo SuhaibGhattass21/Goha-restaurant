@@ -4,7 +4,9 @@ import type {
     RequestCloseShiftDTO,
     ApproveCloseShiftDTO,
     ShiftResponseDto,
-    FilterShiftByStatusDto
+    FilterShiftByStatusDto,
+    ShiftSummaryResponseDto,
+    ShiftSummaryFilterDto
 } from '@application/dtos/Shift/Shift.dto';
 import { ShiftUseCases } from '../../../application/use-cases/Shift/shift.use-case';
 import { Shift } from '../../../infrastructure/database/models/Shift.model';
@@ -55,14 +57,17 @@ export class ShiftService {
         return shifts.map(this.toResponseDto);
     }
 
-
-    getSummary(id: string) {
-        return this.useCases.getSummary(id);
+    async getSummaryByShiftId(shiftId: string): Promise<ShiftSummaryResponseDto> {
+        return this.useCases.getSummaryByShiftId(shiftId);
     }
 
-    getAllSummaries() {
-        return this.useCases.getAllSummaries();
+    async getSummaryByShiftTypeAndDate(filter: ShiftSummaryFilterDto): Promise<ShiftSummaryResponseDto> {
+        return this.useCases.getSummaryByShiftTypeAndDate(filter);
     }
+
+    // getAllSummaries() {
+    //     return this.useCases.getAllSummaries();
+    // }
 
     delete(id: string) {
         return this.useCases.delete(id);

@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW shift_summary_view AS
+CREATE VIEW shift_summary_view AS
 SELECT
     s.shift_id,
     s.start_time,
