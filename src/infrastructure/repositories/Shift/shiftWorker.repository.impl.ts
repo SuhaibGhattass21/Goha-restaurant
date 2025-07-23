@@ -43,6 +43,6 @@ export class ShiftWorkerRepositoryImpl implements IShiftWorkerRepository {
     }
 
     async findByShiftId(shiftId: string): Promise<ShiftWorker[]> {
-        return await this.repo.find({ where: { shift: { shift_id: shiftId } }, relations: ['worker'] });
+        return await this.repo.find({ where: { shift: { shift_id: shiftId } }, relations: ['worker', 'shift'] });
     }
 }

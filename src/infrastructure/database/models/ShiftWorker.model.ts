@@ -18,6 +18,9 @@ export class ShiftWorker {
     @JoinColumn({ name: "shift_id" })
     shift!: Shift;
 
+    @Column()
+    shift_id!: string;
+
     @ManyToOne(() => Worker)
     @JoinColumn({ name: 'worker_id' })
     worker!: Worker;

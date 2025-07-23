@@ -291,10 +291,17 @@
 
 /**
  * @swagger
- * /shift-workers:
+ * /shift-workers/shift/{shiftId}:
  *   get:
  *     summary: Get all shift worker assignments
  *     tags: [ShiftWorkers]
+ *     parameters:
+ *       - in: path
+ *         name: shiftId    
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Shift ID
  *     responses:
  *       200:
  *         description: List of all shift workers

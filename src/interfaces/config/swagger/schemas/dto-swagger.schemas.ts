@@ -856,7 +856,11 @@ export const swaggerSchemas = {
             cashiers: {
                 type: "array",
                 items: {
-                    type: "string",
+                    type: "object",
+                    properties: {
+                        user_id: { type: "string", format: "uuid" },
+                        username: { type: "string" },
+                    },
                 },
             },
         },
