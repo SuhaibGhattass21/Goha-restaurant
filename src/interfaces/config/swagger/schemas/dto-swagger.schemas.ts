@@ -220,7 +220,7 @@ export const swaggerSchemas = {
             workers: {
                 type: "array",
                 items: {
-                    $ref: "#/components/schemas/AddShiftWorkerDTO",
+                    $ref: "#/components/schemas/AddShiftWorkerDto",
                 },
                 description: "List of workers assigned to the shift",
             },
@@ -818,7 +818,7 @@ export const swaggerSchemas = {
             workers: {
                 type: "array",
                 items: {
-                    $ref: "#/components/schemas/AddShiftWorkerDTO",
+                    $ref: "#/components/schemas/AddShiftWorkerDto",
                 },
                 description: "List of workers assigned to the shift",
             },

@@ -12,6 +12,7 @@ export class ExpenseRepositoryImpl implements IExpenseRepository {
         const entity = this.repo.create({
             title: data.title,
             amount: data.amount,
+            description: data.description,
             created_by: { id: data.created_by },
             shift: { shift_id: data.shift_id },
         });
