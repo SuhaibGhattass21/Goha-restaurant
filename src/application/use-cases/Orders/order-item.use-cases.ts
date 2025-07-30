@@ -16,7 +16,6 @@ export class OrderItemUseCases {
   ) { }
 
   async createOrderItem(orderItemData: CreateOrderItemDto): Promise<OrderItemResponseDto> {
-    // Create the order item first
     const orderItem = await this.orderItemRepository.create({
       order_id: orderItemData.order_id,
       product_size_id: orderItemData.product_size_id,
@@ -99,7 +98,7 @@ export class OrderItemUseCases {
 
   private mapToResponseDto(orderItem: OrderItem): OrderItemResponseDto {
     const basePrice = Number(orderItem.unit_price) * orderItem.quantity
-    const extrasPrice = orderItem.extras?.reduce((sum, extra) => sum + Number(extra.price), 0) || 0
+    const extrasPrice = orderItem.extras?.reduce((sum, extra) => sum + Number(extra.price) * Number(extra.quantity), 0) || 0
     const totalPrice = basePrice + extrasPrice
 
     return {
@@ -135,9 +134,11 @@ export class OrderItemUseCases {
           extra_id: extra.extra.extra_id, // Fixed: using extra_id
           name: extra.extra.name,
           price: Number(extra.extra.price),
+          quantity: extra.extra.quantity,
           category_name: extra.extra.category?.name || "",
         }
         : undefined,
+      quantity: extra.quantity || 1, // Default to 1 if not provided
       price: Number(extra.price),
     }
   }

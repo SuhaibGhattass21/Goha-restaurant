@@ -24,4 +24,7 @@ export class OrderItemExtra {
 
     @Column({ type: "decimal", precision: 10, scale: 2 })
     price!: number;
+
+    @Column({ type: "int", default: 1 })
+    quantity!: number;
 }

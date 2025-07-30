@@ -30,7 +30,7 @@ export class OrderItem {
     @Column({ type: "decimal", precision: 10, scale: 2 })
     unit_price!: number;
 
-    @Column({ type: "text" })
+    @Column({ type: "text", nullable: true })
     special_instructions?: string;
 
     @OneToMany(() => OrderItemExtra, (extra) => extra.orderItem, { cascade: true, orphanedRowAction: 'delete' })

@@ -1,3 +1,5 @@
+import e from "express";
+
 export const swaggerSchemas = {
     CreateCategoryExtraDTO: {
         type: "object",
@@ -6,12 +8,14 @@ export const swaggerSchemas = {
             name: {
                 type: "string",
                 description: "Name of the category extra",
+                example: "Extra Cheese"
             },
             price: {
                 type: "number",
                 format: "decimal",
                 minimum: 0,
                 description: "Price of the category extra",
+                example: 25
             },
             category_id: {
                 type: "string",
@@ -47,10 +51,12 @@ export const swaggerSchemas = {
             name: {
                 type: "string",
                 description: "Name of the category",
+                example: "Pizza"
             },
             description: {
                 type: "string",
                 description: "Description of the category",
+                example: "Delicious pizzas with various toppings"
             },
         },
     },
@@ -74,6 +80,7 @@ export const swaggerSchemas = {
             size_name: {
                 type: "string",
                 description: "Name of the category size",
+                example: "Small"
             },
             category_id: {
                 type: "string",
@@ -103,17 +110,17 @@ export const swaggerSchemas = {
             name: {
                 type: "string",
                 description: "Name of the product",
-                example: "Nike Running Shoes"
+                example: "Pizza Mix Cheese"
             },
             description: {
                 type: "string",
                 description: "Detailed description of the product",
-                example: "Lightweight and breathable running shoes"
+                example: "Italian Pizza"
             },
             image_url: {
                 type: "string",
                 description: "URL of the product image",
-                example: "https://example.com/images/product1.jpg"
+                example: "null"
             },
             is_active: {
                 type: "boolean",
@@ -179,6 +186,7 @@ export const swaggerSchemas = {
                 format: "decimal",
                 minimum: 0,
                 description: "Price for the product size",
+                example: 100
             },
         },
     },
@@ -873,6 +881,7 @@ export const swaggerSchemas = {
             full_name: {
                 type: "string",
                 description: "Full name of the worker",
+                example: "Abdo"
             },
             status: {
                 type: "string",
@@ -893,15 +902,18 @@ export const swaggerSchemas = {
                 format: "decimal",
                 minimum: 0,
                 description: "Base hourly rate for the worker",
+                example: 50
             },
             phone: {
                 type: "string",
                 description: "Optional phone number of the worker",
+                example: "+201234567890"
             },
             user_id: {
                 type: "string",
                 format: "uuid",
                 description: "Optional user account ID if the worker has login access",
+                example: "550e8400-e29b-41d4-a716-446655440000"
             },
         },
     },
@@ -1130,12 +1142,38 @@ export const swaggerSchemas = {
         type: "object",
         required: ["name", "type", "unit", "current_quantity", "minimum_value", "status"],
         properties: {
-            name: { type: "string" },
-            type: { type: "string", enum: ["ingredient", "product", "supply"] }, // adjust enum values as needed
-            unit: { type: "string" },
-            current_quantity: { type: "number", format: "decimal", minimum: 0 },
-            minimum_value: { type: "number", format: "decimal", minimum: 0 },
-            status: { type: "string", enum: ["active", "inactive"] } // adjust enum values as needed
+            name: {
+                type: "string",
+                description: "Name of the stock item",
+                example: "Sugar"
+            },
+            type: {
+                type: "string",
+                enum: ["ingredient", "product", "supply"]
+            }, // adjust enum values as needed
+            unit: {
+                type: "string",
+                description: "Unit of measurement for the stock item",
+                example: "kg"
+            },
+            current_quantity: {
+                type: "number",
+                format: "decimal",
+                minimum: 0,
+                description: "Current quantity in stock",
+                example: 50
+            },
+            minimum_value: {
+                type: "number",
+                format: "decimal",
+                minimum: 0,
+                description: "Minimum quantity before restock is needed",
+                example: 10
+            },
+            status: {
+                type: "string",
+                enum: ["active", "inactive"]
+            } // adjust enum values as needed
         }
     },
 
@@ -1186,10 +1224,10 @@ export const swaggerSchemas = {
         type: "object",
         properties: {
             stock_item_id: { type: "string", format: "uuid" },
-            name: { type: "string" },
-            current_quantity: { type: "number", format: "decimal" },
-            minimum_value: { type: "number", format: "decimal" },
-            unit: { type: "string" }
+            name: { type: "string", description: "Name of the stock item", example: "Sugar" },
+            current_quantity: { type: "number", format: "decimal", description: "Current quantity in stock", example: 5 },
+            minimum_value: { type: "number", format: "decimal", description: "Minimum quantity before restock is needed", example: 10 },
+            unit: { type: "string", description: "Unit of measurement for the stock item", example: "kg" },
         }
     },
 
@@ -1198,7 +1236,7 @@ export const swaggerSchemas = {
         properties: {
             transaction_id: { type: "string", format: "uuid" },
             type: { type: "string", enum: ["in", "out"] },
-            quantity: { type: "number", format: "decimal" },
+            quantity: { type: "number", format: "decimal", example: 10 },
             timestamp: { type: "string", format: "date-time" }
         }
     },
@@ -1209,7 +1247,7 @@ export const swaggerSchemas = {
         properties: {
             stock_item_id: { type: "string", format: "uuid" },
             type: { type: "string", enum: ["in", "out"] },
-            quantity: { type: "number", format: "decimal", minimum: 0 },
+            quantity: { type: "number", format: "decimal", minimum: 0, example: 10 },
             user_id: { type: "string", format: "uuid" },
             shift_id: { type: "string", format: "uuid" }
         }
@@ -1247,7 +1285,7 @@ export const swaggerSchemas = {
         properties: {
             cashier_id: { type: "string", format: "uuid" },
             shift_id: { type: "string", format: "uuid" },
-            table_number: { type: "string" },
+            table_number: { type: "string", description: "Table number for dine-in orders", example: "Table 5" },
             order_type: { type: "string", enum: ["dine_in", "takeaway", "delivery"] },
             customer_name: { type: "string" },
             customer_phone: { type: "string" },
@@ -1340,8 +1378,8 @@ export const swaggerSchemas = {
         properties: {
             order_id: { type: "string", format: "uuid" },
             product_size_id: { type: "string", format: "uuid" },
-            quantity: { type: "integer", minimum: 1 },
-            unit_price: { type: "number", format: "decimal", minimum: 0 },
+            quantity: { type: "integer", minimum: 1, example: 3 },
+            unit_price: { type: "number", format: "decimal", minimum: 0, example: 100 },
             special_instructions: { type: "string" },
             extras: {
                 type: "array",
@@ -1387,7 +1425,8 @@ export const swaggerSchemas = {
         required: ["extra_id", "price"],
         properties: {
             extra_id: { type: "string", format: "uuid" },
-            price: { type: "number", format: "decimal" },
+            price: { type: "number", format: "decimal", example: 25 },
+            quantity: { type: "integer", minimum: 1, default: 1, example: 2 },
         },
     },
 
@@ -1398,6 +1437,7 @@ export const swaggerSchemas = {
             order_item_id: { type: "string", format: "uuid" },
             extra: { $ref: "#/components/schemas/CategoryExtraInfoDto" },
             price: { type: "number", format: "decimal" },
+            quantity: { type: "integer", minimum: 1, default: 1 },
         },
     },
 
@@ -1405,8 +1445,9 @@ export const swaggerSchemas = {
         type: "object",
         properties: {
             extra_id: { type: "string", format: "uuid" },
-            name: { type: "string" },
-            price: { type: "number", format: "decimal" },
+            name: { type: "string", description: "Name of the extra", example: "Extra Cheese" },
+            price: { type: "number", format: "decimal", example: 25 },
+            quantity: { type: "integer", minimum: 1, default: 1, example: 2 },
             category_name: { type: "string" },
         },
     },

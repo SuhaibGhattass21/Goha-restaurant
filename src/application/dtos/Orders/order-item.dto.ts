@@ -132,27 +132,29 @@ export class OrderItemListResponseDto {
 
 export class CreateOrderItemExtraDto {
   @IsUUID()
-  extra_id!: string 
+  extra_id!: string
 
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   price!: number
 
-  @IsOptional()
   @IsNumber()
-  @Min(0)
-  quantity?: number
+  @Min(1)
+  quantity!: number
 }
 
 export class CategoryExtraInfoDto {
   @IsUUID()
-  extra_id!: string 
+  extra_id!: string
 
   @IsString()
   name!: string
 
   @IsNumber({ maxDecimalPlaces: 2 })
   price!: number
+
+  @IsNumber()
+  quantity!: number
 
   @IsString()
   category_name!: string
@@ -172,5 +174,9 @@ export class OrderItemExtraResponseDto {
 
   @IsNumber({ maxDecimalPlaces: 2 })
   price!: number
+
+  @IsNumber()
+  @Min(1)
+  quantity!: number
 }
 

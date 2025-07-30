@@ -11,6 +11,7 @@ export class OrderItemExtraRepositoryImpl implements IOrderItemExtraRepository {
       orderItem: { order_item_id: orderItemExtraData.order_item_id },
       extra: { extra_id: orderItemExtraData.extra_id }, // Fixed: using extra_id
       price: orderItemExtraData.price,
+      quantity: orderItemExtraData.quantity || 1, // Default to 1 if not provided
     })
     return await this.orderItemExtraRepository.save(orderItemExtra)
   }
@@ -50,6 +51,7 @@ export class OrderItemExtraRepositoryImpl implements IOrderItemExtraRepository {
         orderItem: { order_item_id: data.order_item_id },
         extra: { extra_id: data.extra_id }, // Fixed: using extra_id
         price: data.price,
+        quantity: data.quantity || 1, // Default to 1 if not provided
       }),
     )
     return await this.orderItemExtraRepository.save(entities)

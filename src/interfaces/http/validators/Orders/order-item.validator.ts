@@ -15,11 +15,6 @@ export class OrderItemValidator {
           return true
         })
         .withMessage("Unit price must be a valid number"),
-      body("special_instructions")
-        .optional()
-        .isLength({ max: 500 })
-        .withMessage("Special instructions must not exceed 500 characters")
-        .trim(),
       body("extras").optional().isArray().withMessage("Extras must be an array"),
       body("extras.*.extra_id") // Fixed: using extra_id
         .if(body("extras").exists())
@@ -53,11 +48,6 @@ export class OrderItemValidator {
           return true
         })
         .withMessage("Unit price must be a valid number"),
-      body("special_instructions")
-        .optional()
-        .isLength({ max: 500 })
-        .withMessage("Special instructions must not exceed 500 characters")
-        .trim(),
     ]
   }
 
