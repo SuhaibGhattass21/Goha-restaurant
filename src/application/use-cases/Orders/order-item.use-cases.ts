@@ -98,7 +98,9 @@ export class OrderItemUseCases {
 
   private mapToResponseDto(orderItem: OrderItem): OrderItemResponseDto {
     const basePrice = Number(orderItem.unit_price) * orderItem.quantity
-    const extrasPrice = orderItem.extras?.reduce((sum, extra) => sum + Number(extra.price) * Number(extra.quantity), 0) || 0
+    const extrasPrice = orderItem.extras?.reduce(
+      (sum, extra) => sum + Number(extra.price) * Number(extra.quantity || 1), 0
+    ) || 0
     const totalPrice = basePrice + extrasPrice
 
     return {
@@ -134,7 +136,7 @@ export class OrderItemUseCases {
           extra_id: extra.extra.extra_id, // Fixed: using extra_id
           name: extra.extra.name,
           price: Number(extra.extra.price),
-          quantity: extra.extra.quantity,
+          quantity: extra.quantity || 1,
           category_name: extra.extra.category?.name || "",
         }
         : undefined,

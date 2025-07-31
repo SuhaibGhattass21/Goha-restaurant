@@ -1286,9 +1286,7 @@ export const swaggerSchemas = {
             cashier_id: { type: "string", format: "uuid" },
             shift_id: { type: "string", format: "uuid" },
             table_number: { type: "string", description: "Table number for dine-in orders", example: "Table 5" },
-            order_type: { type: "string", enum: ["dine_in", "takeaway", "delivery"] },
-            customer_name: { type: "string" },
-            customer_phone: { type: "string" },
+            order_type: { type: "string", enum: ["dine-in", "takeaway", "delivery"] },
             items: {
                 type: "array",
                 items: { $ref: "#/components/schemas/CreateOrderItemDto" },
@@ -1300,7 +1298,7 @@ export const swaggerSchemas = {
         type: "object",
         properties: {
             table_number: { type: "string" },
-            order_type: { type: "string", enum: ["dine_in", "takeaway", "delivery"] },
+            order_type: { type: "string", enum: ["dine-in", "takeaway", "delivery"] },
             status: { type: "string", enum: ["pending", "completed", "cancelled"] },
             customer_name: { type: "string" },
             customer_phone: { type: "string" },
@@ -1376,11 +1374,9 @@ export const swaggerSchemas = {
         type: "object",
         required: ["order_id", "product_size_id", "quantity", "unit_price"],
         properties: {
-            order_id: { type: "string", format: "uuid" },
             product_size_id: { type: "string", format: "uuid" },
             quantity: { type: "integer", minimum: 1, example: 3 },
             unit_price: { type: "number", format: "decimal", minimum: 0, example: 100 },
-            special_instructions: { type: "string" },
             extras: {
                 type: "array",
                 items: { $ref: "#/components/schemas/CreateOrderItemExtraDto" },
