@@ -5,7 +5,7 @@ export class UserValidator {
     return [
       body('username').notEmpty().isString(),
       body('fullName').notEmpty().isString(),
-      body('hourRate').isFloat({ gt: 0 }),
+      body('hourRate').optional().isFloat({ gt: 0 }),
       body('password').notEmpty().isString(),
       body('userPermissions').optional().isArray(),
       body('userPermissions.*').isUUID(),
