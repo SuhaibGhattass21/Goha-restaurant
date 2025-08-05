@@ -9,6 +9,7 @@ export class CreateUserDto {
     @IsNotEmpty()
     fullName!: string;
 
+    @IsOptional()
     @IsNumber()
     hourRate?: number;
 
@@ -35,7 +36,6 @@ export class UpdateUserDto {
     @IsOptional()
     @IsNumber()
     hourRate?: number;
-
 
     @IsOptional()
     @IsString()
@@ -66,8 +66,9 @@ export class UserResponseDto {
     @IsString()
     fullName!: string;
 
+    @IsOptional()
     @IsNumber()
-    hourRate!: number;
+    hourRate?: number;
 
     @IsOptional()
     @IsString()

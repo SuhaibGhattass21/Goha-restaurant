@@ -24,8 +24,8 @@ export class User {
     @Column({ type: "text", unique: false, name: 'full_name' })
     fullName!: string;
 
-    @Column({ type: "numeric", nullable: false, name: 'hour_rate' })
-    hourRate!: number;
+    @Column({ type: "numeric", nullable: true, name: 'hour_rate' })
+    hourRate?: number;
 
     @Column({ type: "text", name: 'password' })
     password!: string;

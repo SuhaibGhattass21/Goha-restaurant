@@ -136,11 +136,11 @@ export class OrderItemUseCases {
           extra_id: extra.extra.extra_id, // Fixed: using extra_id
           name: extra.extra.name,
           price: Number(extra.extra.price),
-          quantity: extra.quantity || 1,
+          quantity: Number(extra.extra.quantity) || 1,
           category_name: extra.extra.category?.name || "",
         }
         : undefined,
-      quantity: extra.quantity || 1, // Default to 1 if not provided
+      quantity: Number(extra.quantity) || 1, // Default to 1 if not provided
       price: Number(extra.price),
     }
   }
