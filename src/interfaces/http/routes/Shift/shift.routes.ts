@@ -21,8 +21,8 @@ export class ShiftRoutes {
         this.router.get("/type/:type", this.controller.getShiftsByType.bind(this.controller));
         this.router.get("/by-date", this.controller.getShiftsByDate.bind(this.controller));
         this.router.get('/summary/:shiftId', this.controller.getSummaryByShiftId.bind(this.controller));
+        this.router.get("/summary/:shiftId/details", this.controller.getSummaryWithDetails.bind(this.controller));
         this.router.get('/summary/by-date', this.controller.getSummaryByShiftTypeAndDate.bind(this.controller));
-        // this.router.get('/summaries/all', this.controller.getAllSummaries.bind(this.controller));
         this.router.delete('/:id', ShiftValidator.getById(), this.controller.delete.bind(this.controller));
     }
 

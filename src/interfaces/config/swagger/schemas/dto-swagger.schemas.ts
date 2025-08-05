@@ -874,6 +874,54 @@ export const swaggerSchemas = {
         },
     },
 
+    ShiftSummaryWithDetailsDto: {
+        type: "object",
+        properties: {
+            shift_id: { type: "string", format: "uuid" },
+            shift_type: { type: "string", enum: ["morning", "night"] },
+            start_time: { type: "string", format: "date-time" },
+            end_time: { type: "string", format: "date-time" },
+            total_orders: { type: "integer" },
+            total_revenue: { type: "number", format: "float" },
+            cafe_revenue: { type: "number", format: "float" },
+            total_expenses: { type: "number", format: "float" },
+            total_salaries: { type: "number", format: "float" },
+            final_number: { type: "number", format: "float" },
+            expenses: {
+                type: "array",
+                items: { $ref: "#/components/schemas/ExpenseDetailsDto" }
+            },
+            workers: {
+                type: "array",
+                items: { $ref: "#/components/schemas/ShiftWorkerSalaryDto" }
+            }
+        }
+    },
+
+    ExpenseDetailsDto: {
+        type: "object",
+        properties: {
+            expense_id: { type: "string", format: "uuid" },
+            shift_id: { type: "string", format: "uuid" },
+            reason: { type: "string" },
+            amount: { type: "number", format: "float" },
+            created_at: { type: "string", format: "date-time" }
+        }
+    },
+
+    ShiftWorkerSalaryDto: {
+        type: "object",
+        properties: {
+            shift_worker_id: { type: "string", format: "uuid" },
+            worker_id: { type: "string", format: "uuid" },
+            worker_name: { type: "string" },
+            hourly_rate: { type: "number", format: "float" },
+            start_time: { type: "string", format: "date-time" },
+            end_time: { type: "string", format: "date-time" },
+            calculated_salary: { type: "number", format: "float" }
+        }
+    },
+
     CreateWorkerDto: {
         type: "object",
         required: ["full_name", "status", "base_hourly_rate"],

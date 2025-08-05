@@ -28,6 +28,9 @@ export class Expense {
     @JoinColumn({ name: 'shift_id' })
     shift!: Shift;
 
+    @Column({ type: "uuid" })
+    shift_id!: string;
+
     @ManyToOne(() => User)
     @JoinColumn({ name: 'created_by' })
     created_by!: User;

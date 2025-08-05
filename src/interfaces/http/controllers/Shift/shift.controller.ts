@@ -207,6 +207,17 @@ export class ShiftController {
         }
     }
 
+    async getSummaryWithDetails(req: Request, res: Response) {
+        try {
+            const { shiftId } = req.params;
+            const result = await this.shiftService.getShiftSummaryWithDetails(shiftId);
+            res.json(result);
+        } catch (err) {
+            console.error("Error fetching shift summary with details:", err);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
     async getSummaryByShiftTypeAndDate(req: Request, res: Response): Promise<void> {
         try {
             const { date, shift_type } = req.query;
@@ -221,21 +232,6 @@ export class ShiftController {
         }
     }
 
-    // async getAllSummaries(req: Request, res: Response): Promise<void> {
-    //     try {
-    //         const summaries = await this.shiftService.getAllSummaries();
-    //         res.status(200).json({
-    //             success: true,
-    //             data: summaries,
-    //         });
-    //     } catch (error: any) {
-    //         res.status(500).json({
-    //             success: false,
-    //             message: 'Internal server error',
-    //             error: error.message,
-    //         });
-    //     }
-    // }
     async delete(req: Request, res: Response) {
         const success = await this.shiftService.delete(req.params.id);
         res.json({ success });

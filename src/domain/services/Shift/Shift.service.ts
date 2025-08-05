@@ -61,13 +61,13 @@ export class ShiftService {
         return this.useCases.getSummaryByShiftId(shiftId);
     }
 
+    async getShiftSummaryWithDetails(shiftId: string) {
+        return await this.useCases.getShiftSummaryWithDetails(shiftId);
+    }
+
     async getSummaryByShiftTypeAndDate(filter: ShiftSummaryFilterDto): Promise<ShiftSummaryResponseDto> {
         return this.useCases.getSummaryByShiftTypeAndDate(filter);
     }
-
-    // getAllSummaries() {
-    //     return this.useCases.getAllSummaries();
-    // }
 
     delete(id: string) {
         return this.useCases.delete(id);

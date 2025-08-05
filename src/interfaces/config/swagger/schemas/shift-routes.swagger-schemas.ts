@@ -219,6 +219,30 @@
 
 /**
  * @swagger
+ * /shifts/summary/{shiftId}/details:
+ *   get:
+ *     summary: Get detailed shift summary with expenses and salaries
+ *     tags: [Shifts]
+ *     parameters:
+ *       - in: path
+ *         name: shiftId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Shift ID
+ *     responses:
+ *       200:
+ *         description: Detailed shift summary
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ShiftSummaryWithDetailsDto'
+ */
+
+
+/**
+ * @swagger
  * /shifts/summary-by-date:
  *   get:
  *     summary: Get shift summary by date and type

@@ -160,6 +160,98 @@ export class ShiftSummaryResponseDto {
     total_orders!: number;
 }
 
+export class ExpenseDetailDto {
+    @IsUUID()
+    expense_id!: string;
+
+    @IsUUID()
+    shift_id!: string;
+
+    @IsNumber()
+    @Min(0)
+    amount!: number;
+
+    @IsString()
+    title!: string;
+
+    @IsOptional()
+    @IsString()
+    description?: string;
+
+    @IsDate()
+    created_at!: Date;
+}
+
+export class WorkerSalaryDetailDto {
+    @IsUUID()
+    shift_worker_id!: string;
+
+    @IsUUID()
+    worker_id!: string;
+
+    @IsString()
+    worker_name!: string;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    hourly_rate!: number;
+
+    @IsDate()
+    start_time!: Date;
+
+    @IsDate()
+    end_time!: Date;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    calculated_salary!: number;
+}
+
+export class ShiftSummaryWithDetailsDto {
+    @IsUUID()
+    shift_id!: string;
+
+    @IsEnum(ShiftType)
+    shift_type!: ShiftType;
+
+    @IsDate()
+    start_time!: Date;
+
+    @IsDate()
+    end_time!: Date;
+
+    @IsNumber()
+    total_orders!: number;
+
+    @IsNumber()
+    total_revenue!: number;
+
+    @IsNumber()
+    cafe_revenue!: number;
+
+    @IsNumber()
+    total_expenses!: number;
+
+    @IsNumber()
+    total_salaries!: number;
+
+    @IsNumber()
+    final_number!: number;
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CashierDto)
+    cashiers!: CashierDto[];
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ExpenseDetailDto)
+    expenses!: ExpenseDetailDto[];
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => WorkerSalaryDetailDto)
+    workers!: WorkerSalaryDetailDto[];
+}
+
 export class ShiftSummaryFilterDto {
     @IsEnum(ShiftType)
     shift_type!: ShiftType;

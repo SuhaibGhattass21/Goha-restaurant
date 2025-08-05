@@ -1,6 +1,6 @@
 import { Shift } from '../../../infrastructure/database/models';
 import { ShiftStatus } from '../../../domain/enums/Shift.enums';
-import { OpenShiftDTO, UpdateShiftTypeDTO, RequestCloseShiftDTO, ApproveCloseShiftDTO, ShiftSummaryResponseDto, ShiftSummaryFilterDto } from '../../../application/dtos/Shift/Shift.dto';
+import { OpenShiftDTO, UpdateShiftTypeDTO, RequestCloseShiftDTO, ApproveCloseShiftDTO, ShiftSummaryResponseDto, ShiftSummaryFilterDto, ShiftSummaryWithDetailsDto } from '../../../application/dtos/Shift/Shift.dto';
 import { ShiftType } from '../../../domain/enums/Shift.enums';
 
 export interface IShiftRepository {
@@ -15,7 +15,7 @@ export interface IShiftRepository {
     findByDate(date: Date): Promise<Shift[]>;
     getShiftsByStatus(status: ShiftStatus): Promise<Shift[]>;
     getRequestedCloseShifts(): Promise<Shift[]>;
-    // getAllShiftSummaries(): Promise<any[]>;
     getSummaryByShiftId(shiftId: string): Promise<ShiftSummaryResponseDto>;
+    getShiftSummaryWithDetails(shiftId: string): Promise<ShiftSummaryWithDetailsDto>;
     getShiftSummaryByTypeAndDate(filter: ShiftSummaryFilterDto): Promise<ShiftSummaryResponseDto>;
 }
