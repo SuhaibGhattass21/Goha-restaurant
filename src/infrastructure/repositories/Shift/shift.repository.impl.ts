@@ -180,7 +180,8 @@ export class ShiftRepositoryImpl implements IShiftRepository {
         const nonCafeOrders = orders.filter(o => o.order_type !== "cafe");
         const cafeOrders = orders.filter(o => o.order_type === "cafe");
 
-        const totalOrders = orders.length;
+        const totalOrders = nonCafeOrders.length;
+        const totalCafeOrders = cafeOrders.length;
         const totalRevenue = nonCafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
         const cafeRevenue = cafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
 
@@ -231,6 +232,7 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             start_time: shift.start_time,
             end_time: shift.end_time!,
             total_orders: totalOrders,
+            total_cafe_orders: totalCafeOrders,
             total_revenue: totalRevenue,
             cafe_revenue: cafeRevenue,
             total_expenses: totalExpenses,

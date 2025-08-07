@@ -222,6 +222,9 @@ export class ShiftSummaryWithDetailsDto {
     total_orders!: number;
 
     @IsNumber()
+    total_cafe_orders!: number;
+
+    @IsNumber()
     total_revenue!: number;
 
     @IsNumber()
