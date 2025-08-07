@@ -175,14 +175,14 @@ export class AuthUseCases {
     }
 
     private generateToken(user: User): string {
-        const permissions = user.userPermissions?.map((p: UserPermission) => p.permission.id) || [];
-
+        const permissions = user.userPermissions?.map((p: UserPermission) => p.id) || [];
+        
         return jwt.sign(
             {
                 userId: user.id,
                 username: user.username,
                 fullName: user.fullName,
-                // permissions
+                permissions
             },
             this.jwtSecret,
             { expiresIn: this.jwtExpiry }
