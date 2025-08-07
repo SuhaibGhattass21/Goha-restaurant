@@ -319,7 +319,7 @@ export class Server {
     apiV1.use("/product-size-prices", AuthorizationMiddleware.requireOwnership() ,dependencies.productSizePriceRoutes.getRouter())
     apiV1.use("/shifts", dependencies.shiftRoutes.getRouter())
     apiV1.use("/workers", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','workers:access']) ,dependencies.workerRoutes.getRouter())
-    apiV1.use("/users", AuthorizationMiddleware.requireOwnership(),dependencies.userRoutes.getRouter())
+    apiV1.use("/users",dependencies.userRoutes.getRouter())
     apiV1.use("/permissions", AuthorizationMiddleware.requireOwnership(),dependencies.permissionRoutes.getRouter())
     apiV1.use("/shift-workers", dependencies.shiftWorkerRoutes.getRouter())
     apiV1.use("/stock-items", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','access:stock']), dependencies.stockItemRoutes.getRouter())
