@@ -24,7 +24,6 @@ export class CreateUserDto {
 
     @IsOptional()
     @IsArray()
-    @IsUUID('all', { each: true })
     userPermissions?: string[];
 }
 
