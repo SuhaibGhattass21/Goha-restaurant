@@ -41,7 +41,7 @@ export class AuthUseCases {
 
             console.log(`User ${JSON.stringify(user)} logged in`);
 
-            const userPermissions = user.userPermissions?.map((permission: UserPermission) => permission.id) || [];
+            const userPermissions = user.userPermissions?.map((permission: UserPermission) => permission.permission.name) || [];
 
             return {
                 user: {
@@ -175,7 +175,7 @@ export class AuthUseCases {
     }
 
     private generateToken(user: User): string {
-        const permissions = user.userPermissions?.map((p: UserPermission) => p.id) || [];
+        const permissions = user.userPermissions?.map((p: UserPermission) => p.permission.name) || [];
         
         return jwt.sign(
             {
