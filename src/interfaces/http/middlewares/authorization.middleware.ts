@@ -68,7 +68,7 @@ export class AuthorizationMiddleware {
 
             const resourceUserId = req.params[resourceUserIdField] || req.body[resourceUserIdField];
 
-            if (resourceUserId !== req.user.userId && !req.user.permissions.includes('ADMIN_ACCESS')) {
+            if (resourceUserId !== req.user.userId && !req.user.permissions.includes('OWNER_ACCESS')) {
                 return res.status(403).json({
                     success: false,
                     message: 'Access denied: Can only access own resources'

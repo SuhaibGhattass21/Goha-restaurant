@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { ShiftController } from '../../controllers/Shift/shift.controller';
 import { ShiftValidator } from '../../validators/Shift/shift.validator';
+import { AuthorizationMiddleware } from '@interfaces/http/middlewares/authorization.middleware';
 
 export class ShiftRoutes {
     private router = Router();
@@ -13,7 +14,7 @@ export class ShiftRoutes {
         this.router.post('/', ShiftValidator.open(), this.controller.openShift.bind(this.controller));
         this.router.patch('/:id/type', ShiftValidator.updateType(), this.controller.updateShiftType.bind(this.controller));
         this.router.patch('/:id/request-close', ShiftValidator.requestClose(), this.controller.requestClose.bind(this.controller));
-        this.router.patch('/:id/approve-close', ShiftValidator.approveClose(), this.controller.approveClose.bind(this.controller));
+        this.router.patch('/:id/approve-close', AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'shift:approve']), ShiftValidator.approveClose(), this.controller.approveClose.bind(this.controller));
         this.router.get('/:id', ShiftValidator.getById(), this.controller.getShiftById.bind(this.controller));
         this.router.get("/status/:status", ShiftValidator.getByStatus(), this.controller.getShiftsByStatus.bind(this.controller));
         this.router.get("/close-requested", this.controller.getRequestedCloseShifts.bind(this.controller));

@@ -91,6 +91,7 @@ import { StockReportController } from "../controllers/Stock/stock-report.control
 import { StockReportRoutes } from "../routes/Stock/stock-report.routes"
 import { StockReportRepositoryImpl } from "../../../infrastructure/repositories/Stock/stock-report.repository.impl"
 import { StockReportUseCases } from "../../../application/use-cases/Stock/stock-report.use-cases"
+import { AuthorizationMiddleware } from '../middlewares/authorization.middleware';
 export class Server {
   private app: express.Application
   private readonly PORT: number
@@ -311,22 +312,22 @@ export class Server {
     const apiV1 = express.Router()
 
     apiV1.use("/auth", dependencies.authRoutes.getRouter())
-    apiV1.use("/categories", dependencies.categoryRoutes.getRouter())
-    apiV1.use("/category-extras", dependencies.categoryExtraRoutes.getRouter())
-    apiV1.use("/category-sizes", dependencies.categorySizeRoutes.getRouter())
-    apiV1.use("/products", dependencies.productRoutes.getRouter())
-    apiV1.use("/product-size-prices", dependencies.productSizePriceRoutes.getRouter())
+    apiV1.use("/categories", AuthorizationMiddleware.requireOwnership(), dependencies.categoryRoutes.getRouter())
+    apiV1.use("/category-extras", AuthorizationMiddleware.requireOwnership(), dependencies.categoryExtraRoutes.getRouter())
+    apiV1.use("/category-sizes", AuthorizationMiddleware.requireOwnership(), dependencies.categorySizeRoutes.getRouter())
+    apiV1.use("/products", AuthorizationMiddleware.requireOwnership(), dependencies.productRoutes.getRouter())
+    apiV1.use("/product-size-prices", AuthorizationMiddleware.requireOwnership() ,dependencies.productSizePriceRoutes.getRouter())
     apiV1.use("/shifts", dependencies.shiftRoutes.getRouter())
-    apiV1.use("/workers", dependencies.workerRoutes.getRouter())
-    apiV1.use("/users", dependencies.userRoutes.getRouter())
-    apiV1.use("/permissions", dependencies.permissionRoutes.getRouter())
+    apiV1.use("/workers", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','workers:access']) ,dependencies.workerRoutes.getRouter())
+    apiV1.use("/users", AuthorizationMiddleware.requireOwnership(),dependencies.userRoutes.getRouter())
+    apiV1.use("/permissions", AuthorizationMiddleware.requireOwnership(),dependencies.permissionRoutes.getRouter())
     apiV1.use("/shift-workers", dependencies.shiftWorkerRoutes.getRouter())
-    apiV1.use("/stock-items", dependencies.stockItemRoutes.getRouter())
-    apiV1.use("/stock-transactions", dependencies.stockTransactionRoutes.getRouter())
-    apiV1.use("/stock-reports", dependencies.stockReportRoutes.getRouter())
+    apiV1.use("/stock-items", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','access:stock']), dependencies.stockItemRoutes.getRouter())
+    apiV1.use("/stock-transactions", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','access:stock']), dependencies.stockTransactionRoutes.getRouter())
+    apiV1.use("/stock-reports", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','access:stock']), dependencies.stockReportRoutes.getRouter())
     apiV1.use("/orders", dependencies.orderRoutes.getRouter())
     apiV1.use("/order-items", dependencies.orderItemRoutes.getRouter())
-    apiV1.use("/cancelled-orders", dependencies.cancelledOrderRoutes.getRouter())
+    apiV1.use("/cancelled-orders",AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','orders:cancelled']), dependencies.cancelledOrderRoutes.getRouter())
     apiV1.use("/external-receipts", dependencies.externalReceiptRoutes.getRouter())
     apiV1.use("/expenses", dependencies.expenseRoutes.getRouter())
 
