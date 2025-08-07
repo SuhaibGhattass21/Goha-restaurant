@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import type { ShiftController } from '../../controllers/Shift/shift.controller';
 import { ShiftValidator } from '../../validators/Shift/shift.validator';
-import { AuthorizationMiddleware } from '@interfaces/http/middlewares/authorization.middleware';
+import { AuthorizationMiddleware } from '../../../../interfaces/http/middlewares/authorization.middleware';
 
 export class ShiftRoutes {
     private router = Router();

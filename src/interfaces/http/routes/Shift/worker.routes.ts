@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { WorkerValidator } from "../../validators/Shift/worker.validator";
-import { WorkerController } from "@interfaces/http/controllers/Shift/worker.controller";
+import { WorkerController } from "../../../../interfaces/http/controllers/Shift/worker.controller";
 
 export class WorkerRoutes {
     private router: Router;
