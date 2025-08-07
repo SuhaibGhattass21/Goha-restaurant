@@ -21,6 +21,9 @@ export class AuthUseCases {
 
             console.log(`User ${JSON.stringify(loginData)} is attempting to log in`);
             const user: User = await this.userRepository.findBy({ username: loginData.username });
+            
+            console.log(`User found: ${JSON.stringify(user)}`);
+            
             if (!user) {
                 throw new Error('Invalid credentials');
             }
