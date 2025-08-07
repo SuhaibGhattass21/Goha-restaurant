@@ -182,7 +182,7 @@ export class AuthUseCases {
                 userId: user.id,
                 username: user.username,
                 fullName: user.fullName,
-                permissions
+                // permissions
             },
             this.jwtSecret,
             { expiresIn: this.jwtExpiry }
