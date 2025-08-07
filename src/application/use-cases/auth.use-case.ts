@@ -34,6 +34,8 @@ export class AuthUseCases {
 
             const token = this.generateToken(user);
 
+            console.log(`User ${JSON.stringify(user)} logged in`);
+
             const userPermissions = user.userPermissions?.map((permission: UserPermission) => permission.id) || [];
 
             return {
