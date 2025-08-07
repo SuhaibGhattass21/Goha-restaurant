@@ -18,6 +18,8 @@ export class AuthUseCases {
 
     async login(loginData: LoginDto): Promise<AuthResponseDto> {
         try {
+
+            console.log(`User ${JSON.stringify(loginData)} is attempting to log in`);
             const user: User = await this.userRepository.findBy({ username: loginData.username });
             if (!user) {
                 throw new Error('Invalid credentials');
