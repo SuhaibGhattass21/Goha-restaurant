@@ -5,17 +5,19 @@ export class AuthorizationMiddleware {
     static requirePermission(permission: string) {
         return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
             if (!req.user) {
-                return res.status(401).json({
+                res.status(401).json({
                     success: false,
                     message: 'Authentication required'
                 });
+                return; // Return early instead of returning the response
             }
 
             if (!req.user.permissions.includes(permission)) {
-                return res.status(403).json({
+                res.status(403).json({
                     success: false,
                     message: `Permission '${permission}' required`
                 });
+                return; // Return early instead of returning the response
             }
 
             next();
@@ -25,10 +27,11 @@ export class AuthorizationMiddleware {
     static requireAnyPermission(permissions: string[]) {
         return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
             if (!req.user) {
-                return res.status(401).json({
+                res.status(401).json({
                     success: false,
                     message: 'Authentication required'
                 });
+                return; // Return early instead of returning the response
             }
 
             const hasPermission = permissions.some(permission =>
@@ -36,10 +39,11 @@ export class AuthorizationMiddleware {
             );
 
             if (!hasPermission) {
-                return res.status(403).json({
+                res.status(403).json({
                     success: false,
                     message: `One of these permissions required: ${permissions.join(', ')}`
                 });
+                return; // Return early instead of returning the response
             }
 
             next();
@@ -58,21 +62,23 @@ export class AuthorizationMiddleware {
     }
 
     static requireOwnership(resourceUserIdField: string = 'userId') {
-        return (req: AuthenticatedRequest, res: Response, next: NextFunction) : void => {
+        return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
             if (!req.user) {
-                return res.status(401).json({
+                res.status(401).json({
                     success: false,
                     message: 'Authentication required'
                 });
+                return; // Return early instead of returning the response
             }
 
             const resourceUserId = req.params[resourceUserIdField] || req.body[resourceUserIdField];
 
             if (resourceUserId !== req.user.userId && !req.user.permissions.includes('OWNER_ACCESS')) {
-                return res.status(403).json({
+                res.status(403).json({
                     success: false,
                     message: 'Access denied: Can only access own resources'
                 });
+                return; // Return early instead of returning the response
             }
 
             next();
