@@ -21,9 +21,12 @@ export class ShiftWorker {
     @Column()
     shift_id!: string;
 
-    @ManyToOne(() => Worker)
+    @ManyToOne(() => Worker, (worker) => worker.shiftAssignments, { onDelete: "CASCADE" })
     @JoinColumn({ name: 'worker_id' })
     worker!: Worker;
+
+    @Column()
+    worker_id!: string;
 
     @Column({ type: "decimal", precision: 10, scale: 2 })
     hourly_rate!: number;

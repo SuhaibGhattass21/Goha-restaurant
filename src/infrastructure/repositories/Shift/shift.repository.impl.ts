@@ -198,7 +198,7 @@ export class ShiftRepositoryImpl implements IShiftRepository {
 
         const workers: WorkerSalaryDetailDto[] = (shift.shiftWorkers || []).map(sw => ({
             shift_worker_id: sw.shift_worker_id,
-            worker_id: sw.worker?.worker_id ?? "",
+            worker_id: sw.worker?.worker_id || sw.worker_id,
             worker_name: sw.worker?.full_name ?? "",
             hourly_rate: Number(sw.hourly_rate),
             start_time: sw.start_time,
