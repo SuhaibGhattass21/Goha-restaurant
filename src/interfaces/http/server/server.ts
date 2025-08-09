@@ -322,7 +322,7 @@ export class Server {
     apiV1.use("/users",dependencies.userRoutes.getRouter())
     apiV1.use("/permissions",dependencies.permissionRoutes.getRouter())
     apiV1.use("/shift-workers", dependencies.shiftWorkerRoutes.getRouter())
-    apiV1.use("/stock-items", AuthMiddleware.authenticate, AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','access:stock']), dependencies.stockItemRoutes.getRouter())
+    apiV1.use("/stock-items", AuthMiddleware.authenticate(), AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','access:stock']), dependencies.stockItemRoutes.getRouter())
     apiV1.use("/stock-transactions", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','access:stock']), dependencies.stockTransactionRoutes.getRouter())
     apiV1.use("/stock-reports", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','access:stock']), dependencies.stockReportRoutes.getRouter())
     apiV1.use("/orders", dependencies.orderRoutes.getRouter())
