@@ -12,7 +12,7 @@ export interface AuthenticatedRequest extends Request {
 export class AuthMiddleware {
     constructor(private authUsecases: AuthUseCases) { }
 
-    authenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+    static authenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
         try {
             const authHeader = req.headers.authorization;
 
