@@ -237,8 +237,7 @@ export class Server {
       const userRepository = new UserRepositoryImpl(userRepo);
       const authUseCases = new AuthUseCases(userRepository);
       const authController = new AuthController(authUseCases);
-      const authMiddleware = new AuthMiddleware(authUseCases);
-      const authRoutes = new AuthRoutes(authController, authMiddleware);
+      const authRoutes = new AuthRoutes(authController, new AuthMiddleware(),);
 
       // Setup ShiftWorker module
       const shiftWorkerRepository = new ShiftWorkerRepositoryImpl(shiftWorkerRepo)
