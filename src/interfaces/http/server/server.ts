@@ -416,19 +416,19 @@ export class Server {
     apiV1.use(
       "/categories",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS"]),
+      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS","access:category"]),
       dependencies.categoryRoutes.getRouter()
     );
     apiV1.use(
       "/category-extras",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS"]),
+      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS","access:categroy"]),
       dependencies.categoryExtraRoutes.getRouter()
     );
     apiV1.use(
       "/category-sizes",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS"]),
+      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS","access:categroy"]),
       dependencies.categorySizeRoutes.getRouter()
     );
     apiV1.use(
