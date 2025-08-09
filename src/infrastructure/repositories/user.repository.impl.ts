@@ -10,13 +10,13 @@ export class UserRepositoryImpl implements IUserRepository {
     findById(id: string): Promise<any | null> {
         return this.userRepository.findOne({
             where: { id },
-            relations: ["userPermissions"]
+            relations: ["userPermissions", "userPermissions.permission"],
         });
     }
     findBy(filter: any): Promise<User | null> {
         return this.userRepository.findOne({
             where: filter,
-            relations: ["userPermissions"]
+            relations: ["userPermissions", "userPermissions.permission"],
         });
     }
     update(id: string, data: Partial<User>): Promise<User | null> {
@@ -37,7 +37,7 @@ export class UserRepositoryImpl implements IUserRepository {
         return this.userRepository.find({
             skip,
             take: limit || 10,
-            relations: ["userPermissions"],
+            relations: ["userPermissions", "userPermissions.permission"],
         });
     }
 

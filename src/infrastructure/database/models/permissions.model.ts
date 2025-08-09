@@ -28,6 +28,6 @@ export class Permissions {
     @CreateDateColumn({ type: "timestamptz" })
     created_at: Date = new Date(new Date().getTime());
 
-    @OneToMany(() => UserPermission, (userPermission) => userPermission.permission)
+    @OneToMany(() => UserPermission, (userPermission: UserPermission) => userPermission.permission)
     userPermissions?: UserPermission[];
 }

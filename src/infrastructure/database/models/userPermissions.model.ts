@@ -19,11 +19,11 @@ export class UserPermission {
     @PrimaryGeneratedColumn("uuid", { name: "id" })
     id: string = uuidv4().toString();
 
-    @ManyToOne(() => User, (user) => user.userPermissions, { onDelete: "CASCADE" })
+    @ManyToOne(() => User, (user: User) => user.userPermissions, { onDelete: "CASCADE" })
     @JoinColumn({ name: "user_id" })
     user!: User;
 
-    @ManyToOne(() => Permissions, (permission) => permission.userPermissions, { onDelete: "CASCADE" })
+    @ManyToOne(() => Permissions, (permission: Permissions) => permission.userPermissions, { onDelete: "CASCADE" })
     @JoinColumn({ name: "permission_id" })
     permission!: Permissions;
 
