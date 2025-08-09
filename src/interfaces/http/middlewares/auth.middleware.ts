@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import { AuthUseCases } from "../../../application/use-cases/auth.use-case";
+import { JwtUtils } from "../../../interfaces/utils/jwt.utils";
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -10,7 +11,7 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export class AuthMiddleware {
-  constructor(private authUsecases: AuthUseCases) {}
+  constructor() {}
 
   static authenticate() {
     return (
@@ -30,7 +31,7 @@ export class AuthMiddleware {
         }
 
         const token = authHeader.substring(7);
-        const decoded = this.authUsecases.verifyToken(token);
+        const decoded = JwtUtils.verifyToken(token);
 
         req.user = {
           userId: decoded.userId,
@@ -58,7 +59,7 @@ export class AuthMiddleware {
 
       if (authHeader && authHeader.startsWith("Bearer ")) {
         const token = authHeader.substring(7);
-        const decoded = this.authUsecases.verifyToken(token);
+        const decoded = JwtUtils.verifyToken(token);
 
         req.user = {
           userId: decoded.userId,
