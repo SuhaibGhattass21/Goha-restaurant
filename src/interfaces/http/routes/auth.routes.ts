@@ -7,7 +7,6 @@ export class AuthRoutes {
 
     constructor(
         private authController: AuthController,
-        private authMiddleware: AuthMiddleware
     ) {
         this.router = Router();
         this.initializeRoutes();
@@ -26,25 +25,25 @@ export class AuthRoutes {
 
         this.router.get(
             '/profile',
-            this.authMiddleware.authenticate,
+            AuthMiddleware.authenticate(),
             this.authController.getProfile.bind(this.authController)
         );
 
         this.router.post(
             '/refresh-token',
-            this.authMiddleware.authenticate,
+            AuthMiddleware.authenticate(),
             this.authController.refreshToken.bind(this.authController)
         );
 
         this.router.post(
             '/change-password',
-            this.authMiddleware.authenticate,
+            AuthMiddleware.authenticate(),
             this.authController.changePassword.bind(this.authController)
         );
 
         this.router.post(
             '/logout',
-            this.authMiddleware.authenticate,
+            AuthMiddleware.authenticate(),
             this.authController.logout.bind(this.authController)
         );
     }
