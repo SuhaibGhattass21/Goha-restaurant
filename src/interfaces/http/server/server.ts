@@ -434,13 +434,13 @@ export class Server {
     apiV1.use(
       "/products",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS"]),
+      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS","access:products"]),
       dependencies.productRoutes.getRouter()
     );
     apiV1.use(
       "/product-size-prices",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS"]),
+      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS","access:product-size-prices"]),
       dependencies.productSizePriceRoutes.getRouter()
     );
     apiV1.use(
@@ -453,23 +453,35 @@ export class Server {
       AuthMiddleware.authenticate(),
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
-        "workers:access",
+        "access:workers",
       ]),
       dependencies.workerRoutes.getRouter()
     );
     apiV1.use(
       "/users",
       AuthMiddleware.authenticate(),
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:users",
+      ]),
       dependencies.userRoutes.getRouter()
     );
     apiV1.use(
       "/permissions",
       AuthMiddleware.authenticate(),
+      // AuthorizationMiddleware.requireAnyPermission([
+      //   "OWNER_ACCESS",
+      //   "access:permissions",
+      // ]),
       dependencies.permissionRoutes.getRouter()
     );
     apiV1.use(
       "/shift-workers",
       AuthMiddleware.authenticate(),
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:cashier",
+      ]),
       dependencies.shiftWorkerRoutes.getRouter()
     );
     apiV1.use(
@@ -503,7 +515,8 @@ export class Server {
       "/orders",
       AuthMiddleware.authenticate(),
       AuthorizationMiddleware.requireAnyPermission([
-        "cashier:access",
+        "OWNER_ACCESS",
+        "access:cashier",
       ]),
       dependencies.orderRoutes.getRouter()
     );
@@ -512,7 +525,7 @@ export class Server {
       AuthMiddleware.authenticate(),
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
-        "cashier:access",
+        "access:cashier",
       ]),
       dependencies.orderItemRoutes.getRouter()
     );
@@ -530,7 +543,7 @@ export class Server {
       AuthMiddleware.authenticate(),
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
-        "cashier:access",
+        "access:cashier",
       ]),
       dependencies.externalReceiptRoutes.getRouter()
     );
@@ -539,7 +552,7 @@ export class Server {
       AuthMiddleware.authenticate(),
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
-        "cashier:access",
+        "access:cashier",
       ]),
       dependencies.expenseRoutes.getRouter()
     );
