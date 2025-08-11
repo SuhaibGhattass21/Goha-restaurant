@@ -416,31 +416,46 @@ export class Server {
     apiV1.use(
       "/categories",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS","access:category"]),
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:category"
+      ]),
       dependencies.categoryRoutes.getRouter()
     );
     apiV1.use(
       "/category-extras",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS","access:categroy"]),
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:category"
+      ]),
       dependencies.categoryExtraRoutes.getRouter()
     );
     apiV1.use(
       "/category-sizes",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS","access:categroy"]),
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:category"
+      ]),
       dependencies.categorySizeRoutes.getRouter()
     );
     apiV1.use(
       "/products",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS","access:products"]),
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:products"
+      ]),
       dependencies.productRoutes.getRouter()
     );
     apiV1.use(
       "/product-size-prices",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission(["OWNER_ACCESS","access:product-size-prices"]),
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:product-size-prices"
+      ]),
       dependencies.productSizePriceRoutes.getRouter()
     );
     apiV1.use(

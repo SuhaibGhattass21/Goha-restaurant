@@ -16,14 +16,14 @@ export class ShiftRoutes {
         this.router.patch('/:id/request-close',AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','cashier:access']), ShiftValidator.requestClose(), this.controller.requestClose.bind(this.controller));
         this.router.patch('/:id/approve-close', AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS','shift:approve']), ShiftValidator.approveClose(), this.controller.approveClose.bind(this.controller));
         this.router.get('/:id',AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']), ShiftValidator.getById(), this.controller.getShiftById.bind(this.controller));
-        this.router.get("/status/:status", ShiftValidator.getByStatus(), this.controller.getShiftsByStatus.bind(this.controller));
-        this.router.get("/close-requested", this.controller.getRequestedCloseShifts.bind(this.controller));
-        this.router.get('/cashier/:cashierId', ShiftValidator.getByCashier(), this.controller.getShiftsByCashier.bind(this.controller));
-        this.router.get("/type/:type", this.controller.getShiftsByType.bind(this.controller));
-        this.router.get("/by-date", this.controller.getShiftsByDate.bind(this.controller));
-        this.router.get('/summary/:shiftId', this.controller.getSummaryByShiftId.bind(this.controller));
-        this.router.get("/summary/:shiftId/details", this.controller.getSummaryWithDetails.bind(this.controller));
-        this.router.get('/summary/by-date', this.controller.getSummaryByShiftTypeAndDate.bind(this.controller));
+        this.router.get("/status/:status", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']), ShiftValidator.getByStatus(), this.controller.getShiftsByStatus.bind(this.controller));
+        this.router.get("/close-requested", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']), this.controller.getRequestedCloseShifts.bind(this.controller));
+        this.router.get('/cashier/:cashierId', AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']), ShiftValidator.getByCashier(), this.controller.getShiftsByCashier.bind(this.controller));
+        this.router.get("/type/:type", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']), this.controller.getShiftsByType.bind(this.controller));
+        this.router.get("/by-date", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']), this.controller.getShiftsByDate.bind(this.controller));
+        this.router.get('/summary/:shiftId', AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'shift:summary']), this.controller.getSummaryByShiftId.bind(this.controller));
+        this.router.get("/summary/:shiftId/details", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'shift:summary']), this.controller.getSummaryWithDetails.bind(this.controller));
+        this.router.get('/summary/by-date', AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'shift:summary']), this.controller.getSummaryByShiftTypeAndDate.bind(this.controller));
         this.router.delete('/:id', ShiftValidator.getById(), this.controller.delete.bind(this.controller));
     }
 
