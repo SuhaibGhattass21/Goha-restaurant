@@ -11,10 +11,10 @@ export class ShiftRoutes {
     }
 
     private initializeRoutes(): void {
-        this.router.post('/', ShiftValidator.open(), this.controller.openShift.bind(this.controller));
+        this.router.post('/',AuthorizationMiddleware.requireAnyPermission(['cashier:access']), ShiftValidator.open(), this.controller.openShift.bind(this.controller));
         this.router.patch('/:id/type', ShiftValidator.updateType(), this.controller.updateShiftType.bind(this.controller));
-        this.router.patch('/:id/request-close', ShiftValidator.requestClose(), this.controller.requestClose.bind(this.controller));
-        this.router.patch('/:id/approve-close', AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'shift:approve']), ShiftValidator.approveClose(), this.controller.approveClose.bind(this.controller));
+        this.router.patch('/:id/request-close',AuthorizationMiddleware.requireAnyPermission(['cashier:access']), ShiftValidator.requestClose(), this.controller.requestClose.bind(this.controller));
+        this.router.patch('/:id/approve-close', AuthorizationMiddleware.requireAnyPermission(['shift:approve']), ShiftValidator.approveClose(), this.controller.approveClose.bind(this.controller));
         this.router.get('/:id', ShiftValidator.getById(), this.controller.getShiftById.bind(this.controller));
         this.router.get("/status/:status", ShiftValidator.getByStatus(), this.controller.getShiftsByStatus.bind(this.controller));
         this.router.get("/close-requested", this.controller.getRequestedCloseShifts.bind(this.controller));

@@ -495,18 +495,25 @@ export class Server {
       AuthMiddleware.authenticate(),
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
-        "access:stock",
+        "access:stock",        
       ]),
       dependencies.stockReportRoutes.getRouter()
     );
     apiV1.use(
       "/orders",
       AuthMiddleware.authenticate(),
+      AuthorizationMiddleware.requireAnyPermission([
+        "cashier:access",
+      ]),
       dependencies.orderRoutes.getRouter()
     );
     apiV1.use(
       "/order-items",
       AuthMiddleware.authenticate(),
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "cashier:access",
+      ]),
       dependencies.orderItemRoutes.getRouter()
     );
     apiV1.use(
@@ -521,11 +528,19 @@ export class Server {
     apiV1.use(
       "/external-receipts",
       AuthMiddleware.authenticate(),
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "cashier:access",
+      ]),
       dependencies.externalReceiptRoutes.getRouter()
     );
     apiV1.use(
       "/expenses",
       AuthMiddleware.authenticate(),
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "cashier:access",
+      ]),
       dependencies.expenseRoutes.getRouter()
     );
 
