@@ -1,6 +1,7 @@
 import { Router } from "express"
 import type { ProductSizePriceController } from "../../controllers/Product/product-size-price.controller"
 import { ProductSizePriceValidator } from "../../validators/Product/product-size-price.validator"
+import { AuthorizationMiddleware } from "@interfaces/http/middlewares/authorization.middleware"
 
 export class ProductSizePriceRoutes {
   private router: Router
@@ -16,6 +17,10 @@ export class ProductSizePriceRoutes {
     // POST /product-size-prices - Create a new product size price
     this.router.post(
       "/",
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:product-size-prices",
+      ]),
       ProductSizePriceValidator.createProductSizePrice(),
       this.productSizePriceController.createProductSizePrice.bind(this.productSizePriceController),
     )
@@ -23,6 +28,10 @@ export class ProductSizePriceRoutes {
     // GET /product-size-prices - Get all product size prices with pagination
     this.router.get(
       "/",
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:cashier",
+      ]),
       ProductSizePriceValidator.getProductSizePrices(),
       this.productSizePriceController.getAllProductSizePrices.bind(this.productSizePriceController),
     )
@@ -30,6 +39,10 @@ export class ProductSizePriceRoutes {
     // GET /product-size-prices/product/:productId - Get product size prices by product
     this.router.get(
       "/product/:productId",
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:cashier",
+      ]),
       ProductSizePriceValidator.getProductSizePricesByProduct(),
       this.productSizePriceController.getProductSizePricesByProduct.bind(this.productSizePriceController),
     )
@@ -37,6 +50,10 @@ export class ProductSizePriceRoutes {
     // GET /product-size-prices/:id - Get product size price by ID
     this.router.get(
       "/:id",
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:cashier",
+      ]),
       ProductSizePriceValidator.getProductSizePriceById(),
       this.productSizePriceController.getProductSizePriceById.bind(this.productSizePriceController),
     )
@@ -44,6 +61,10 @@ export class ProductSizePriceRoutes {
     // PUT /product-size-prices/:id - Update product size price
     this.router.put(
       "/:id",
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:product-size-prices",
+      ]),
       ProductSizePriceValidator.updateProductSizePrice(),
       this.productSizePriceController.updateProductSizePrice.bind(this.productSizePriceController),
     )
@@ -51,6 +72,10 @@ export class ProductSizePriceRoutes {
     // DELETE /product-size-prices/:id - Delete product size price
     this.router.delete(
       "/:id",
+      AuthorizationMiddleware.requireAnyPermission([
+        "OWNER_ACCESS",
+        "access:product-size-prices",
+      ]),
       ProductSizePriceValidator.deleteProductSizePrice(),
       this.productSizePriceController.deleteProductSizePrice.bind(this.productSizePriceController),
     )

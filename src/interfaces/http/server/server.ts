@@ -431,19 +431,11 @@ export class Server {
     apiV1.use(
       "/products",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission([
-        "OWNER_ACCESS",
-        "access:products"
-      ]),
       dependencies.productRoutes.getRouter()
     );
     apiV1.use(
       "/product-size-prices",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission([
-        "OWNER_ACCESS",
-        "access:product-size-prices"
-      ]),
       dependencies.productSizePriceRoutes.getRouter()
     );
     apiV1.use(
