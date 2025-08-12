@@ -540,6 +540,7 @@ export class Server {
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
         "access:cashier",
+        "access:expenses",
       ]),
       dependencies.expenseRoutes.getRouter()
     );
