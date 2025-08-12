@@ -19,7 +19,7 @@ export class ProductSizePriceRoutes {
       "/",
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
-        "access:product-size-prices",
+        "access:products",
       ]),
       ProductSizePriceValidator.createProductSizePrice(),
       this.productSizePriceController.createProductSizePrice.bind(this.productSizePriceController),
@@ -30,6 +30,7 @@ export class ProductSizePriceRoutes {
       "/",
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
+        "access:products",
         "access:cashier",
       ]),
       ProductSizePriceValidator.getProductSizePrices(),
@@ -41,6 +42,7 @@ export class ProductSizePriceRoutes {
       "/product/:productId",
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
+        "access:products",
         "access:cashier",
       ]),
       ProductSizePriceValidator.getProductSizePricesByProduct(),
@@ -52,6 +54,7 @@ export class ProductSizePriceRoutes {
       "/:id",
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
+        "access:products",
         "access:cashier",
       ]),
       ProductSizePriceValidator.getProductSizePriceById(),
@@ -63,7 +66,7 @@ export class ProductSizePriceRoutes {
       "/:id",
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
-        "access:product-size-prices",
+        "access:products",
       ]),
       ProductSizePriceValidator.updateProductSizePrice(),
       this.productSizePriceController.updateProductSizePrice.bind(this.productSizePriceController),
@@ -74,7 +77,7 @@ export class ProductSizePriceRoutes {
       "/:id",
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
-        "access:product-size-prices",
+        "access:products",
       ]),
       ProductSizePriceValidator.deleteProductSizePrice(),
       this.productSizePriceController.deleteProductSizePrice.bind(this.productSizePriceController),

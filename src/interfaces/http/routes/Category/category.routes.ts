@@ -25,7 +25,7 @@ export class CategoryRoutes {
     // GET /categories - Get all categories with pagination
     this.router.get(
       "/",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category', 'access:cashier']),
       CategoryValidator.getCategories(),
       this.categoryController.getAllCategories.bind(this.categoryController),
     )
@@ -33,7 +33,7 @@ export class CategoryRoutes {
     // GET /categories/:id - Get category by ID
     this.router.get(
       "/:id",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category', 'access:cashier']),
       CategoryValidator.getCategoryById(),
       this.categoryController.getCategoryById.bind(this.categoryController),
     )

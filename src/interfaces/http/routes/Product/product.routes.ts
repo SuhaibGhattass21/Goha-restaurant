@@ -30,6 +30,7 @@ export class ProductRoutes {
       "/",
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
+        "access:products",
         "access:cashier",
       ]),
       ProductValidator.getProducts(),
@@ -41,6 +42,7 @@ export class ProductRoutes {
       "/category/:categoryId",
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
+        "access:products",
         "access:cashier",
       ]),
       ProductValidator.getProductsByCategory(),
@@ -52,6 +54,7 @@ export class ProductRoutes {
       "/:id",
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
+        "access:products",
         "access:cashier",
       ]),
       ProductValidator.getProductById(),

@@ -25,7 +25,7 @@ export class CategoryExtraRoutes {
     // GET /category-extras - Get all category extras with pagination
     this.router.get(
       "/",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category', 'access:cashier']),
       CategoryExtraValidator.getCategoryExtras(),
       this.categoryExtraController.getAllCategoryExtras.bind(this.categoryExtraController),
     )
@@ -34,7 +34,7 @@ export class CategoryExtraRoutes {
     // GET /category-extras/category/:categoryId - Get extras by category ID
     this.router.get(
       "/category/:categoryId",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category', 'access:cashier']),
       CategoryExtraValidator.getCategoryExtrasByCategoryId(),
       this.categoryExtraController.getCategoryExtrasByCategoryId.bind(this.categoryExtraController),
     )
@@ -42,7 +42,7 @@ export class CategoryExtraRoutes {
     // GET /category-extras/:id - Get category extra by ID
     this.router.get(
       "/:id",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category', 'access:cashier']),
       CategoryExtraValidator.getCategoryExtraById(),
       this.categoryExtraController.getCategoryExtraById.bind(this.categoryExtraController),
     )

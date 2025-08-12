@@ -446,10 +446,6 @@ export class Server {
     apiV1.use(
       "/workers",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission([
-        "OWNER_ACCESS",
-        "access:workers",
-      ]),
       dependencies.workerRoutes.getRouter()
     );
     apiV1.use(

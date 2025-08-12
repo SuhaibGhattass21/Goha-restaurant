@@ -25,7 +25,7 @@ export class CategorySizeRoutes {
     // GET /category-sizes - Get all category sizes with pagination
     this.router.get(
       "/",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category', 'access:cashier']),
       CategorySizeValidator.getCategorySizes(),
       this.categorySizeController.getAllCategorySizes.bind(this.categorySizeController),
     )
@@ -33,7 +33,7 @@ export class CategorySizeRoutes {
     // GET /category-sizes/:id - Get category size by ID
     this.router.get(
       "/:id",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category', 'access:cashier']),
       CategorySizeValidator.getCategorySizeById(),
       this.categorySizeController.getCategorySizeById.bind(this.categorySizeController),
     )
@@ -41,7 +41,7 @@ export class CategorySizeRoutes {
     // GET /category-sizes/category/:categoryId - Get sizes by category ID
     this.router.get(
       "/category/:categoryId",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category', 'access:cashier']),
       CategorySizeValidator.getCategorySizesByCategoryId(),
       this.categorySizeController.getCategorySizesByCategoryId.bind(this.categorySizeController),
     )
