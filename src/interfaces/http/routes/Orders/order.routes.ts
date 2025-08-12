@@ -1,7 +1,7 @@
 import { Router } from "express"
 import type { OrderController } from "../../controllers/Orders/order.controller"
 import { OrderValidator } from "../../validators/Orders/order.validator"
-import { AuthorizationMiddleware } from "@interfaces/http/middlewares/authorization.middleware"
+import { AuthorizationMiddleware } from "../../middlewares/authorization.middleware"
 
 export class OrderRoutes {
   private router: Router

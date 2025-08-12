@@ -1,7 +1,7 @@
 import { Router } from "express"
 import type { ProductController } from "../../controllers/Product/product.controller"
 import { ProductValidator } from "../../validators/Product/product.validator"
-import { AuthorizationMiddleware } from "@interfaces/http/middlewares/authorization.middleware"
+import { AuthorizationMiddleware } from "../../middlewares/authorization.middleware"
 
 export class ProductRoutes {
   private router: Router

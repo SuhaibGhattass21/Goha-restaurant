@@ -1,7 +1,7 @@
 import { Router } from "express"
 import type { CategoryExtraController } from "../../controllers/Category/category-extra.controller"
 import { CategoryExtraValidator } from "../../validators/Category/category-extra.validator"
-import { AuthorizationMiddleware } from "@interfaces/http/middlewares/authorization.middleware"
+import { AuthorizationMiddleware } from "../../middlewares/authorization.middleware"
 
 export class CategoryExtraRoutes {
   private router: Router

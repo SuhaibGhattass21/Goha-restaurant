@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { WorkerValidator } from "../../validators/Shift/worker.validator";
 import { WorkerController } from "../../../../interfaces/http/controllers/Shift/worker.controller";
-import { AuthorizationMiddleware } from "@interfaces/http/middlewares/authorization.middleware";
+import { AuthorizationMiddleware } from "../../../../interfaces/http/middlewares/authorization.middleware";
 
 export class WorkerRoutes {
     private router: Router;

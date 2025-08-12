@@ -1,7 +1,7 @@
 import { Router } from "express"
 import type { CategorySizeController } from "../../controllers/Category/category-size.controller"
 import { CategorySizeValidator } from "../../validators/Category/category-size.validator"
-import { AuthorizationMiddleware } from "@interfaces/http/middlewares/authorization.middleware"
+import { AuthorizationMiddleware } from "../../middlewares/authorization.middleware"
 
 export class CategorySizeRoutes {
   private router: Router

@@ -1,7 +1,7 @@
 import { Router } from "express"
 import type { ProductSizePriceController } from "../../controllers/Product/product-size-price.controller"
 import { ProductSizePriceValidator } from "../../validators/Product/product-size-price.validator"
-import { AuthorizationMiddleware } from "@interfaces/http/middlewares/authorization.middleware"
+import { AuthorizationMiddleware } from "../../middlewares/authorization.middleware"
 
 export class ProductSizePriceRoutes {
   private router: Router
