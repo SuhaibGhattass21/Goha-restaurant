@@ -505,10 +505,6 @@ export class Server {
     apiV1.use(
       "/orders",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission([
-        "OWNER_ACCESS",
-        "access:cashier",
-      ]),
       dependencies.orderRoutes.getRouter()
     );
     apiV1.use(
@@ -525,7 +521,7 @@ export class Server {
       AuthMiddleware.authenticate(),
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
-        "orders:cancelled",
+        "access:orders",
       ]),
       dependencies.cancelledOrderRoutes.getRouter()
     );
