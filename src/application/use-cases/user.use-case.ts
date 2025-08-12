@@ -7,7 +7,7 @@ import { IUserRepository } from "../../domain/repositories/user.repository.inter
 import bcrypt from 'bcrypt';
 
 export class UserUseCases {
-  constructor(private userRepository: IUserRepository) {}
+  constructor(private userRepository: IUserRepository) { }
 
   async createUser(userData: CreateUserDto): Promise<UserResponseDto> {
     const existingUserByUsername = await this.userRepository.findBy({
@@ -116,6 +116,13 @@ export class UserUseCases {
       phone: user.phone,
       isActive: user.isActive,
       createdAt: user.createdAt,
+      userPermissions: user.userPermissions?.map(up => ({
+        id: up.permission.id,
+        name: up.permission.name,
+        description: up.permission.description,
+        created_at: up.permission.created_at,
+        granted_by: up.granted_by.username
+      })) || []
     };
   }
 }

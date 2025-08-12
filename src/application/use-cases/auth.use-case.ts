@@ -21,9 +21,9 @@ export class AuthUseCases {
 
             console.log(`User ${JSON.stringify(loginData)} is attempting to log in`);
             const user: User = await this.userRepository.findBy({ username: loginData.username });
-            
+
             console.log(`User found: ${JSON.stringify(user)}`);
-            
+
             if (!user) {
                 throw new Error('Invalid credentials');
             }
@@ -41,7 +41,14 @@ export class AuthUseCases {
 
             console.log(`User ${JSON.stringify(user)} logged in`);
 
-            const userPermissions = user.userPermissions?.map((permission: UserPermission) => permission.permission.name) || [];
+            const userPermissions = user.userPermissions?.map(
+                (up: UserPermission) => ({
+                    id: up.permission.id,
+                    name: up.permission.name,
+                    description: up.permission.description,
+                    created_at: up.permission.created_at,
+                })
+            ) || [];
 
             return {
                 user: {
@@ -176,7 +183,7 @@ export class AuthUseCases {
 
     private generateToken(user: User): string {
         const permissions = user.userPermissions?.map((permission: UserPermission) => permission.permission.name) || [];
-                
+
         return jwt.sign(
             {
                 userId: user.id,

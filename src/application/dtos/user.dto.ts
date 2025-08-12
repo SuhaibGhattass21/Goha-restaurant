@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsBoolean, IsUUID, IsArray, IsNotEmpty, IsPhoneNumber, IsNumber, IsDate } from 'class-validator';
+import { PermissionResponseDto } from './Permission.dto'
 
 export class CreateUserDto {
     @IsString()
@@ -81,7 +82,7 @@ export class UserResponseDto {
 
     @IsOptional()
     @IsArray()
-    userPermissions?: string[];
+    userPermissions?: PermissionResponseDto[];
 
     @IsOptional()
     @IsUUID()
