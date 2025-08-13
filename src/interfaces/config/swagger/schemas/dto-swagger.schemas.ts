@@ -1,3 +1,4 @@
+import { LoginDto } from "@application/dtos/auth.dto";
 import e from "express";
 
 export const swaggerSchemas = {
@@ -284,6 +285,25 @@ export const swaggerSchemas = {
                 type: "string",
                 format: "uuid",
                 description: "ID of the admin approving the close",
+            },
+        },
+    },
+
+    LoginDto: {
+        type: "object",
+        required: ["username", "password"],
+        properties: {
+            username: {
+                type: "string",
+                format: "email",
+                description: "User's email address",
+                example: "ysn",
+            },
+            password: {
+                type: "string",
+                format: "password",
+                description: "User's password",
+                example: "009opoP",
             },
         },
     },

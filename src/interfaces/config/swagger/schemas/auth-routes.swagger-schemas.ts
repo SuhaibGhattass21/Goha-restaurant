@@ -7,7 +7,7 @@
 
 /**
  * @swagger
- * /login:
+ * /auth/login:
  *   post:
  *     summary: User login
  *     tags: [Auth]
@@ -18,7 +18,7 @@
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               username:
  *                 type: string
  *                 format: email
  *                 description: User's email address
@@ -35,7 +35,7 @@
 
 /**
  * @swagger
- * /register:
+ * /auth/register:
  *   post:
  *     summary: User registration
  *     tags: [Auth]
@@ -66,7 +66,7 @@
 
 /**
  * @swagger
- * /profile:
+ * /auth/profile:
  *   get:
  *     summary: Get user profile
  *     tags: [Auth]
@@ -81,7 +81,7 @@
 
 /**
  * @swagger
- * /refresh-token:
+ * /auth/refresh-token:
  *   post:
  *     summary: Refresh authentication token
  *     tags: [Auth]
@@ -96,7 +96,7 @@
 
 /**
  * @swagger
- * /change-password:
+ * /auth/change-password:
  *   post:
  *     summary: Change user password
  *     tags: [Auth]
@@ -126,7 +126,7 @@
 
 /**
  * @swagger
- * /logout:
+ * /auth/logout:
  *   post:
  *     summary: Logout user
  *     tags: [Auth]

@@ -121,7 +121,6 @@ export class UserUseCases {
         name: up.permission.name,
         description: up.permission.description,
         created_at: up.permission.created_at,
-        granted_by: up.granted_by.username
       })) || []
     };
   }
