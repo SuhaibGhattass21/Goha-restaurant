@@ -1,4 +1,4 @@
-import { IsString, IsUUID, IsOptional, IsBoolean, IsArray, IsObject } from 'class-validator';
+import { IsString, IsUUID, IsDate, IsOptional, IsBoolean, IsArray, IsObject } from 'class-validator';
 /**
  * @swagger
  * components:

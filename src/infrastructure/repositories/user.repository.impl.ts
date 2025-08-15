@@ -1,18 +1,32 @@
 import { User } from "../../infrastructure/database/models";
 import { Repository } from "typeorm";
 import { IUserRepository } from "../../domain/repositories/user.repository.interface";
+import { UserPermission } from "../../infrastructure/database/models";
 export class UserRepositoryImpl implements IUserRepository {
     constructor(private userRepository: Repository<User>) { }
     create(data: User): Promise<User> {
         const user = this.userRepository.create(data);
         return this.userRepository.save(user);
     }
-    findById(id: string): Promise<any | null> {
-        return this.userRepository.findOne({
-            where: { id },
-            relations: ["userPermissions", "userPermissions.permission"],
+    async findById(userId: string): Promise<User | null> {
+        const user = await this.userRepository.findOne({
+            where: { id: userId },
+            relations: [
+                'userPermissions',
+                'userPermissions.permission'
+            ]
         });
+
+        if (user?.userPermissions) {
+            // Filter out revoked permissions here
+            user.userPermissions = user.userPermissions.filter(
+                (up: UserPermission) => !up.is_revoked
+            );
+        }
+
+        return user;
     }
+
     findBy(filter: any): Promise<User | null> {
         return this.userRepository.findOne({
             where: filter,

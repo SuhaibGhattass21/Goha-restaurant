@@ -41,14 +41,16 @@ export class AuthUseCases {
 
             console.log(`User ${JSON.stringify(user)} logged in`);
 
-            const userPermissions = user.userPermissions?.map(
-                (up: UserPermission) => ({
+            const userPermissions = user.userPermissions
+                ?.filter(up => !up.is_revoked) // filter revoked
+                .map(up => ({
                     id: up.permission.id,
                     name: up.permission.name,
                     description: up.permission.description,
-                    created_at: up.permission.created_at,
-                })
-            ) || [];
+                    granted_at: up.granted_at,
+                    granted_by_name: up.granted_by.username,
+                    is_revoked: up.is_revoked
+                })) || [];
 
             return {
                 user: {
@@ -118,7 +120,16 @@ export class AuthUseCases {
                 throw new Error('Account is deactivated');
             }
 
-            const userPermissions = user.userPermissions || [];
+            const userPermissions = user.userPermissions
+                ?.filter((up: UserPermission) => !up.is_revoked) // explicit type here
+                .map((up: UserPermission) => ({
+                    id: up.permission.id,
+                    name: up.permission.name,
+                    description: up.permission.description,
+                    granted_at: up.granted_at,
+                    granted_by_name: up.granted_by.username,
+                    is_revoked: up.is_revoked
+                })) || [];
 
             return {
                 id: user.id,
