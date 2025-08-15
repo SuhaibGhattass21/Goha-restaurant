@@ -120,8 +120,11 @@ export class UserUseCases {
         id: up.permission.id,
         name: up.permission.name,
         description: up.permission.description,
-        created_at: up.permission.created_at,
+        granted_at: up.granted_at,
+        granted_by_name: up.granted_by.username,
+        is_revoked: up.is_revoked
       })) || []
     };
   }
+
 }
