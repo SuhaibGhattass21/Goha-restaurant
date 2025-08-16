@@ -56,7 +56,7 @@ export class UserUseCases {
     id: string,
     userData: Partial<CreateUserDto>
   ): Promise<UserResponseDto | null> {
-    const existingUser = await this.userRepository.findById(id);
+    const existingUser = await this.userRepository.findBy({id});
     if (!existingUser) {
       throw new Error("User not found");
     }
