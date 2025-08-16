@@ -121,7 +121,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
 
 async findAllExceptCafe(page = 1, limit = 10): Promise<{ orders: (Order & { items: any[] })[]; total: number }> {
   const [orders, total] = await this.orderRepository.findAndCount({
-    where: { order_type: Not(OrderType.CAFE) },
+    where: { order_type: Not(OrderType.CAFE) , order_status: Not(OrderStatus.CANCELLED)},
     relations: [
       "cashier",
       "shift",
