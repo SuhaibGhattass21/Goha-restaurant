@@ -157,4 +157,13 @@ export class OrderValidator {
   static recalculateOrderTotal(): ValidationChain[] {
     return [param("id").isUUID().withMessage("Invalid order ID format")]
   }
+
+  static cancelOrder(): ValidationChain[] {
+    return [
+      param("id").isUUID().withMessage("Invalid order ID format"),
+      body("cancelled_by").isUUID().withMessage("Cancelled by user ID must be a valid UUID"),
+      body("shift_id").isUUID().withMessage("Shift ID must be a valid UUID"),
+      body("reason").optional().isLength({ max: 500 }).withMessage("Reason must not exceed 500 characters").trim(),
+    ]
+  }
 }

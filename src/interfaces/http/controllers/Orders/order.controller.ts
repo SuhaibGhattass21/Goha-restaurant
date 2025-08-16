@@ -541,4 +541,40 @@ export class OrderController {
       })
     }
   }
+
+  async cancelOrder(req: Request, res: Response): Promise<void> {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        })
+        return
+      }
+
+      const { id } = req.params
+      const { cancelled_by, shift_id, reason } = req.body
+
+      const result = await this.orderUseCases.cancelOrder({
+        order_id: id,
+        cancelled_by,
+        shift_id,
+        reason,
+      })
+
+      res.status(200).json({
+        success: true,
+        message: "Order cancelled successfully",
+        data: result,
+      })
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      })
+    }
+  }
 }

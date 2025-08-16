@@ -1,6 +1,7 @@
 import { Router } from "express"
 import type { CancelledOrderController } from "../../controllers/Orders/cancelled-order.controller"
 import { CancelledOrderValidator } from "../../validators/Orders/cancelled-order.validator"
+import { AuthorizationMiddleware } from "../../middlewares/authorization.middleware"
 
 export class CancelledOrderRoutes {
   private router: Router
@@ -16,6 +17,7 @@ export class CancelledOrderRoutes {
     // POST /cancelled-orders - Create a new cancelled order record
     this.router.post(
       "/",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       CancelledOrderValidator.createCancelledOrder(),
       this.cancelledOrderController.createCancelledOrder.bind(this.cancelledOrderController),
     )
@@ -23,6 +25,7 @@ export class CancelledOrderRoutes {
     // GET /cancelled-orders - Get all cancelled orders with pagination
     this.router.get(
       "/",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
       CancelledOrderValidator.getCancelledOrders(),
       this.cancelledOrderController.getAllCancelledOrders.bind(this.cancelledOrderController),
     )
@@ -30,6 +33,7 @@ export class CancelledOrderRoutes {
     // GET /cancelled-orders/:id - Get cancelled order by ID
     this.router.get(
       "/:id",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
       CancelledOrderValidator.getCancelledOrderById(),
       this.cancelledOrderController.getCancelledOrderById.bind(this.cancelledOrderController),
     )
@@ -37,6 +41,7 @@ export class CancelledOrderRoutes {
     // GET /cancelled-orders/order/:orderId - Get cancelled order by original order ID
     this.router.get(
       "/order/:orderId",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
       CancelledOrderValidator.getCancelledOrderByOrderId(),
       this.cancelledOrderController.getCancelledOrderByOrderId.bind(this.cancelledOrderController),
     )
@@ -44,6 +49,7 @@ export class CancelledOrderRoutes {
     // GET /cancelled-orders/user/:userId - Get cancelled orders by the user who cancelled them
     this.router.get(
       "/user/:userId",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
       CancelledOrderValidator.getCancelledOrdersByCancelledBy(),
       this.cancelledOrderController.getCancelledOrdersByCancelledBy.bind(this.cancelledOrderController),
     )
@@ -51,6 +57,7 @@ export class CancelledOrderRoutes {
     // GET /cancelled-orders/shift/:shiftId - Get cancelled orders by shift ID
     this.router.get(
       "/shift/:shiftId",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
       CancelledOrderValidator.getCancelledOrdersByShiftId(),
       this.cancelledOrderController.getCancelledOrdersByShiftId.bind(this.cancelledOrderController),
     )

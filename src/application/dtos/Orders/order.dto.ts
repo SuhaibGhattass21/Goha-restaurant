@@ -214,3 +214,18 @@ export class FilterOrdersByShiftTypeAndDateDto {
   @IsDateString()
   date!: string; // e.g., "2024-06-09"
 }
+
+export class CancelOrderDto {
+  @IsUUID()
+  order_id!: string
+
+  @IsUUID()
+  cancelled_by!: string
+
+  @IsUUID()
+  shift_id!: string
+
+  @IsOptional()
+  @IsString()
+  reason?: string
+}

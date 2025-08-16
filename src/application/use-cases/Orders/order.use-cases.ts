@@ -10,6 +10,7 @@ import type {
   OrderSummaryDto,
   OrderStatsDto,
   FilterOrdersByShiftTypeAndDateDto,
+  CancelOrderDto,
 } from "../../../application/dtos/Orders/order.dto"
 import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums" 
 import type { CancelledOrderUseCases } from "./cancelled-order.use-cases"
@@ -189,6 +190,46 @@ export class OrderUseCases {
     await this.orderItemRepository.deleteByOrderId(id)
 
     return await this.orderRepository.delete(id)
+  }
+
+  async cancelOrder(cancelOrderData: { order_id: string; cancelled_by: string; shift_id: string; reason?: string }): Promise<{ order: OrderResponseDto; cancelledOrder: any }> {
+    // First, check if the order exists and is not already cancelled
+    const existingOrder = await this.orderRepository.findById(cancelOrderData.order_id)
+    if (!existingOrder) {
+      throw new Error("Order not found")
+    }
+
+    if (existingOrder.status === OrderStatus.CANCELLED) {
+      throw new Error("Order is already cancelled")
+    }
+
+    // Update the order status to cancelled
+    const updatedOrder = await this.orderRepository.updateStatus(cancelOrderData.order_id, OrderStatus.CANCELLED)
+    if (!updatedOrder) {
+      throw new Error("Failed to update order status")
+    }
+
+    // Create a cancelled order record
+    const cancelledOrder = await this.cancelledOrderUseCases.createCancelledOrder({
+      order_id: cancelOrderData.order_id,
+      cancelled_by: cancelOrderData.cancelled_by,
+      shift_id: cancelOrderData.shift_id,
+      reason: cancelOrderData.reason || "Manually cancelled",
+    })
+
+    // Recalculate order total
+    await this.orderRepository.calculateOrderTotal(cancelOrderData.order_id)
+    
+    // Get the complete updated order
+    const completeOrder = await this.orderRepository.findById(cancelOrderData.order_id)
+    if (!completeOrder) {
+      throw new Error("Failed to retrieve updated order")
+    }
+
+    return {
+      order: this.mapToResponseDto(completeOrder),
+      cancelledOrder,
+    }
   }
 
   async getOrderStats(shiftId?: string, startDate?: Date, endDate?: Date): Promise<OrderStatsDto> {
