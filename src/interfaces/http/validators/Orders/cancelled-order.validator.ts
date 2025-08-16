@@ -45,7 +45,13 @@ export class CancelledOrderValidator {
     return [
       param("cancelled_order_id").isUUID().withMessage("Invalid cancelled order ID format"),
       body("approved_by").isUUID().withMessage("Approved By User ID must be a valid UUID"),
-      body("status").isIn(['approved', 'rejected']).withMessage("Status must be either 'approved' or 'rejected'"),
+    ]
+  }
+
+  static denyCancellation(): ValidationChain[] {
+    return [
+      param("cancelled_order_id").isUUID().withMessage("Invalid cancelled order ID format"),
+      body("approved_by").isUUID().withMessage("Approved By User ID must be a valid UUID"),
     ]
   }
 

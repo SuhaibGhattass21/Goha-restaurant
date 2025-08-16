@@ -4,9 +4,13 @@ import type { OrderUseCases } from "../../../../application/use-cases/Orders/ord
 import type { OrderStatus, OrderType } from "../../../../domain/enums/Order.enums"
 import { plainToInstance } from "class-transformer"
 import { FilterOrdersByShiftTypeAndDateDto } from "../../../../application/dtos/Orders/order.dto"
+import type { CancelledOrderUseCases } from "../../../../application/use-cases/Orders/cancelled-order.use-cases"
 
 export class OrderController {
-  constructor(private orderUseCases: OrderUseCases) { }
+  constructor(
+    private orderUseCases: OrderUseCases,
+    private cancelledOrderUseCases: CancelledOrderUseCases,
+  ) { }
 
   async createOrder(req: Request, res: Response): Promise<void> {
     try {
@@ -557,17 +561,24 @@ export class OrderController {
       const { id } = req.params
       const { cancelled_by, shift_id, reason } = req.body
 
-      const result = await this.orderUseCases.requestCancelOrder({
+      // Use CancelledOrderUseCases to create a cancellation request
+      const cancelledOrder = await this.cancelledOrderUseCases.requestCancellation({
         order_id: id,
         cancelled_by,
         shift_id,
         reason,
       })
 
+      // Optionally include the updated order in the response for parity with previous behavior
+      const order = await this.orderUseCases.getOrderById(id)
+
       res.status(200).json({
         success: true,
         message: "Cancellation request submitted successfully",
-        data: result,
+        data: {
+          order,
+          cancelledOrder,
+        },
       })
     } catch (error: any) {
       res.status(500).json({

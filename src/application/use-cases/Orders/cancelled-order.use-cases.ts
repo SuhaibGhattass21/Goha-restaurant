@@ -124,6 +124,38 @@ export class CancelledOrderUseCases {
     return this.mapToResponseDto(finalCancelledOrder)
   }
 
+  async requestCancellation(data: CreateCancelledOrderDto): Promise<CancelledOrderResponseDto> {
+    // Ensure order exists and is not already cancelled or pending cancellation
+    const existingOrder = await this.orderRepository.findById(data.order_id)
+    if (!existingOrder) {
+      throw new Error("Order not found")
+    }
+
+    if (existingOrder.status === OrderStatus.CANCELLED) {
+      throw new Error("Order is already cancelled")
+    }
+
+    if (existingOrder.status === OrderStatus.PENDING_CANCELLATION) {
+      throw new Error("Order already has a pending cancellation request")
+    }
+
+    // Move order to pending cancellation
+    const updated = await this.orderRepository.updateStatus(data.order_id, OrderStatus.PENDING_CANCELLATION)
+    if (!updated) {
+      throw new Error("Failed to update order status")
+    }
+
+    // Create a cancelled order record with default PENDING status
+    const created = await this.createCancelledOrder({
+      order_id: data.order_id,
+      cancelled_by: data.cancelled_by,
+      shift_id: data.shift_id,
+      reason: data.reason || "Cancellation requested",
+    })
+
+    return created
+  }
+
   private mapToResponseDto(cancelledOrder: CancelledOrder): CancelledOrderResponseDto {
     const orderDto: OrderResponseDto = {
       order_id: cancelledOrder.order.order_id,

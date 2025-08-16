@@ -241,19 +241,52 @@ export class CancelledOrderController {
       }
 
       const { cancelled_order_id } = req.params
-      const { approved_by, status } = req.body
+      const { approved_by } = req.body
 
       const result = await this.cancelledOrderUseCases.approveCancellation({
         cancelled_order_id,
         approved_by,
-        status,
-      })
-
-      const message = status === 'approved' ? 'Cancellation approved successfully' : 'Cancellation rejected successfully'
+        status: 'approved',
+      } as any)
 
       res.status(200).json({
         success: true,
-        message,
+        message: 'Cancellation approved successfully',
+        data: result,
+      })
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      })
+    }
+  }
+
+  async denyCancellation(req: Request, res: Response): Promise<void> {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        })
+        return
+      }
+
+      const { cancelled_order_id } = req.params
+      const { approved_by } = req.body
+
+      const result = await this.cancelledOrderUseCases.approveCancellation({
+        cancelled_order_id,
+        approved_by,
+        status: 'rejected',
+      } as any)
+
+      res.status(200).json({
+        success: true,
+        message: 'Cancellation rejected successfully',
         data: result,
       })
     } catch (error: any) {

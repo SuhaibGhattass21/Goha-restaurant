@@ -193,35 +193,13 @@ export class OrderUseCases {
   }
 
   async requestCancelOrder(cancelOrderData: { order_id: string; cancelled_by: string; shift_id: string; reason?: string }): Promise<{ order: OrderResponseDto; cancelledOrder: any }> {
-    // First, check if the order exists and is not already cancelled or pending cancellation
-    const existingOrder = await this.orderRepository.findById(cancelOrderData.order_id)
-    if (!existingOrder) {
-      throw new Error("Order not found")
-    }
-
-    if (existingOrder.status === OrderStatus.CANCELLED) {
-      throw new Error("Order is already cancelled")
-    }
-
-    if (existingOrder.status === OrderStatus.PENDING_CANCELLATION) {
-      throw new Error("Order already has a pending cancellation request")
-    }
-
-    // Update the order status to pending cancellation
-    const updatedOrder = await this.orderRepository.updateStatus(cancelOrderData.order_id, OrderStatus.PENDING_CANCELLATION)
-    if (!updatedOrder) {
-      throw new Error("Failed to update order status")
-    }
-
-    // Create a cancelled order record with PENDING status
-    const cancelledOrder = await this.cancelledOrderUseCases.createCancelledOrder({
+    const cancelledOrder = await this.cancelledOrderUseCases.requestCancellation({
       order_id: cancelOrderData.order_id,
       cancelled_by: cancelOrderData.cancelled_by,
       shift_id: cancelOrderData.shift_id,
-      reason: cancelOrderData.reason || "Cancellation requested",
+      reason: cancelOrderData.reason,
     })
 
-    // Get the complete updated order
     const completeOrder = await this.orderRepository.findById(cancelOrderData.order_id)
     if (!completeOrder) {
       throw new Error("Failed to retrieve updated order")

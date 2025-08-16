@@ -124,7 +124,7 @@ export class OrderRoutes {
     // POST /orders/:id/cancel - Cancel an order directly (for admin/owner)
     this.router.post(
       "/:id/cancel",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']),
       OrderValidator.cancelOrder(),
       this.orderController.cancelOrder.bind(this.orderController),
     )

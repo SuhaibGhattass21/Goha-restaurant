@@ -342,7 +342,7 @@ export class Server {
         orderItemExtraRepository,
         cancelledOrderUseCases
       );
-      const orderController = new OrderController(orderUseCases);
+      const orderController = new OrderController(orderUseCases, cancelledOrderUseCases);
       const orderRoutes = new OrderRoutes(orderController);
       const orderItemUseCases = new OrderItemUseCases(
         orderItemRepository,
