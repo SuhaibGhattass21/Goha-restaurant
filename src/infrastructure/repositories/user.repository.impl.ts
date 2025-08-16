@@ -30,7 +30,7 @@ export class UserRepositoryImpl implements IUserRepository {
     findBy(filter: any): Promise<User | null> {
         return this.userRepository.findOne({
             where: filter,
-            relations: ["userPermissions", "userPermissions.permission"],
+            relations: ["userPermissions", "userPermissions.permission", "userPermissions.permission.granted_by"],
         });
     }
     update(id: string, data: Partial<User>): Promise<User | null> {
