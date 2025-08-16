@@ -40,4 +40,19 @@ export class CancelledOrderValidator {
       query("limit").optional().isInt({ min: 1, max: 100 }).withMessage("Limit must be between 1 and 100").toInt(),
     ]
   }
+
+  static approveCancellation(): ValidationChain[] {
+    return [
+      param("cancelled_order_id").isUUID().withMessage("Invalid cancelled order ID format"),
+      body("approved_by").isUUID().withMessage("Approved By User ID must be a valid UUID"),
+      body("status").isIn(['approved', 'rejected']).withMessage("Status must be either 'approved' or 'rejected'"),
+    ]
+  }
+
+  static getPendingCancellations(): ValidationChain[] {
+    return [
+      query("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer").toInt(),
+      query("limit").optional().isInt({ min: 1, max: 100 }).withMessage("Limit must be between 1 and 100").toInt(),
+    ]
+  }
 }

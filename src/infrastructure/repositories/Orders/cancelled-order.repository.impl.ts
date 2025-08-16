@@ -1,5 +1,6 @@
 import type { Repository } from "typeorm"
 import type { CancelledOrder } from "../../database/models/CancelledOrder.model"
+import { CancellationStatus } from "../../database/models/CancelledOrder.model"
 import type { CreateCancelledOrderDto } from "../../../application/dtos/Orders/cancelled-order.dto"
 import type { ICancelledOrderRepository } from "../../../domain/repositories/Orders/cancelled-order.repository.interface"
 
@@ -19,14 +20,14 @@ export class CancelledOrderRepositoryImpl implements ICancelledOrderRepository {
   async findById(id: string): Promise<CancelledOrder | null> {
     return await this.cancelledOrderRepository.findOne({
       where: { cancelled_order_id: id },
-      relations: ["order", "cancelled_by", "shift"],
+      relations: ["order", "cancelled_by", "shift", "approved_by"],
     })
   }
 
   async findByOrderId(orderId: string): Promise<CancelledOrder | null> {
     return await this.cancelledOrderRepository.findOne({
       where: { order: { order_id: orderId } },
-      relations: ["order", "cancelled_by", "shift"],
+      relations: ["order", "cancelled_by", "shift", "approved_by"],
     })
   }
 
@@ -37,7 +38,7 @@ export class CancelledOrderRepositoryImpl implements ICancelledOrderRepository {
   ): Promise<{ cancelledOrders: CancelledOrder[]; total: number }> {
     const [cancelledOrders, total] = await this.cancelledOrderRepository.findAndCount({
       where: { cancelled_by: { id: userId } },
-      relations: ["order", "cancelled_by", "shift"],
+      relations: ["order", "cancelled_by", "shift", "approved_by"],
       skip: (page - 1) * limit,
       take: limit,
       order: { cancelled_at: "DESC" },
@@ -52,7 +53,7 @@ export class CancelledOrderRepositoryImpl implements ICancelledOrderRepository {
   ): Promise<{ cancelledOrders: CancelledOrder[]; total: number }> {
     const [cancelledOrders, total] = await this.cancelledOrderRepository.findAndCount({
       where: { shift: { shift_id: shiftId } },
-      relations: ["order", "cancelled_by", "shift"],
+      relations: ["order", "cancelled_by", "shift", "approved_by"],
       skip: (page - 1) * limit,
       take: limit,
       order: { cancelled_at: "DESC" },
@@ -60,9 +61,40 @@ export class CancelledOrderRepositoryImpl implements ICancelledOrderRepository {
     return { cancelledOrders, total }
   }
 
+  async findByStatus(
+    status: CancellationStatus,
+    page = 1,
+    limit = 10,
+  ): Promise<{ cancelledOrders: CancelledOrder[]; total: number }> {
+    const [cancelledOrders, total] = await this.cancelledOrderRepository.findAndCount({
+      where: { status },
+      relations: ["order", "cancelled_by", "shift", "approved_by"],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { cancelled_at: "DESC" },
+    })
+    return { cancelledOrders, total }
+  }
+
+  async updateStatus(id: string, status: CancellationStatus, approvedBy?: string): Promise<CancelledOrder | null> {
+    const updateData: any = { status }
+    
+    if (approvedBy) {
+      updateData.approved_by = { id: approvedBy }
+      updateData.approved_at = new Date()
+    }
+
+    await this.cancelledOrderRepository.update(id, updateData)
+    
+    return await this.cancelledOrderRepository.findOne({
+      where: { cancelled_order_id: id },
+      relations: ["order", "cancelled_by", "shift", "approved_by"],
+    })
+  }
+
   async findAll(page = 1, limit = 10): Promise<{ cancelledOrders: CancelledOrder[]; total: number }> {
     const [cancelledOrders, total] = await this.cancelledOrderRepository.findAndCount({
-      relations: ["order", "cancelled_by", "shift"],
+      relations: ["order", "cancelled_by", "shift", "approved_by"],
       skip: (page - 1) * limit,
       take: limit,
       order: { cancelled_at: "DESC" },

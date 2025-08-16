@@ -61,6 +61,30 @@ export class CancelledOrderRoutes {
       CancelledOrderValidator.getCancelledOrdersByShiftId(),
       this.cancelledOrderController.getCancelledOrdersByShiftId.bind(this.cancelledOrderController),
     )
+
+    // GET /cancelled-orders/pending - Get pending cancellation requests
+    this.router.get(
+      "/pending",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
+      CancelledOrderValidator.getPendingCancellations(),
+      this.cancelledOrderController.getPendingCancellations.bind(this.cancelledOrderController),
+    )
+
+    // GET /cancelled-orders/requested - Alias for pending cancellation requests (same as /pending)
+    this.router.get(
+      "/requested",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
+      CancelledOrderValidator.getPendingCancellations(),
+      this.cancelledOrderController.getPendingCancellations.bind(this.cancelledOrderController),
+    )
+
+    // POST /cancelled-orders/:cancelled_order_id/approve - Approve or reject a cancellation request
+    this.router.post(
+      "/:cancelled_order_id/approve",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
+      CancelledOrderValidator.approveCancellation(),
+      this.cancelledOrderController.approveCancellation.bind(this.cancelledOrderController),
+    )
   }
 
   public getRouter(): Router {

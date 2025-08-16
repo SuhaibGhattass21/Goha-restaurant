@@ -1,7 +1,8 @@
 export enum OrderStatus {
     COMPLETED = 'completed',
     CANCELLED = 'cancelled',
-    ACTIVE = 'active'
+    ACTIVE = 'active',
+    PENDING_CANCELLATION = 'pending_cancellation'
 }
 
 export enum OrderType {

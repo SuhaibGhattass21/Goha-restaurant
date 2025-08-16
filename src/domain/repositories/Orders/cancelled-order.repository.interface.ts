@@ -1,5 +1,6 @@
-import type { CreateCancelledOrderDto } from "../../../application/dtos/Orders/cancelled-order.dto"
+import type { CreateCancelledOrderDto, ApproveCancellationDto } from "../../../application/dtos/Orders/cancelled-order.dto"
 import type { CancelledOrder } from "../../../infrastructure/database/models"
+import type { CancellationStatus } from "../../../infrastructure/database/models/CancelledOrder.model"
 
 export interface ICancelledOrderRepository {
   create(cancelledOrderData: CreateCancelledOrderDto): Promise<CancelledOrder>
@@ -16,4 +17,10 @@ export interface ICancelledOrderRepository {
     limit?: number,
   ): Promise<{ cancelledOrders: CancelledOrder[]; total: number }>
   findAll(page?: number, limit?: number): Promise<{ cancelledOrders: CancelledOrder[]; total: number }>
+  findByStatus(
+    status: CancellationStatus,
+    page?: number,
+    limit?: number,
+  ): Promise<{ cancelledOrders: CancelledOrder[]; total: number }>
+  updateStatus(id: string, status: CancellationStatus, approvedBy?: string): Promise<CancelledOrder | null>
 }

@@ -1,14 +1,21 @@
 import type { ICancelledOrderRepository } from "../../../domain/repositories/Orders/cancelled-order.repository.interface"
 import type { CancelledOrder } from "../../../infrastructure/database/models/CancelledOrder.model"
+import { CancellationStatus } from "../../../infrastructure/database/models/CancelledOrder.model"
 import type {
   CreateCancelledOrderDto,
   CancelledOrderResponseDto,
   CancelledOrderListResponseDto,
+  ApproveCancellationDto,
 } from "../../../application/dtos/Orders/cancelled-order.dto"
 import type { OrderResponseDto, CashierInfoDto, ShiftInfoDto } from "../../../application/dtos/Orders/order.dto"
+import type { IOrderRepository } from "../../../domain/repositories/Orders/order.repository.interface"
+import { OrderStatus } from "../../../domain/enums/Order.enums"
 
 export class CancelledOrderUseCases {
-  constructor(private cancelledOrderRepository: ICancelledOrderRepository) { }
+  constructor(
+    private cancelledOrderRepository: ICancelledOrderRepository,
+    private orderRepository: IOrderRepository
+  ) { }
 
   async createCancelledOrder(cancelledOrderData: CreateCancelledOrderDto): Promise<CancelledOrderResponseDto> {
     const cancelledOrder = await this.cancelledOrderRepository.create(cancelledOrderData)
@@ -59,6 +66,64 @@ export class CancelledOrderUseCases {
     }
   }
 
+  async getPendingCancellations(page = 1, limit = 10): Promise<CancelledOrderListResponseDto> {
+    const { cancelledOrders, total } = await this.cancelledOrderRepository.findByStatus(CancellationStatus.PENDING, page, limit)
+    return {
+      cancelled_orders: cancelledOrders.map((order) => this.mapToResponseDto(order)),
+      total,
+      page,
+      limit,
+    }
+  }
+
+  async approveCancellation(approvalData: ApproveCancellationDto): Promise<CancelledOrderResponseDto> {
+    // First, get the cancelled order
+    const cancelledOrder = await this.cancelledOrderRepository.findById(approvalData.cancelled_order_id)
+    if (!cancelledOrder) {
+      throw new Error("Cancelled order not found")
+    }
+
+    if (cancelledOrder.status !== CancellationStatus.PENDING) {
+      throw new Error("Cancellation request is not pending")
+    }
+
+    // Update the cancellation status
+    const updatedCancelledOrder = await this.cancelledOrderRepository.updateStatus(
+      approvalData.cancelled_order_id, 
+      approvalData.status, 
+      approvalData.approved_by
+    )
+
+    if (!updatedCancelledOrder) {
+      throw new Error("Failed to update cancellation status")
+    }
+
+    // If approved, update the order status to cancelled
+    if (approvalData.status === CancellationStatus.APPROVED) {
+      const updatedOrder = await this.orderRepository.updateStatus(cancelledOrder.order.order_id, OrderStatus.CANCELLED)
+      if (!updatedOrder) {
+        throw new Error("Failed to update order status to cancelled")
+      }
+      
+      // Recalculate order total
+      await this.orderRepository.calculateOrderTotal(cancelledOrder.order.order_id)
+    } else if (approvalData.status === CancellationStatus.REJECTED) {
+      // If rejected, revert the order status back to ACTIVE
+      const updatedOrder = await this.orderRepository.updateStatus(cancelledOrder.order.order_id, OrderStatus.ACTIVE)
+      if (!updatedOrder) {
+        throw new Error("Failed to revert order status to active")
+      }
+    }
+
+    // Get the updated cancelled order with all relations
+    const finalCancelledOrder = await this.cancelledOrderRepository.findById(approvalData.cancelled_order_id)
+    if (!finalCancelledOrder) {
+      throw new Error("Failed to retrieve updated cancelled order")
+    }
+
+    return this.mapToResponseDto(finalCancelledOrder)
+  }
+
   private mapToResponseDto(cancelledOrder: CancelledOrder): CancelledOrderResponseDto {
     const orderDto: OrderResponseDto = {
       order_id: cancelledOrder.order.order_id,
@@ -101,13 +166,22 @@ export class CancelledOrderUseCases {
       status: cancelledOrder.shift.status,
     }
 
+    const approvedByDto = cancelledOrder.approved_by ? {
+      id: cancelledOrder.approved_by.id,
+      username: cancelledOrder.approved_by.username,
+      fullName: cancelledOrder.approved_by.fullName,
+    } : undefined
+
     return {
       cancelled_order_id: cancelledOrder.cancelled_order_id,
       order: orderDto,
       cancelled_by: cancelledByDto,
       shift: shiftDto,
       reason: cancelledOrder.reason,
+      status: cancelledOrder.status,
+      approved_by: approvedByDto,
       cancelled_at: cancelledOrder.cancelled_at.toISOString(),
+      approved_at: cancelledOrder.approved_at?.toISOString(),
     }
   }
 }

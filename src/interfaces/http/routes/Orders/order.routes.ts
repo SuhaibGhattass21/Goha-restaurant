@@ -113,7 +113,15 @@ export class OrderRoutes {
       this.orderController.recalculateOrderTotal.bind(this.orderController),
     )
 
-    // POST /orders/:id/cancel - Cancel an order
+    // POST /orders/:id/request-cancel - Request cancellation for an order
+    this.router.post(
+      "/:id/request-cancel",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
+      OrderValidator.requestCancelOrder(),
+      this.orderController.requestCancelOrder.bind(this.orderController),
+    )
+
+    // POST /orders/:id/cancel - Cancel an order directly (for admin/owner)
     this.router.post(
       "/:id/cancel",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),

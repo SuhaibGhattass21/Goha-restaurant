@@ -1,6 +1,7 @@
-import { IsString, IsOptional, IsUUID, IsDateString, IsInt, Min, IsArray, ValidateNested } from "class-validator"
+import { IsString, IsOptional, IsUUID, IsDateString, IsInt, Min, IsArray, ValidateNested, IsEnum } from "class-validator"
 import { Type } from "class-transformer"
 import { OrderResponseDto, CashierInfoDto, ShiftInfoDto } from "./order.dto" // Reusing existing DTOs
+import { CancellationStatus } from "../../../infrastructure/database/models/CancelledOrder.model"
 
 export class CreateCancelledOrderDto {
   @IsUUID()
@@ -15,6 +16,17 @@ export class CreateCancelledOrderDto {
   @IsOptional()
   @IsString()
   reason?: string
+}
+
+export class ApproveCancellationDto {
+  @IsUUID()
+  cancelled_order_id!: string
+
+  @IsUUID()
+  approved_by!: string
+
+  @IsEnum(CancellationStatus)
+  status!: CancellationStatus // APPROVED or REJECTED
 }
 
 export class CancelledOrderResponseDto {
@@ -37,8 +49,20 @@ export class CancelledOrderResponseDto {
   @IsString()
   reason?: string
 
+  @IsEnum(CancellationStatus)
+  status!: CancellationStatus
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CashierInfoDto)
+  approved_by?: CashierInfoDto
+
   @IsDateString()
   cancelled_at!: string
+
+  @IsOptional()
+  @IsDateString()
+  approved_at?: string
 }
 
 export class CancelledOrderListResponseDto {

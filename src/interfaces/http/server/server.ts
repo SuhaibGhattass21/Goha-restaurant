@@ -333,7 +333,8 @@ export class Server {
         cancelledOrderRepo
       );
       const cancelledOrderUseCases = new CancelledOrderUseCases(
-        cancelledOrderRepository
+        cancelledOrderRepository,
+        orderRepository
       );
       const orderUseCases = new OrderUseCases(
         orderRepository,

@@ -197,4 +197,71 @@ export class CancelledOrderController {
       })
     }
   }
+
+  async getPendingCancellations(req: Request, res: Response): Promise<void> {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        })
+        return
+      }
+
+      const page = Number.parseInt(req.query.page as string) || 1
+      const limit = Number.parseInt(req.query.limit as string) || 10
+
+      const result = await this.cancelledOrderUseCases.getPendingCancellations(page, limit)
+
+      res.status(200).json({
+        success: true,
+        data: result,
+      })
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      })
+    }
+  }
+
+  async approveCancellation(req: Request, res: Response): Promise<void> {
+    try {
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors.array(),
+        })
+        return
+      }
+
+      const { cancelled_order_id } = req.params
+      const { approved_by, status } = req.body
+
+      const result = await this.cancelledOrderUseCases.approveCancellation({
+        cancelled_order_id,
+        approved_by,
+        status,
+      })
+
+      const message = status === 'approved' ? 'Cancellation approved successfully' : 'Cancellation rejected successfully'
+
+      res.status(200).json({
+        success: true,
+        message,
+        data: result,
+      })
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      })
+    }
+  }
 }
