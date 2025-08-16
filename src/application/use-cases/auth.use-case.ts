@@ -111,7 +111,7 @@ export class AuthUseCases {
 
     async getUserProfile(userId: string): Promise<UserResponseDto> {
         try {
-            const user = await this.userRepository.findById(userId);
+            const user = await this.userRepository.findBy({id:userId});
             if (!user) {
                 throw new Error('User not found');
             }
