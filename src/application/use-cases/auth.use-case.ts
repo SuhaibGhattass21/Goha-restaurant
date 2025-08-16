@@ -48,7 +48,7 @@ export class AuthUseCases {
                     name: up.permission.name,
                     description: up.permission.description,
                     granted_at: up.granted_at,
-                    granted_by_name: up.granted_by.username,
+                    granted_by_name: up.granted_by.id,
                     is_revoked: up.is_revoked
                 })) || [];
 
