@@ -88,8 +88,8 @@ export class CancelledOrderUseCases {
 
     // Update the cancellation status
     const updatedCancelledOrder = await this.cancelledOrderRepository.updateStatus(
-      approvalData.cancelled_order_id, 
-      approvalData.status, 
+      approvalData.cancelled_order_id,
+      approvalData.status,
       approvalData.approved_by
     )
 
@@ -98,12 +98,12 @@ export class CancelledOrderUseCases {
     }
 
     // If approved, update the order status to cancelled
-    if (approvalData.status === OrderStatus.APPROVED) {
+    if (approvalData.status === OrderStatus.CANCELLED) {
       const updatedOrder = await this.orderRepository.updateStatus(cancelledOrder.order.order_id, OrderStatus.CANCELLED)
       if (!updatedOrder) {
         throw new Error("Failed to update order status to cancelled")
       }
-      
+
       // Recalculate order total
       await this.orderRepository.calculateOrderTotal(cancelledOrder.order.order_id)
     } else if (approvalData.status === OrderStatus.REJECTED) {

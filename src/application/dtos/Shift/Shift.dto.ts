@@ -230,6 +230,9 @@ export class ShiftSummaryWithDetailsDto {
     total_orders!: number;
 
     @IsNumber()
+    total_cancelled_orders!: number;
+
+    @IsNumber()
     total_cafe_orders!: number;
 
     @IsNumber()

@@ -27,7 +27,7 @@ export class ApproveCancellationDto {
   approved_by!: string
 
   @IsEnum(OrderStatus)
-  status!: OrderStatus // APPROVED or REJECTED
+  status!: OrderStatus
 }
 
 export class CancelledOrderResponseDto {

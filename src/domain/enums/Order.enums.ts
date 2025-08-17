@@ -3,8 +3,7 @@ export enum OrderStatus {
     CANCELLED = 'cancelled',
     ACTIVE = 'active',
     PENDING = 'pending',
-    APPROVED = 'approved',
-    REJECTED = 'rejected'
+    REJECTED = 'rejected',
 }
 
 

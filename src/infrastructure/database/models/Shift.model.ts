@@ -12,6 +12,7 @@ import { User } from "./user.model";
 import { ShiftWorker } from "./ShiftWorker.model";
 import { Expense } from "./Expense.model";
 import { Order } from "./Order.model";
+import { CancelledOrder } from "./CancelledOrder.model";
 import { ShiftType, ShiftStatus } from "../../../domain/enums/Shift.enums"
 
 @Entity("shifts")
@@ -63,6 +64,9 @@ export class Shift {
 
     @OneToMany(() => Order, (order) => order.shift)
     orders!: Order[];
+
+    @OneToMany(() => CancelledOrder, (cancelledOrder) => cancelledOrder.shift)
+    cancelledOrders!: CancelledOrder[];
 
     @Column({ type: "date" })
     created_at: Date = new Date();
