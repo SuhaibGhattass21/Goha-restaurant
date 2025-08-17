@@ -17,15 +17,15 @@ export class ExternalReceipt {
     @PrimaryGeneratedColumn("uuid")
     receipt_id: string = uuidv4().toString();
 
-    @ManyToOne(() => Order)
+    @ManyToOne(() => Order, { onDelete: "CASCADE" })
     @JoinColumn({ name: 'order_id' })
     order!: Order
 
-    @ManyToOne(() => Shift)
+    @ManyToOne(() => Shift, { onDelete: "CASCADE" })
     @JoinColumn({ name: "shift_id" })
     shift!: Shift;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { onDelete: "CASCADE" })
     @JoinColumn({ name: 'cashier_id' })
     cashier!: User
 

@@ -24,7 +24,7 @@ export class Expense {
     @Column({ type: 'numeric', precision: 10, scale: 2 })
     amount!: number;
 
-    @ManyToOne(() => Shift)
+    @ManyToOne(() => Shift, { onDelete: "CASCADE" })
     @JoinColumn({ name: 'shift_id' })
     shift!: Shift;
 

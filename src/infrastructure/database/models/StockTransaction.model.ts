@@ -17,7 +17,7 @@ export class StockTransaction {
     @PrimaryGeneratedColumn("uuid")
     transaction_id: string = uuidv4().toString();
 
-    @ManyToOne(() => StockItem, (item) => item.transactions)
+    @ManyToOne(() => StockItem, (item) => item.transactions, { onDelete: "CASCADE" })
     @JoinColumn({ name: "stock_item_id" })
     stockItem!: StockItem;
 
@@ -31,7 +31,7 @@ export class StockTransaction {
     @JoinColumn({ name: "user_id" })
     admin!: User;
 
-    @ManyToOne(() => Shift)
+    @ManyToOne(() => Shift, { onDelete: "CASCADE" })
     @JoinColumn({ name: "shift_id" })
     shift!: Shift;
 

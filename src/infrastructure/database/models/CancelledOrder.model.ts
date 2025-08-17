@@ -20,15 +20,15 @@ export class CancelledOrder {
     @PrimaryGeneratedColumn('uuid')
     cancelled_order_id: string = uuidv4().toString();
 
-    @ManyToOne(() => Order)
+    @ManyToOne(() => Order, { onDelete: "CASCADE" })
     @JoinColumn({ name: 'order_id' })
     order!: Order;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { onDelete: "CASCADE" })
     @JoinColumn({ name: 'cancelled_by' })
     cancelled_by!: User;
 
-    @ManyToOne(() => Shift)
+    @ManyToOne(() => Shift, { onDelete: "CASCADE" })
     @JoinColumn({ name: 'shift_id' })
     shift!: Shift;
 
