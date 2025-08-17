@@ -250,7 +250,7 @@ export class ShiftSummaryWithDetailsDto {
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => AdminDto)
-    admins?: AdminDto[];
+    owner?: AdminDto[];
 
     @IsArray()
     @ValidateNested({ each: true })

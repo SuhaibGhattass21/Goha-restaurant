@@ -227,42 +227,38 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             username
         }));
 
-        // ✅ Admins: From shiftWorkers with admin role
-        const adminSet = new Map<string, string>();
+        // Admins: From shiftWorkers with admin role
+        // const adminSet = new Map<string, string>();
 
-        (shift.shiftWorkers || []).forEach(sw => {
-            if (sw.worker?.status === "admin") {
-                const userId = sw.worker.user?.id;
-                if (userId) {
-                    adminSet.set(userId, sw.worker.user?.username || "");
-                }
-            }
-        });
+        // (shift.shiftWorkers || []).forEach(sw => {
+        //     if (sw.worker?.status === "admin") {
+        //         const userId = sw.worker.user?.id;
+        //         if (userId) {
+        //             adminSet.set(userId, sw.worker.user?.username || "");
+        //         }
+        //     }
+        // });
 
-        // ✅ Add Owners (system admins not in shiftWorkers)
-        // You need repository/service call to load owners
-        const owners = await this.userRepo.find({
+        // Add Owners (system admins not in shiftWorkers)
+        const owners: User[] = await this.userRepo.findBy({
             relations: ["userPermissions", "userPermissions.permission"],
             where: {
                 userPermissions: {
-                    permission: {
-                        name: "OWNER_ACCESS"
-                    },
+                    permission: { name: "OWNER_ACCESS" },
                     is_revoked: false
                 }
             }
         });
 
-        const admins = owners.map(o => ({
+        const owner = owners.map((o: User) => ({
             user_id: o.id,
             username: o.username
         }));
 
-
-        const admins = [...adminSet.entries()].map(([user_id, username]) => ({
-            user_id,
-            username
-        }));
+        // const admins = [...adminSet.entries()].map(([user_id, username]) => ({
+        //     user_id,
+        //     username
+        // }));
 
         return {
             shift_id: shift.shift_id,
@@ -279,7 +275,7 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             cashiers,
             expenses,
             workers,
-            admins
+            owner,
         };
     }
 
