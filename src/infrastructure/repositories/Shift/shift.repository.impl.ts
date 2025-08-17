@@ -12,10 +12,9 @@ import type {
     WorkerSalaryDetailDto
 } from '../../../application/dtos/Shift/Shift.dto'
 import { IShiftRepository } from '../../../domain/repositories/Shift/shift.repository.interface'
-import { IUserRepository } from '../../../domain/repositories/user.repository.interface'
 import { ShiftStatus, ShiftType } from '../../../domain/enums/Shift.enums'
 import { startOfDay, endOfDay } from 'date-fns'
-import { User } from '@infrastructure/database/models'
+import { User } from '../../../infrastructure/database/models'
 
 export class ShiftRepositoryImpl implements IShiftRepository {
     constructor(private repo: Repository<Shift>, private userRepo: Repository<User>) { }
