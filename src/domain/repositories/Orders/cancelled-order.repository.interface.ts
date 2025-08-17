@@ -1,4 +1,4 @@
-import { OrderStatus } from "@domain/enums/Order.enums"
+import { OrderStatus } from '../../../domain/enums/Order.enums';
 import type { CreateCancelledOrderDto, ApproveCancellationDto } from "../../../application/dtos/Orders/cancelled-order.dto"
 import type { CancelledOrder } from "../../../infrastructure/database/models"
 

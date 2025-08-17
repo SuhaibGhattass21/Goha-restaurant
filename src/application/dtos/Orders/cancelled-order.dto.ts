@@ -1,7 +1,8 @@
 import { IsString, IsOptional, IsUUID, IsDateString, IsInt, Min, IsArray, ValidateNested, IsEnum } from "class-validator"
 import { Type } from "class-transformer"
 import { OrderResponseDto, CashierInfoDto, ShiftInfoDto } from "./order.dto" // Reusing existing DTOs
-import { OrderStatus } from "@domain/enums/Order.enums"
+import { OrderStatus } from '../../../domain/enums/Order.enums';
+
 
 export class CreateCancelledOrderDto {
   @IsUUID()

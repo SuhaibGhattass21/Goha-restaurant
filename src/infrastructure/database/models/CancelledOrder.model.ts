@@ -11,7 +11,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Order } from './Order.model';
 import { User } from './user.model';
 import { Shift } from './Shift.model';
-import { OrderStatus } from '@domain/enums/Order.enums';
+import { OrderStatus } from '../../../domain/enums/Order.enums';
+
 
 
 

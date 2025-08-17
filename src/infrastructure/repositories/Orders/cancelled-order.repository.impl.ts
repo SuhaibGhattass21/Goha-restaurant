@@ -2,7 +2,8 @@ import type { Repository } from "typeorm"
 import type { CancelledOrder } from "../../database/models/CancelledOrder.model"
 import type { CreateCancelledOrderDto } from "../../../application/dtos/Orders/cancelled-order.dto"
 import type { ICancelledOrderRepository } from "../../../domain/repositories/Orders/cancelled-order.repository.interface"
-import { OrderStatus } from "@domain/enums/Order.enums"
+import { OrderStatus } from '../../../domain/enums/Order.enums';
+
 
 export class CancelledOrderRepositoryImpl implements ICancelledOrderRepository {
   constructor(private cancelledOrderRepository: Repository<CancelledOrder>) { }
