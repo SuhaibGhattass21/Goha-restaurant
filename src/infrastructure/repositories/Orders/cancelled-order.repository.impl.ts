@@ -1,8 +1,9 @@
 import type { Repository } from "typeorm"
 import type { CancelledOrder } from "../../database/models/CancelledOrder.model"
-import { CancellationStatus } from "../../database/models/CancelledOrder.model"
 import type { CreateCancelledOrderDto } from "../../../application/dtos/Orders/cancelled-order.dto"
 import type { ICancelledOrderRepository } from "../../../domain/repositories/Orders/cancelled-order.repository.interface"
+import { OrderStatus } from '../../../domain/enums/Order.enums';
+
 
 export class CancelledOrderRepositoryImpl implements ICancelledOrderRepository {
   constructor(private cancelledOrderRepository: Repository<CancelledOrder>) { }
@@ -62,7 +63,7 @@ export class CancelledOrderRepositoryImpl implements ICancelledOrderRepository {
   }
 
   async findByStatus(
-    status: CancellationStatus,
+    status: OrderStatus,
     page = 1,
     limit = 10,
   ): Promise<{ cancelledOrders: CancelledOrder[]; total: number }> {
@@ -76,7 +77,7 @@ export class CancelledOrderRepositoryImpl implements ICancelledOrderRepository {
     return { cancelledOrders, total }
   }
 
-  async updateStatus(id: string, status: CancellationStatus, approvedBy?: string): Promise<CancelledOrder | null> {
+  async updateStatus(id: string, status: OrderStatus, approvedBy?: string): Promise<CancelledOrder | null> {
     const updateData: any = { status }
     
     if (approvedBy) {

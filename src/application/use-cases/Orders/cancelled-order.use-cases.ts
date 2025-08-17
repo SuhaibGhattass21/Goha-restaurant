@@ -1,6 +1,5 @@
 import type { ICancelledOrderRepository } from "../../../domain/repositories/Orders/cancelled-order.repository.interface"
 import type { CancelledOrder } from "../../../infrastructure/database/models/CancelledOrder.model"
-import { CancellationStatus } from "../../../infrastructure/database/models/CancelledOrder.model"
 import type {
   CreateCancelledOrderDto,
   CancelledOrderResponseDto,
@@ -67,7 +66,7 @@ export class CancelledOrderUseCases {
   }
 
   async getPendingCancellations(page = 1, limit = 10): Promise<CancelledOrderListResponseDto> {
-    const { cancelledOrders, total } = await this.cancelledOrderRepository.findByStatus(CancellationStatus.PENDING, page, limit)
+    const { cancelledOrders, total } = await this.cancelledOrderRepository.findByStatus(OrderStatus.PENDING, page, limit)
     return {
       cancelled_orders: cancelledOrders.map((order) => this.mapToResponseDto(order)),
       total,
@@ -83,7 +82,7 @@ export class CancelledOrderUseCases {
       throw new Error("Cancelled order not found")
     }
 
-    if (cancelledOrder.status !== CancellationStatus.PENDING) {
+    if (cancelledOrder.status !== OrderStatus.PENDING) {
       throw new Error("Cancellation request is not pending")
     }
 
@@ -99,7 +98,7 @@ export class CancelledOrderUseCases {
     }
 
     // If approved, update the order status to cancelled
-    if (approvalData.status === CancellationStatus.APPROVED) {
+    if (approvalData.status === OrderStatus.APPROVED) {
       const updatedOrder = await this.orderRepository.updateStatus(cancelledOrder.order.order_id, OrderStatus.CANCELLED)
       if (!updatedOrder) {
         throw new Error("Failed to update order status to cancelled")
@@ -107,7 +106,7 @@ export class CancelledOrderUseCases {
       
       // Recalculate order total
       await this.orderRepository.calculateOrderTotal(cancelledOrder.order.order_id)
-    } else if (approvalData.status === CancellationStatus.REJECTED) {
+    } else if (approvalData.status === OrderStatus.REJECTED) {
       // If rejected, revert the order status back to ACTIVE
       const updatedOrder = await this.orderRepository.updateStatus(cancelledOrder.order.order_id, OrderStatus.ACTIVE)
       if (!updatedOrder) {
@@ -135,12 +134,12 @@ export class CancelledOrderUseCases {
       throw new Error("Order is already cancelled")
     }
 
-    if (existingOrder.status === OrderStatus.PENDING_CANCELLATION) {
+    if (existingOrder.status === OrderStatus.PENDING) {
       throw new Error("Order already has a pending cancellation request")
     }
 
     // Move order to pending cancellation
-    const updated = await this.orderRepository.updateStatus(data.order_id, OrderStatus.PENDING_CANCELLATION)
+    const updated = await this.orderRepository.updateStatus(data.order_id, OrderStatus.PENDING)
     if (!updated) {
       throw new Error("Failed to update order status")
     }

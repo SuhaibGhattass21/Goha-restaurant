@@ -11,12 +11,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { Order } from './Order.model';
 import { User } from './user.model';
 import { Shift } from './Shift.model';
+import { OrderStatus } from '../../../domain/enums/Order.enums';
 
-export enum CancellationStatus {
-    PENDING = 'pending',
-    APPROVED = 'approved',
-    REJECTED = 'rejected'
-}
+
+
 
 @Entity('cancelled_orders')
 export class CancelledOrder {
@@ -40,10 +38,10 @@ export class CancelledOrder {
 
     @Column({
         type: 'enum',
-        enum: CancellationStatus,
-        default: CancellationStatus.PENDING
+        enum: OrderStatus,
+        default: OrderStatus.PENDING
     })
-    status: CancellationStatus = CancellationStatus.PENDING;
+    status: OrderStatus = OrderStatus.PENDING;
 
     @ManyToOne(() => User, { nullable: true })
     @JoinColumn({ name: 'approved_by' })
