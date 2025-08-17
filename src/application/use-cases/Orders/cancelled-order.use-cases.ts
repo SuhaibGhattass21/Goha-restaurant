@@ -106,7 +106,7 @@ export class CancelledOrderUseCases {
 
       // Recalculate order total
       await this.orderRepository.calculateOrderTotal(cancelledOrder.order.order_id)
-    } else if (approvalData.status === OrderStatus.REJECTED) {
+    } else if (approvalData.status === OrderStatus.ACTIVE) {
       // If rejected, revert the order status back to ACTIVE
       const updatedOrder = await this.orderRepository.updateStatus(cancelledOrder.order.order_id, OrderStatus.ACTIVE)
       if (!updatedOrder) {
