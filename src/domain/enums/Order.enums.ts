@@ -2,8 +2,12 @@ export enum OrderStatus {
     COMPLETED = 'completed',
     CANCELLED = 'cancelled',
     ACTIVE = 'active',
-    PENDING_CANCELLATION = 'pending_cancellation'
+    PENDING = 'pending',
+    APPROVED = 'approved',
+    REJECTED = 'rejected'
 }
+
+
 
 export enum OrderType {
     DINE_IN = 'dine-in',
