@@ -18,7 +18,7 @@ import { startOfDay, endOfDay } from 'date-fns'
 import { User } from '@infrastructure/database/models'
 
 export class ShiftRepositoryImpl implements IShiftRepository {
-    constructor(private repo: Repository<Shift>, private userRepo: IUserRepository) { }
+    constructor(private repo: Repository<Shift>, private userRepo: Repository<User>) { }
     async create(data: OpenShiftDTO): Promise<Shift> {
         const shift = this.repo.create({
             shift_type: data.shift_type,
@@ -243,14 +243,14 @@ export class ShiftRepositoryImpl implements IShiftRepository {
         // });
 
         // Add Owners (system admins not in shiftWorkers)
-        const owners: User[] = await this.userRepo.findBy({
-            relations: ["userPermissions", "userPermissions.permission"],
+        const owners: User[] = await this.userRepo.find({
             where: {
                 userPermissions: {
                     permission: { name: "OWNER_ACCESS" },
                     is_revoked: false
                 }
-            }
+            },
+            relations: ["userPermissions", "userPermissions.permission"],
         });
 
         const owner = owners.map((o: User) => ({

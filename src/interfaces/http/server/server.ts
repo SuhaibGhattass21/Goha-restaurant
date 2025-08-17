@@ -115,6 +115,7 @@ import { StockReportRoutes } from "../routes/Stock/stock-report.routes";
 import { StockReportRepositoryImpl } from "../../../infrastructure/repositories/Stock/stock-report.repository.impl";
 import { StockReportUseCases } from "../../../application/use-cases/Stock/stock-report.use-cases";
 import { AuthorizationMiddleware } from "../middlewares/authorization.middleware";
+import { IUserRepository } from "@domain/repositories/user.repository.interface";
 export class Server {
   private app: express.Application;
   private readonly PORT: number;
@@ -275,7 +276,7 @@ export class Server {
       );
       const stockReportRoutes = new StockReportRoutes(stockReportController);
       // Setup Shift module
-      const shiftRepository = new ShiftRepositoryImpl(shiftRepo);
+      const shiftRepository = new ShiftRepositoryImpl(shiftRepo, userRepo);
       const shiftUseCases = new ShiftUseCases(shiftRepository);
       const shiftService = new ShiftService(shiftUseCases);
       const shiftController = new ShiftController(shiftService);
