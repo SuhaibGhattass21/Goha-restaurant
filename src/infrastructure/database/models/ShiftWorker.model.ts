@@ -14,7 +14,7 @@ export class ShiftWorker {
     @PrimaryGeneratedColumn("uuid")
     shift_worker_id: string = uuidv4().toString();
 
-    @ManyToOne(() => Shift, (shift) => shift.shiftWorkers)
+    @ManyToOne(() => Shift, (shift) => shift.shiftWorkers, { onDelete: "CASCADE" })
     @JoinColumn({ name: "shift_id" })
     shift!: Shift;
 

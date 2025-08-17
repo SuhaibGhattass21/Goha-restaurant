@@ -22,7 +22,7 @@ export class Order {
     @JoinColumn({ name: "user_id" })
     cashier!: User;
 
-    @ManyToOne(() => Shift)
+    @ManyToOne(() => Shift, { onDelete: "CASCADE" })
     @JoinColumn({ name: "shift_id" })
     shift!: Shift;
 
