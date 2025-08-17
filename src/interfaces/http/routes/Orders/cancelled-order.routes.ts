@@ -57,7 +57,7 @@ export class CancelledOrderRoutes {
     // GET /cancelled-orders/shift/:shiftId - Get cancelled orders by shift ID
     this.router.get(
       "/shift/:shiftId",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders', 'access:cashier']),
       CancelledOrderValidator.getCancelledOrdersByShiftId(),
       this.cancelledOrderController.getCancelledOrdersByShiftId.bind(this.cancelledOrderController),
     )

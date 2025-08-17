@@ -12,12 +12,13 @@ import type {
     WorkerSalaryDetailDto
 } from '../../../application/dtos/Shift/Shift.dto'
 import { IShiftRepository } from '../../../domain/repositories/Shift/shift.repository.interface'
+import { IUserRepository } from '../../../domain/repositories/user.repository.interface'
 import { ShiftStatus, ShiftType } from '../../../domain/enums/Shift.enums'
 import { startOfDay, endOfDay } from 'date-fns'
+import { User } from '@infrastructure/database/models'
 
 export class ShiftRepositoryImpl implements IShiftRepository {
-    constructor(private repo: Repository<Shift>) { }
-
+    constructor(private repo: Repository<Shift>, private userRepo: IUserRepository) { }
     async create(data: OpenShiftDTO): Promise<Shift> {
         const shift = this.repo.create({
             shift_type: data.shift_type,
@@ -170,7 +171,8 @@ export class ShiftRepositoryImpl implements IShiftRepository {
                 "expenses",
                 "shiftWorkers",
                 "shiftWorkers.worker",
-                "opened_by"
+                "shiftWorkers.worker.user",
+                "opened_by",
             ]
         });
 
@@ -193,7 +195,6 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             description: typeof e.description === "string" ? e.description : undefined,
             created_at: e.created_at,
         }));
-
 
         const totalExpenses = expenses.reduce((acc, e) => acc + e.amount, 0);
 
@@ -226,6 +227,43 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             username
         }));
 
+        // ✅ Admins: From shiftWorkers with admin role
+        const adminSet = new Map<string, string>();
+
+        (shift.shiftWorkers || []).forEach(sw => {
+            if (sw.worker?.status === "admin") {
+                const userId = sw.worker.user?.id;
+                if (userId) {
+                    adminSet.set(userId, sw.worker.user?.username || "");
+                }
+            }
+        });
+
+        // ✅ Add Owners (system admins not in shiftWorkers)
+        // You need repository/service call to load owners
+        const owners = await this.userRepo.find({
+            relations: ["userPermissions", "userPermissions.permission"],
+            where: {
+                userPermissions: {
+                    permission: {
+                        name: "OWNER_ACCESS"
+                    },
+                    is_revoked: false
+                }
+            }
+        });
+
+        const admins = owners.map(o => ({
+            user_id: o.id,
+            username: o.username
+        }));
+
+
+        const admins = [...adminSet.entries()].map(([user_id, username]) => ({
+            user_id,
+            username
+        }));
+
         return {
             shift_id: shift.shift_id,
             shift_type: shift.shift_type,
@@ -240,9 +278,11 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             final_number: totalRevenue - totalExpenses - totalSalaries,
             cashiers,
             expenses,
-            workers
+            workers,
+            admins
         };
     }
+
 
     async getShiftSummaryByTypeAndDate(filter: ShiftSummaryFilterDto): Promise<ShiftSummaryResponseDto> {
         const { date, shift_type } = filter;

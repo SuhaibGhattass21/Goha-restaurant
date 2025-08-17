@@ -118,6 +118,14 @@ export class CashierDto {
     username!: string;
 }
 
+export class AdminDto {
+    @IsUUID()
+    user_id!: string;
+
+    @IsString()
+    username!: string;
+}
+
 export class ShiftSummaryResponseDto {
     @IsUUID()
     shift_id!: string;
@@ -238,6 +246,11 @@ export class ShiftSummaryWithDetailsDto {
 
     @IsNumber()
     final_number!: number;
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => AdminDto)
+    admins?: AdminDto[];
 
     @IsArray()
     @ValidateNested({ each: true })
