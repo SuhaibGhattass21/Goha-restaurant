@@ -6,7 +6,6 @@ import { OrderStatus, OrderType } from "../../../domain/enums/Order.enums"
 import { ShiftType } from "../../../domain/enums/Shift.enums"
 import { startOfDay, endOfDay } from "date-fns"
 import { Not } from "typeorm"
-import { log } from "node:console"
 export class OrderRepositoryImpl implements IOrderRepository {
   constructor(private orderRepository: Repository<Order>) { }
 
@@ -119,88 +118,89 @@ export class OrderRepositoryImpl implements IOrderRepository {
     return { orders, total }
   }
 
-async findAllExceptCafe(page = 1, limit = 10): Promise<{ orders: (Order & { items: any[] })[]; total: number }> {
-  const [orders, total] = await this.orderRepository.findAndCount({
-    where: { order_type: Not(OrderType.CAFE) , status: Not(OrderStatus.CANCELLED)},
-    relations: [
-      "cashier",
-      "shift",
-      "items",
-      "items.product_size",
-      "items.product_size.product",
-      "items.product_size.product.category",
-      "items.product_size.size",
-      "items.extras"
-    ],
-    skip: (page - 1) * limit,
-    take: limit,
-    order: { created_at: "DESC" },
-  });
-
-  // Add extrasCount and size_name to each item
-  const ordersWithExtrasAndSize = orders.map(order => ({
-    ...order,
-    items: order.items.map(item => ({
-      ...item,
-      extrasCount: item.extras ? item.extras.length : 0,
-      size_name: item.product_size?.size?.size_name || null
-    }))
-  }));
-
-  return { orders: ordersWithExtrasAndSize, total };}
-
-  async findAllCafe(page = 1, limit = 10): Promise<{ orders: (Order & { extrasSummary: any[], items: any[] })[]; total: number }> {
-  const [orders, total] = await this.orderRepository.findAndCount({
-    where: { order_type: OrderType.CAFE },
-    relations: [
-      "cashier",
-      "shift",
-      "items",
-      "items.product_size",
-      "items.product_size.product",
-      "items.product_size.product.category",
-      "items.product_size.size",
-      "items.extras"
-    ],
-    skip: (page - 1) * limit,
-    take: limit,
-    order: { created_at: "DESC" },
-  });
-
-  const ordersWithExtrasSummary = orders.map(order => {
-    const allExtras = order.items.flatMap(item => item.extras || []);
-    const extraCountMap: Record<string, { extra_id: string, name: string, price: number, count: number }> = {};
-    allExtras.forEach(extra => {
-      const id = extra.extra?.extra_id;
-      if (!id) return;
-      if (!extraCountMap[id]) {
-        extraCountMap[id] = {
-          extra_id: id,
-          name: extra.extra?.name || "",
-          price: Number(extra.extra?.price ?? extra.price),
-          count: 1
-        };
-      } else {
-        extraCountMap[id].count += 1;
-      }
+  async findAllExceptCafe(page = 1, limit = 10): Promise<{ orders: (Order & { items: any[] })[]; total: number }> {
+    const [orders, total] = await this.orderRepository.findAndCount({
+      where: { order_type: Not(OrderType.CAFE), status: Not(OrderStatus.CANCELLED) },
+      relations: [
+        "cashier",
+        "shift",
+        "items",
+        "items.product_size",
+        "items.product_size.product",
+        "items.product_size.product.category",
+        "items.product_size.size",
+        "items.extras"
+      ],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: "DESC" },
     });
 
     // Add extrasCount and size_name to each item
-    const itemsWithExtrasCountAndSize = order.items.map(item => ({
-      ...item,
-      extrasCount: item.extras ? item.extras.length : 0,
-      size_name: item.product_size?.size?.size_name || null
+    const ordersWithExtrasAndSize = orders.map(order => ({
+      ...order,
+      items: order.items.map(item => ({
+        ...item,
+        extrasCount: item.extras ? item.extras.length : 0,
+        size_name: item.product_size?.size?.size_name || null
+      }))
     }));
 
-    return {
-      ...order,
-      items: itemsWithExtrasCountAndSize,
-      extrasSummary: Object.values(extraCountMap)
-    };
-  });
+    return { orders: ordersWithExtrasAndSize, total };
+  }
 
-  return { orders: ordersWithExtrasSummary, total };
-}
+  async findAllCafe(page = 1, limit = 10): Promise<{ orders: (Order & { extrasSummary: any[], items: any[] })[]; total: number }> {
+    const [orders, total] = await this.orderRepository.findAndCount({
+      where: { order_type: OrderType.CAFE },
+      relations: [
+        "cashier",
+        "shift",
+        "items",
+        "items.product_size",
+        "items.product_size.product",
+        "items.product_size.product.category",
+        "items.product_size.size",
+        "items.extras"
+      ],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: "DESC" },
+    });
+
+    const ordersWithExtrasSummary = orders.map(order => {
+      const allExtras = order.items.flatMap(item => item.extras || []);
+      const extraCountMap: Record<string, { extra_id: string, name: string, price: number, count: number }> = {};
+      allExtras.forEach(extra => {
+        const id = extra.extra?.extra_id;
+        if (!id) return;
+        if (!extraCountMap[id]) {
+          extraCountMap[id] = {
+            extra_id: id,
+            name: extra.extra?.name || "",
+            price: Number(extra.extra?.price ?? extra.price),
+            count: 1
+          };
+        } else {
+          extraCountMap[id].count += 1;
+        }
+      });
+
+      // Add extrasCount and size_name to each item
+      const itemsWithExtrasCountAndSize = order.items.map(item => ({
+        ...item,
+        extrasCount: item.extras ? item.extras.length : 0,
+        size_name: item.product_size?.size?.size_name || null
+      }));
+
+      return {
+        ...order,
+        items: itemsWithExtrasCountAndSize,
+        extrasSummary: Object.values(extraCountMap)
+      };
+    });
+
+    return { orders: ordersWithExtrasSummary, total };
+  }
   // async findAll(page = 1, limit = 10): Promise<{ orders: Order[]; total: number }> {
   //   const [orders, total] = await this.orderRepository.findAndCount({
   //     relations: ["cashier", "shift", "items", "items.product_size",

@@ -462,10 +462,10 @@ export class Server {
     apiV1.use(
       "/permissions",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission([
-        "OWNER_ACCESS",
-        "access:permissions",
-      ]),
+      // AuthorizationMiddleware.requireAnyPermission([
+      //   "OWNER_ACCESS",
+      //   "access:permissions",
+      // ]),
       dependencies.permissionRoutes.getRouter()
     );
     apiV1.use(
