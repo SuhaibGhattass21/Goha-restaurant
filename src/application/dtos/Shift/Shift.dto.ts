@@ -141,6 +141,10 @@ export class ShiftSummaryResponseDto {
 
     @IsNumber({ maxDecimalPlaces: 2 })
     @Min(0)
+    intial_balance!: number;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0)
     total_revenue!: number;
 
     @IsNumber({ maxDecimalPlaces: 2 })
@@ -225,6 +229,10 @@ export class ShiftSummaryWithDetailsDto {
 
     @IsDate()
     end_time!: Date;
+
+    @IsNumber({ maxDecimalPlaces: 2 })
+    @Min(0)
+    intial_balance!: number;
 
     @IsNumber()
     total_orders!: number;
