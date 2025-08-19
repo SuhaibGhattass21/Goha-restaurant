@@ -8,6 +8,7 @@ import type {
   UpdateOrderItemDto,
   OrderItemExtraResponseDto,
 } from "../../../application/dtos/Orders/order-item.dto"
+import { OrderItemExtra } from "@infrastructure/database/models"
 
 export class OrderItemUseCases {
   constructor(
@@ -127,20 +128,19 @@ export class OrderItemUseCases {
     }
   }
 
-  private mapExtraToResponseDto(extra: any): OrderItemExtraResponseDto {
+  private mapExtraToResponseDto(extra: OrderItemExtra): OrderItemExtraResponseDto {
     return {
       order_item_extra_id: extra.order_item_extra_id,
       order_item_id: extra.orderItem?.order_item_id || "",
       extra: extra.extra
         ? {
-          extra_id: extra.extra.extra_id, // Fixed: using extra_id
+          extra_id: extra.extra.extra_id,
           name: extra.extra.name,
           price: Number(extra.extra.price),
-          quantity: Number(extra.extra.quantity) || 1,
           category_name: extra.extra.category?.name || "",
         }
         : undefined,
-      quantity: Number(extra.quantity) || 1, // Default to 1 if not provided
+      quantity: Number(extra.quantity) || 1,
       price: Number(extra.price),
     }
   }

@@ -153,9 +153,6 @@ export class CategoryExtraInfoDto {
   @IsNumber({ maxDecimalPlaces: 2 })
   price!: number
 
-  @IsNumber()
-  quantity!: number
-
   @IsString()
   category_name!: string
 }
