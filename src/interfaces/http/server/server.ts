@@ -480,19 +480,11 @@ export class Server {
     apiV1.use(
       "/stock-items",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission([
-        "OWNER_ACCESS",
-        "access:stock",
-      ]),
       dependencies.stockItemRoutes.getRouter()
     );
     apiV1.use(
       "/stock-transactions",
       AuthMiddleware.authenticate(),
-      AuthorizationMiddleware.requireAnyPermission([
-        "OWNER_ACCESS",
-        "access:stock",
-      ]),
       dependencies.stockTransactionRoutes.getRouter()
     );
     apiV1.use(

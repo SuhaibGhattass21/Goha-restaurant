@@ -1,6 +1,7 @@
 import { Router } from "express"
 import type { StockTransactionController } from "../../controllers/Stock/stock-transaction.controller"
 import { StockTransactionValidator } from "../../validators/Stock/stock-transaction.validator"
+import { AuthorizationMiddleware } from "@interfaces/http/middlewares/authorization.middleware"
 
 export class StockTransactionRoutes {
 
@@ -18,6 +19,7 @@ export class StockTransactionRoutes {
     this.router.post(
       "/",
       StockTransactionValidator.createStockTransaction(),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.createStockTransaction.bind(this.stockTransactionController),
     )
 
@@ -25,6 +27,7 @@ export class StockTransactionRoutes {
     this.router.get(
       "/",
       StockTransactionValidator.getStockTransactions(),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.getAllStockTransactions.bind(this.stockTransactionController),
     )
 
@@ -32,6 +35,7 @@ export class StockTransactionRoutes {
     this.router.get(
       "/stock-item/:stockItemId",
       StockTransactionValidator.getTransactionsByStockItem(),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.getTransactionsByStockItem.bind(this.stockTransactionController),
     )
 
@@ -39,6 +43,7 @@ export class StockTransactionRoutes {
     this.router.get(
       "/shift/:shiftId",
       StockTransactionValidator.getTransactionsByShift(),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.getTransactionsByShift.bind(this.stockTransactionController),
     )
 
@@ -46,6 +51,7 @@ export class StockTransactionRoutes {
     this.router.get(
       "/user/:userId",
       StockTransactionValidator.getTransactionsByUser(),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.getTransactionsByUser.bind(this.stockTransactionController),
     )
 
@@ -53,6 +59,7 @@ export class StockTransactionRoutes {
     this.router.get(
       "/stats/:stockItemId",
       StockTransactionValidator.getStockItemStats(),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']),
       this.stockTransactionController.getStockItemStats.bind(this.stockTransactionController),
     )
 
@@ -60,6 +67,7 @@ export class StockTransactionRoutes {
     this.router.get(
       "/:id",
       StockTransactionValidator.getStockTransactionById(),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.getStockTransactionById.bind(this.stockTransactionController),
     )
 
@@ -67,6 +75,7 @@ export class StockTransactionRoutes {
     this.router.put(
       "/:id",
       StockTransactionValidator.updateStockTransaction(),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.updateStockTransaction.bind(this.stockTransactionController),
     )
 
@@ -74,6 +83,7 @@ export class StockTransactionRoutes {
     this.router.delete(
       "/:id",
       StockTransactionValidator.deleteStockTransaction(),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.deleteStockTransaction.bind(this.stockTransactionController),
     )
   }
