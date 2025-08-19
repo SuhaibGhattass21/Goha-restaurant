@@ -1,7 +1,7 @@
 import { Router } from "express"
 import type { StockItemController } from "../../controllers/Stock/stock-item.controller"
 import { StockItemValidator } from "../../validators/Stock/stock-item.validator"
-import { AuthorizationMiddleware } from "@interfaces/http/middlewares/authorization.middleware"
+import { AuthorizationMiddleware } from "../../../../interfaces/http/middlewares/authorization.middleware"
 
 export class StockItemRoutes {
 
