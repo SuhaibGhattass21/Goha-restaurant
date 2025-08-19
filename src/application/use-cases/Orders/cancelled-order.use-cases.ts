@@ -98,7 +98,7 @@ export class CancelledOrderUseCases {
     }
 
     // If approved, update the order status to cancelled
-    if (approvalData.status === OrderStatus.CANCELLED) {
+    if (approvalData.status === OrderStatus.PENDING) {
       const updatedOrder = await this.orderRepository.updateStatus(cancelledOrder.order.order_id, OrderStatus.CANCELLED)
       if (!updatedOrder) {
         throw new Error("Failed to update order status to cancelled")
@@ -106,13 +106,14 @@ export class CancelledOrderUseCases {
 
       // Recalculate order total
       await this.orderRepository.calculateOrderTotal(cancelledOrder.order.order_id)
-    } else if (approvalData.status === OrderStatus.ACTIVE) {
-      // If rejected, revert the order status back to ACTIVE
-      const updatedOrder = await this.orderRepository.updateStatus(cancelledOrder.order.order_id, OrderStatus.ACTIVE)
-      if (!updatedOrder) {
-        throw new Error("Failed to revert order status to active")
-      }
     }
+    //else if (approvalData.status === OrderStatus.ACTIVE) {
+    //   // If rejected, revert the order status back to ACTIVE
+    //   const updatedOrder = await this.orderRepository.updateStatus(cancelledOrder.order.order_id, OrderStatus.ACTIVE)
+    //   if (!updatedOrder) {
+    //     throw new Error("Failed to revert order status to active")
+    //   }
+    // }
 
     // Get the updated cancelled order with all relations
     const finalCancelledOrder = await this.cancelledOrderRepository.findById(approvalData.cancelled_order_id)
