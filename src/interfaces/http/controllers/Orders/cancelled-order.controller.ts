@@ -1,8 +1,8 @@
 import type { Request, Response } from "express"
 import { validationResult } from "express-validator"
 import type { CancelledOrderUseCases } from "../../../../application/use-cases/Orders/cancelled-order.use-cases"
-import { OrderUseCases } from "@application/use-cases/Orders/order.use-cases"
-import { OrderStatus } from "@domain/enums/Order.enums"
+import { OrderUseCases } from "../../../../application/use-cases/Orders/order.use-cases"
+import { OrderStatus } from "../../../../domain/enums/Order.enums"
 
 export class CancelledOrderController {
   constructor(private cancelledOrderUseCases: CancelledOrderUseCases, private orderUseCases: OrderUseCases) { }
