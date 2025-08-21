@@ -1,9 +1,11 @@
 import type { Request, Response } from "express"
 import { validationResult } from "express-validator"
 import type { CancelledOrderUseCases } from "../../../../application/use-cases/Orders/cancelled-order.use-cases"
+import { OrderUseCases } from "@application/use-cases/Orders/order.use-cases"
+import { OrderStatus } from "@domain/enums/Order.enums"
 
 export class CancelledOrderController {
-  constructor(private cancelledOrderUseCases: CancelledOrderUseCases) { }
+  constructor(private cancelledOrderUseCases: CancelledOrderUseCases, private orderUseCases: OrderUseCases) { }
 
   async createCancelledOrder(req: Request, res: Response): Promise<void> {
     try {
@@ -249,10 +251,12 @@ export class CancelledOrderController {
         status: 'cancelled',
       } as any)
 
+      const orderResult = await this.orderUseCases.updateOrderStatus(cancelled_order_id, OrderStatus.CANCELLED);
+
       res.status(200).json({
         success: true,
         message: 'Cancellation approved successfully',
-        data: result,
+        data: {cancelledOrder:result, order:orderResult},
       })
     } catch (error: any) {
       res.status(500).json({
