@@ -25,7 +25,7 @@ export class CancelledOrderRoutes {
     // GET /cancelled-orders - Get all cancelled orders with pagination
     this.router.get(
       "/",
-      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders', 'access:cashier']),
       CancelledOrderValidator.getCancelledOrders(),
       this.cancelledOrderController.getAllCancelledOrders.bind(this.cancelledOrderController),
     )

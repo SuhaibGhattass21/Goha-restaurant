@@ -516,6 +516,7 @@ export class Server {
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
         "access:orders",
+        'access:cashier'
       ]),
       dependencies.cancelledOrderRoutes.getRouter()
     );
