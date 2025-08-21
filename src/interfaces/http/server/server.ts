@@ -352,7 +352,8 @@ export class Server {
       const orderItemController = new OrderItemController(orderItemUseCases);
       const orderItemRoutes = new OrderItemRoutes(orderItemController);
       const cancelledOrderController = new CancelledOrderController(
-        cancelledOrderUseCases
+        cancelledOrderUseCases,
+        orderUseCases
       );
       const cancelledOrderRoutes = new CancelledOrderRoutes(
         cancelledOrderController
