@@ -251,12 +251,10 @@ export class CancelledOrderController {
         status: 'cancelled',
       } as any)
 
-      const orderResult = await this.orderUseCases.updateOrderStatus(cancelled_order_id, OrderStatus.CANCELLED);
-
       res.status(200).json({
         success: true,
         message: 'Cancellation approved successfully',
-        data: {cancelledOrder:result, order:orderResult},
+        data: result,
       })
     } catch (error: any) {
       res.status(500).json({
