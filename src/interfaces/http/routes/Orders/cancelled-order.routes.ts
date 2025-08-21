@@ -77,6 +77,14 @@ export class CancelledOrderRoutes {
       CancelledOrderValidator.approveCancellation(),
       this.cancelledOrderController.approveCancellation.bind(this.cancelledOrderController),
     )
+
+    // POST /cancelled-orders/:cancelled_order_id/reject - Reject a cancellation request
+    this.router.post(
+      "/:cancelled_order_id/reject",
+      AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
+      CancelledOrderValidator.denyCancellation(),
+      this.cancelledOrderController.denyCancellation.bind(this.cancelledOrderController),
+    )
   }
 
   public getRouter(): Router {

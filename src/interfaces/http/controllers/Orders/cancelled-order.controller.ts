@@ -245,16 +245,22 @@ export class CancelledOrderController {
       const { cancelled_order_id } = req.params
       const { approved_by } = req.body
 
-      const result = await this.cancelledOrderUseCases.approveCancellation({
+      // Approve the cancellation (set CancelledOrder status to OrderStatus.CANCELLED)
+      const cancelledOrderResult = await this.cancelledOrderUseCases.approveCancellation({
         cancelled_order_id,
         approved_by,
-        status: 'cancelled',
-      } as any)
+        status: OrderStatus.CANCELLED,
+      })
+
+      // Set the related Order status to CANCELLED
+      if (cancelledOrderResult && cancelledOrderResult.order && cancelledOrderResult.order.order_id) {
+        await this.orderUseCases.updateOrderStatus(cancelledOrderResult.order.order_id, OrderStatus.CANCELLED)
+      }
 
       res.status(200).json({
         success: true,
         message: 'Cancellation approved successfully',
-        data: result,
+        data: cancelledOrderResult,
       })
     } catch (error: any) {
       res.status(500).json({
@@ -280,16 +286,22 @@ export class CancelledOrderController {
       const { cancelled_order_id } = req.params
       const { approved_by } = req.body
 
-      const result = await this.cancelledOrderUseCases.approveCancellation({
+      // Reject the cancellation (set CancelledOrder status to OrderStatus.REJECTED or ACTIVE)
+      const cancelledOrderResult = await this.cancelledOrderUseCases.approveCancellation({
         cancelled_order_id,
         approved_by,
-        status: 'rejected',
-      } as any)
+        status: OrderStatus.ACTIVE, // Use ACTIVE to indicate rejection
+      })
+
+      // Set the related Order status to ACTIVE
+      if (cancelledOrderResult && cancelledOrderResult.order && cancelledOrderResult.order.order_id) {
+        await this.orderUseCases.updateOrderStatus(cancelledOrderResult.order.order_id, OrderStatus.ACTIVE)
+      }
 
       res.status(200).json({
         success: true,
         message: 'Cancellation rejected successfully',
-        data: result,
+        data: cancelledOrderResult,
       })
     } catch (error: any) {
       res.status(500).json({
