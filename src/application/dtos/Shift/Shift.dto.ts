@@ -58,6 +58,12 @@ export class ApproveCloseShiftDTO {
 
     @IsUUID()
     approved_by_admin_id!: string;
+
+    @IsDateString()
+    end_time!: string;
+
+    @IsEnum(ShiftStatus)
+    status!: ShiftStatus;
 }
 
 export class FilterShiftByStatusDto {
