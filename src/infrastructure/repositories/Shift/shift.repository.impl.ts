@@ -66,6 +66,7 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             is_closed: true,
             approved_by_admin_id: { id: data.approved_by_admin_id },
             end_time: new Date(),
+            status: ShiftStatus.CLOSED
         });
         return this.findById(data.shift_id);
     }
