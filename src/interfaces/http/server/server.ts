@@ -116,6 +116,7 @@ import { StockReportRepositoryImpl } from "../../../infrastructure/repositories/
 import { StockReportUseCases } from "../../../application/use-cases/Stock/stock-report.use-cases";
 import { AuthorizationMiddleware } from "../middlewares/authorization.middleware";
 import { IUserRepository } from "@domain/repositories/user.repository.interface";
+import rateLimit from "express-rate-limit";
 export class Server {
   private app: express.Application;
   private readonly PORT: number;
@@ -142,17 +143,28 @@ export class Server {
 
     this.app.use(express.json({ limit: "10mb" }));
     this.app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+    this.app.use(rateLimit({
+      windowMs: 15 * 60 * 1000, 
+      max: 100, 
+    }));
   }
 
+
   private setupHealthCheck(): void {
-    this.app.get("/health", (req, res) => {
-      res.status(200).json({
-        status: "OK",
-        message: "Goha Restaurant Cafe System is running",
-        timestamp: new Date().toISOString(),
-        database: "connected",
-        version: process.env.npm_package_version || "1.0.0",
-      });
+    this.app.get("/health", async (req, res) => {
+      const db = await AppDataSource.query("select 1")
+        .then(() => "connected")
+        .catch(() => "disconnected");
+      res
+        .status(200)
+        .json({
+          status: "OK",
+          message: "Goha Restaurant Cafe System is running",
+          timestamp: new Date().toISOString(),
+          database: db,
+          version: process.env.npm_package_version || "1.0.0",
+        });
     });
   }
 
@@ -343,7 +355,10 @@ export class Server {
         orderItemExtraRepository,
         cancelledOrderUseCases
       );
-      const orderController = new OrderController(orderUseCases, cancelledOrderUseCases);
+      const orderController = new OrderController(
+        orderUseCases,
+        cancelledOrderUseCases
+      );
       const orderRoutes = new OrderRoutes(orderController);
       const orderItemUseCases = new OrderItemUseCases(
         orderItemRepository,
@@ -517,7 +532,7 @@ export class Server {
       AuthorizationMiddleware.requireAnyPermission([
         "OWNER_ACCESS",
         "access:orders",
-        'access:cashier'
+        "access:cashier",
       ]),
       dependencies.cancelledOrderRoutes.getRouter()
     );
@@ -542,10 +557,6 @@ export class Server {
     );
 
     this.app.use("/api/v1", apiV1);
-    this.app.use("/api/v1", apiV1);
-
-    // Backward compatibility
-    this.app.use("/api", apiV1);
   }
 
   private setupErrorHandlers(): void {

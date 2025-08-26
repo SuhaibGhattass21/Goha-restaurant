@@ -45,7 +45,6 @@
     "express-validator": "^7.2.1",
     "glob": "^11.0.2",
     "helmet": "^8.1.0",
-    "inversify": "^7.5.2",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^7.0.3",
     "nodemon": "^3.1.10",
