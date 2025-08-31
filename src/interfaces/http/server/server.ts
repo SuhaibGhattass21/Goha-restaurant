@@ -145,7 +145,7 @@ export class Server {
     this.app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
     this.app.use(rateLimit({
-      windowMs: 15 * 60 * 1000, 
+      windowMs: 15 * 60 * 10000, 
       max: 100, 
     }));
   }
