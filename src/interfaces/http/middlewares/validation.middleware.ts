@@ -35,7 +35,6 @@ export function validateQuery<T>(dtoClass: new () => T): RequestHandler {
             res.status(400).json({ success: false, message: 'Invalid query parameters', errors: formatErrors(errors) });
             return;
         }
-        (req as any).query = instance as any;
         next();
     };
 }
@@ -48,7 +47,6 @@ export function validateParamsDto<T>(dtoClass: new () => T): RequestHandler {
             res.status(400).json({ success: false, message: 'Invalid route parameters', errors: formatErrors(errors) });
             return;
         }
-        (req as any).params = instance as any;
         next();
     };
 } 
