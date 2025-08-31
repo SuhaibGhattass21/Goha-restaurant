@@ -3,7 +3,7 @@ import { Type } from "class-transformer"
 
 export class CreateProductDto {
   @IsString()
-  name!: string
+  name: string = ''
 
   @IsOptional()
   @IsString()
@@ -18,7 +18,7 @@ export class CreateProductDto {
   is_active?: boolean
 
   @IsUUID()
-  category_id!: string
+  category_id: string = ''
 }
 
 export class UpdateProductDto {
@@ -43,8 +43,16 @@ export class UpdateProductDto {
   category_id?: string
 }
 
-export class ProductIdParamDto { @IsUUID() id!: string }
-export class CategoryIdParamDto { @IsUUID() categoryId!: string }
+export class ProductIdParamDto { 
+  @IsUUID() 
+  id: string = ''
+}
+
+export class CategoryIdParamDto { 
+  @IsUUID() 
+  categoryId: string = ''
+}
+
 export class PaginationQueryDto {
   @IsOptional()
   @IsInt()
@@ -59,19 +67,18 @@ export class PaginationQueryDto {
 
 export class ProductCategoryDto {
   @IsUUID()
-  category_id!: string
+  category_id: string = ''
 
   @IsString()
-  name!: string
+  name: string = ''
 }
-
 
 export class ProductSizePriceDto {
   @IsUUID()
-  product_size_id!: string
+  product_size_id: string = ''
 
   @IsNumber()
-  price!: number
+  price: number = 0
 
   @IsOptional()
   @ValidateNested()
@@ -81,18 +88,18 @@ export class ProductSizePriceDto {
 
 export class ProductSizeDto {
   @IsUUID()
-  size_id!: string
+  size_id: string = ''
 
   @IsString()
-  size_name!: string
+  size_name: string = ''
 }
 
 export class ProductResponseDto {
   @IsUUID()
-  product_id!: string
+  product_id: string = ''
 
   @IsString()
-  name!: string
+  name: string = ''
 
   @IsOptional()
   @IsString()
@@ -103,7 +110,7 @@ export class ProductResponseDto {
   image_url?: string
 
   @IsBoolean()
-  is_active!: boolean
+  is_active: boolean = false
 
   @IsOptional()
   @ValidateNested()
@@ -121,17 +128,17 @@ export class ProductListResponseDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ProductResponseDto)
-  products!: ProductResponseDto[]
+  products: ProductResponseDto[] = []
 
   @IsInt()
   @Min(0)
-  total!: number
+  total: number = 0
 
   @IsInt()
   @Min(1)
-  page!: number
+  page: number = 1
 
   @IsInt()
   @Min(1)
-  limit!: number
+  limit: number = 10
 }
