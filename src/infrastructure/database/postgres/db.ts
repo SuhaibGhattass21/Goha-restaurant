@@ -32,8 +32,12 @@ export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL || "",
   synchronize: process.env.NODE_ENV === "development",
-  logging: false,
-  migrations: ["src/infrastructure/database/postgres/migrations/*.ts"],
+  logging: process.env.NODE_ENV === "development",
+  migrations: [
+    process.env.NODE_ENV === "production"
+      ? "dist/infrastructure/database/postgres/migrations/*.js"
+      : "src/infrastructure/database/postgres/migrations/*.ts",
+  ],
   entities: [
     User,
     Product,
@@ -60,4 +64,5 @@ export const AppDataSource = new DataSource({
     Expense,
   ],
   subscribers: [],
+  migrationsRun: process.env.NODE_ENV === "production",
 });
