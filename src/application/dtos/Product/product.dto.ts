@@ -73,6 +73,14 @@ export class ProductCategoryDto {
   name: string = ''
 }
 
+export class ProductSizeDto {
+  @IsUUID()
+  size_id: string = ''
+
+  @IsString()
+  size_name: string = ''
+}
+
 export class ProductSizePriceDto {
   @IsUUID()
   product_size_id: string = ''
@@ -86,13 +94,6 @@ export class ProductSizePriceDto {
   size?: ProductSizeDto
 }
 
-export class ProductSizeDto {
-  @IsUUID()
-  size_id: string = ''
-
-  @IsString()
-  size_name: string = ''
-}
 
 export class ProductResponseDto {
   @IsUUID()
