@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
     url: process.env.DATABASE_URL || '',
     synchronize: process.env.NODE_ENV === 'development',
     logging: false,
-    migrations: ['src/infrastructure/database/postgres/migrations/*.ts'],
+    migrations: [],
     entities: [
         User,
         Product,
