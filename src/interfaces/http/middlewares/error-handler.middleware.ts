@@ -9,13 +9,19 @@ export const errorHandler = (error: AppError, req: Request, res: Response, next:
   const statusCode = error.statusCode || 500
   const message = error.message || "Internal Server Error"
 
-  console.error(`Error ${statusCode}: ${message}`)
-  console.error(error.stack)
+  const isDev = process.env.NODE_ENV === "development"
+
+  if (isDev) {
+    console.error(`Error ${statusCode}: ${message}`)
+    if (error.stack) console.error(error.stack)
+  } else {
+    console.error(`Error ${statusCode}: ${message}`)
+  }
 
   res.status(statusCode).json({
     success: false,
     message,
-    ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
+    ...(isDev && { stack: error.stack }),
   })
 }
 

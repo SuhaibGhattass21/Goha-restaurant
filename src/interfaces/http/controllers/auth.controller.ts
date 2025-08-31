@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { validationResult } from 'express-validator';
 import { AuthUseCases } from '../../../application/use-cases/auth.use-case';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 
@@ -8,16 +7,6 @@ export class AuthController {
 
     async login(req: Request, res: Response): Promise<void> {
         try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                res.status(400).json({
-                    success: false,
-                    message: 'Validation failed',
-                    errors: errors.array()
-                });
-                return;
-            }
-
             const authData = await this.authUseCases.login(req.body);
 
             res.status(200).json({
@@ -35,16 +24,6 @@ export class AuthController {
 
     async register(req: Request, res: Response): Promise<void> {
         try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                res.status(400).json({
-                    success: false,
-                    message: 'Validation failed',
-                    errors: errors.array()
-                });
-                return;
-            }
-
             const authData = await this.authUseCases.register(req.body);
 
             res.status(201).json({
@@ -111,16 +90,6 @@ export class AuthController {
 
     async changePassword(req: AuthenticatedRequest, res: Response): Promise<void> {
         try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                res.status(400).json({
-                    success: false,
-                    message: 'Validation failed',
-                    errors: errors.array()
-                });
-                return;
-            }
-
             if (!req.user?.userId) {
                 res.status(401).json({
                     success: false,
@@ -129,7 +98,7 @@ export class AuthController {
                 return;
             }
 
-            const { oldPassword, newPassword } = req.body;
+            const { oldPassword, newPassword } = req.body as any;
             await this.authUseCases.changePassword(req.user.userId, oldPassword, newPassword);
 
             res.status(200).json({

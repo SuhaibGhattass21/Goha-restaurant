@@ -1,7 +1,8 @@
 import { Router } from "express"
 import type { CategoryController } from "../../controllers/Category/category.controller"
-import { CategoryValidator } from "../../validators/Category/category.validator"
 import { AuthorizationMiddleware } from "../../middlewares/authorization.middleware"
+import { validateBody, validateParamsDto, validateQuery } from "../../middlewares/validation.middleware"
+import { CreateCategoryDto, UpdateCategoryDto, CategoryIdParamDto, PaginationQueryDto } from "../../../../application/dtos/Category/category.dto"
 
 export class CategoryRoutes {
   private router: Router
@@ -18,7 +19,7 @@ export class CategoryRoutes {
     this.router.post(
       "/",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category']),
-      CategoryValidator.createCategory(),
+      validateBody(CreateCategoryDto),
       this.categoryController.createCategory.bind(this.categoryController),
     )
 
@@ -26,7 +27,7 @@ export class CategoryRoutes {
     this.router.get(
       "/",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category', 'access:cashier']),
-      CategoryValidator.getCategories(),
+      validateQuery(PaginationQueryDto),
       this.categoryController.getAllCategories.bind(this.categoryController),
     )
 
@@ -34,7 +35,7 @@ export class CategoryRoutes {
     this.router.get(
       "/:id",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category', 'access:cashier']),
-      CategoryValidator.getCategoryById(),
+      validateParamsDto(CategoryIdParamDto),
       this.categoryController.getCategoryById.bind(this.categoryController),
     )
 
@@ -42,7 +43,8 @@ export class CategoryRoutes {
     this.router.put(
       "/:id",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category']),
-      CategoryValidator.updateCategory(),
+      validateParamsDto(CategoryIdParamDto),
+      validateBody(UpdateCategoryDto),
       this.categoryController.updateCategory.bind(this.categoryController),
     )
 
@@ -50,7 +52,7 @@ export class CategoryRoutes {
     this.router.delete(
       "/:id",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:category']),
-      CategoryValidator.deleteCategory(),
+      validateParamsDto(CategoryIdParamDto),
       this.categoryController.deleteCategory.bind(this.categoryController),
     )
   }

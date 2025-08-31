@@ -1,7 +1,20 @@
 import { Router } from "express"
 import type { OrderController } from "../../controllers/Orders/order.controller"
-import { OrderValidator } from "../../validators/Orders/order.validator"
 import { AuthorizationMiddleware } from "../../middlewares/authorization.middleware"
+import { validateBody, validateParamsDto, validateQuery } from "../../middlewares/validation.middleware"
+import {
+  CancelOrderDto,
+  CashierIdParamDto,
+  CreateOrderDto,
+  DateRangeQueryDto,
+  OrderIdParamDto,
+  OrderStatusParamDto,
+  OrderTypeParamDto,
+  PaginationQueryDto,
+  ShiftIdParamDto,
+  OrderStatsQueryDto,
+  UpdateOrderDto,
+} from "../../../../application/dtos/Orders/order.dto"
 
 export class OrderRoutes {
   private router: Router
@@ -15,25 +28,25 @@ export class OrderRoutes {
 
   private initializeRoutes(): void {
     // POST /orders - Create a new order
-    this.router.post("/", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']), OrderValidator.createOrder(), this.orderController.createOrder.bind(this.orderController))
+    this.router.post("/", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']), validateBody(CreateOrderDto), this.orderController.createOrder.bind(this.orderController))
 
     // GET /orders - Get all orders with pagination
-    this.router.get("/cafe", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']), OrderValidator.getOrders(), this.orderController.getAllOrdersCafe.bind(this.orderController))
+    this.router.get("/cafe", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']), validateQuery(PaginationQueryDto), this.orderController.getAllOrdersCafe.bind(this.orderController))
     //Get all orders exceptCafe
-    this.router.get("/except-cafe", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']), OrderValidator.getOrders(), this.orderController.getAllOrdersExceptCafe.bind(this.orderController))
+    this.router.get("/except-cafe", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']), validateQuery(PaginationQueryDto), this.orderController.getAllOrdersExceptCafe.bind(this.orderController))
 
     // GET /orders/stats - Get order statistics
     this.router.get(
       "/stats",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier', 'access:orders']),
-      OrderValidator.getOrderStats(),
+      validateQuery(OrderStatsQueryDto),
       this.orderController.getOrderStats.bind(this.orderController),
     )
     // GET /orders/stats/cafe - Get cafe order statistics
     this.router.get(
       "/stats-cafe",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier', 'access:orders']),
-      OrderValidator.getOrderStats(),
+      validateQuery(OrderStatsQueryDto),
       this.orderController.getOrderStatsCafe.bind(this.orderController),
     )
 
@@ -41,14 +54,14 @@ export class OrderRoutes {
     this.router.get(
       "/shift-goha/:shiftId",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier', 'access:orders']),
-      OrderValidator.getOrdersByShiftId(),
+      validateParamsDto(ShiftIdParamDto),
       this.orderController.getOrdersByShiftIdGoha.bind(this.orderController),
     )
     // for cafe
     this.router.get(
       "/shift-cafe/:shiftId",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier', 'access:orders']),
-      OrderValidator.getOrdersByShiftId(),
+      validateParamsDto(ShiftIdParamDto),
       this.orderController.getOrdersByShiftIdCafe.bind(this.orderController),
     )
 
@@ -56,7 +69,8 @@ export class OrderRoutes {
     this.router.get(
       "/cashier/:cashierId",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier', 'access:orders']),
-      OrderValidator.getOrdersByCashierId(),
+      validateParamsDto(CashierIdParamDto),
+      validateQuery(PaginationQueryDto),
       this.orderController.getOrdersByCashierId.bind(this.orderController),
     )
 
@@ -64,7 +78,8 @@ export class OrderRoutes {
     this.router.get(
       "/status/:status",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
-      OrderValidator.getOrdersByStatus(),
+      validateParamsDto(OrderStatusParamDto),
+      validateQuery(PaginationQueryDto),
       this.orderController.getOrdersByStatus.bind(this.orderController),
     )
 
@@ -72,7 +87,8 @@ export class OrderRoutes {
     this.router.get(
       "/type/:type",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
-      OrderValidator.getOrdersByType(),
+      validateParamsDto(OrderTypeParamDto),
+      validateQuery(PaginationQueryDto),
       this.orderController.getOrdersByType.bind(this.orderController),
     )
 
@@ -80,12 +96,12 @@ export class OrderRoutes {
     this.router.get(
       "/date-range",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier', 'access:orders']),
-      OrderValidator.getOrdersByDateRange(),
+      validateQuery(DateRangeQueryDto),
       this.orderController.getOrdersByDateRange.bind(this.orderController),
     )
 
     // GET /orders/:id - Get order by ID
-    this.router.get("/:id", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']), OrderValidator.getOrderById(), this.orderController.getOrderById.bind(this.orderController))
+    this.router.get("/:id", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']), validateParamsDto(OrderIdParamDto), this.orderController.getOrderById.bind(this.orderController))
 
     // interfaces/http/routes/Orders/order.routes.ts
     this.router.get(
@@ -95,13 +111,14 @@ export class OrderRoutes {
     );
 
     // PUT /orders/:id - Update order
-    this.router.put("/:id", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']), OrderValidator.updateOrder(), this.orderController.updateOrder.bind(this.orderController))
+    this.router.put("/:id", AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']), validateParamsDto(OrderIdParamDto), validateBody(UpdateOrderDto), this.orderController.updateOrder.bind(this.orderController))
 
     // PATCH /orders/:id/:status - Update order status
     this.router.patch(
       "/:id/:status",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
-      OrderValidator.updateOrderStatus(),
+      validateParamsDto(OrderIdParamDto),
+      validateBody(OrderStatusParamDto),
       this.orderController.updateOrderStatus.bind(this.orderController),
     )
 
@@ -109,7 +126,7 @@ export class OrderRoutes {
     this.router.post(
       "/:id/recalculate",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
-      OrderValidator.recalculateOrderTotal(),
+      validateParamsDto(OrderIdParamDto),
       this.orderController.recalculateOrderTotal.bind(this.orderController),
     )
 
@@ -117,7 +134,8 @@ export class OrderRoutes {
     this.router.post(
       "/:id/request-cancel",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
-      OrderValidator.requestCancelOrder(),
+      validateParamsDto(OrderIdParamDto),
+      validateBody(CancelOrderDto),
       this.orderController.requestCancelOrder.bind(this.orderController),
     )
 
@@ -125,7 +143,8 @@ export class OrderRoutes {
     this.router.post(
       "/:id/cancel",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']),
-      OrderValidator.cancelOrder(),
+      validateParamsDto(OrderIdParamDto),
+      validateBody(CancelOrderDto),
       this.orderController.cancelOrder.bind(this.orderController),
     )
 
@@ -133,7 +152,7 @@ export class OrderRoutes {
     this.router.delete(
       "/:id",
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:orders']),
-      OrderValidator.deleteOrder(),
+      validateParamsDto(OrderIdParamDto),
       this.orderController.deleteOrder.bind(this.orderController),
     )
   }

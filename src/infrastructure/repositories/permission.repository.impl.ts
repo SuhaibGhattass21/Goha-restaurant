@@ -56,6 +56,10 @@ export class PermissionRepositoryImpl implements IPermissionRepository {
                 }
             }
 
+            // bump token version to invalidate existing JWTs
+            user.tokenVersion = (user.tokenVersion || 0) + 1;
+            await queryRunner.manager.save(user);
+
             await queryRunner.commitTransaction();
         } catch (error) {
             await queryRunner.rollbackTransaction();
@@ -71,6 +75,9 @@ export class PermissionRepositoryImpl implements IPermissionRepository {
         await queryRunner.startTransaction();
 
         try {
+            const user = await this.userRepo.findOne({ where: { id: userId } });
+            if (!user) throw new Error('User not found');
+
             for (const permissionId of permissions) {
                 const userPermission = await this.userPermissionRepo.findOne({
                     where: {
@@ -84,6 +91,10 @@ export class PermissionRepositoryImpl implements IPermissionRepository {
                     await queryRunner.manager.save(userPermission);
                 }
             }
+
+            // bump token version to invalidate existing JWTs
+            user.tokenVersion = (user.tokenVersion || 0) + 1;
+            await queryRunner.manager.save(user);
 
             await queryRunner.commitTransaction();
         } catch (error) {

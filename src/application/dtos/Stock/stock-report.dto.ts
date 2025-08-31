@@ -9,6 +9,8 @@ import {
   IsDateString,
   IsInt,
   IsBoolean,
+  IsBooleanString,
+  IsISO8601,
 } from "class-validator"
 import { Type } from "class-transformer"
 import { StockTransactionType, StockItemStatus } from "../../../domain/enums/Stock.enums"
@@ -179,4 +181,41 @@ export class StockReportFiltersDto {
   @IsOptional()
   @IsString()
   stock_item_type?: string
+}
+
+export class DailyStockReportQueryDto {
+  @IsOptional()
+  @IsISO8601()
+  date?: string;
+
+  @IsOptional()
+  @IsUUID()
+  shift_id?: string;
+
+  @IsOptional()
+  @IsBooleanString()
+  include_low_stock_only?: string;
+
+  @IsOptional()
+  @IsString()
+  stock_item_type?: string;
+}
+
+export class ShiftStockReportParamsDto {
+  @IsUUID()
+  shiftId!: string;
+}
+
+export class ShiftStockReportQueryDto {
+  @IsOptional()
+  @IsISO8601()
+  date?: string;
+
+  @IsOptional()
+  @IsBooleanString()
+  include_low_stock_only?: string;
+
+  @IsOptional()
+  @IsString()
+  stock_item_type?: string;
 }

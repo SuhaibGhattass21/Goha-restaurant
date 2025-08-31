@@ -1,5 +1,4 @@
 import type { Request, Response } from "express"
-import { validationResult } from "express-validator"
 import type { StockTransactionUseCases } from "../../../../application/use-cases/Stock/stock-transaction.use-cases"
 
 export class StockTransactionController {
@@ -7,16 +6,6 @@ export class StockTransactionController {
 
   async createStockTransaction(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const transactionData = req.body
       const transaction = await this.stockTransactionUseCases.createStockTransaction(transactionData)
 
@@ -44,16 +33,6 @@ export class StockTransactionController {
 
   async getStockTransactionById(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const transaction = await this.stockTransactionUseCases.getStockTransactionById(id)
 
@@ -80,16 +59,6 @@ export class StockTransactionController {
 
   async getAllStockTransactions(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
 
@@ -110,16 +79,6 @@ export class StockTransactionController {
 
   async updateStockTransaction(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const transactionData = req.body
 
@@ -157,16 +116,6 @@ export class StockTransactionController {
 
   async deleteStockTransaction(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const deleted = await this.stockTransactionUseCases.deleteStockTransaction(id)
 
@@ -193,16 +142,6 @@ export class StockTransactionController {
 
   async getTransactionsByStockItem(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { stockItemId } = req.params
       const transactions = await this.stockTransactionUseCases.getTransactionsByStockItem(stockItemId)
 
@@ -221,16 +160,6 @@ export class StockTransactionController {
 
   async getTransactionsByShift(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { shiftId } = req.params
       const summary = await this.stockTransactionUseCases.getTransactionsByShift(shiftId)
 
@@ -249,16 +178,6 @@ export class StockTransactionController {
 
   async getTransactionsByUser(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { userId } = req.params
       const transactions = await this.stockTransactionUseCases.getTransactionsByUser(userId)
 
@@ -277,16 +196,6 @@ export class StockTransactionController {
 
   async getStockItemStats(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { stockItemId } = req.params
       const stats = await this.stockTransactionUseCases.getStockItemStats(stockItemId)
 

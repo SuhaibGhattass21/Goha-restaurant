@@ -29,6 +29,20 @@ export class UpdateCategoryDto {
   description?: string;
 }
 
+export class CategoryIdParamDto { @IsUUID() id!: string }
+
+export class PaginationQueryDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  limit?: number;
+}
+
 export class CategoryResponseDto {
   @IsUUID()
   category_id!: string;

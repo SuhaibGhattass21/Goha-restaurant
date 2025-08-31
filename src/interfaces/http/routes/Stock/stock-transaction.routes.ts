@@ -1,7 +1,8 @@
 import { Router } from "express"
 import type { StockTransactionController } from "../../controllers/Stock/stock-transaction.controller"
-import { StockTransactionValidator } from "../../validators/Stock/stock-transaction.validator"
 import { AuthorizationMiddleware } from "../../../../interfaces/http/middlewares/authorization.middleware"
+import { validateBody, validateParamsDto, validateQuery } from "../../middlewares/validation.middleware"
+import { CreateStockTransactionDto, UpdateStockTransactionDto, StockTransactionIdParamDto, StockItemIdParamDto, ShiftIdParamDto, UserIdParamDto, PaginationQueryDto } from "../../../../application/dtos/Stock/stock-transaction.dto"
 
 export class StockTransactionRoutes {
 
@@ -18,7 +19,7 @@ export class StockTransactionRoutes {
     // POST /stock-transactions - Create a new stock transaction
     this.router.post(
       "/",
-      StockTransactionValidator.createStockTransaction(),
+      validateBody(CreateStockTransactionDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.createStockTransaction.bind(this.stockTransactionController),
     )
@@ -26,7 +27,7 @@ export class StockTransactionRoutes {
     // GET /stock-transactions - Get all stock transactions with pagination
     this.router.get(
       "/",
-      StockTransactionValidator.getStockTransactions(),
+      validateQuery(PaginationQueryDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.getAllStockTransactions.bind(this.stockTransactionController),
     )
@@ -34,7 +35,7 @@ export class StockTransactionRoutes {
     // GET /stock-transactions/stock-item/:stockItemId - Get transactions by stock item
     this.router.get(
       "/stock-item/:stockItemId",
-      StockTransactionValidator.getTransactionsByStockItem(),
+      validateParamsDto(StockItemIdParamDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.getTransactionsByStockItem.bind(this.stockTransactionController),
     )
@@ -42,7 +43,7 @@ export class StockTransactionRoutes {
     // GET /stock-transactions/shift/:shiftId - Get transactions by shift
     this.router.get(
       "/shift/:shiftId",
-      StockTransactionValidator.getTransactionsByShift(),
+      validateParamsDto(ShiftIdParamDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.getTransactionsByShift.bind(this.stockTransactionController),
     )
@@ -50,7 +51,7 @@ export class StockTransactionRoutes {
     // GET /stock-transactions/user/:userId - Get transactions by user
     this.router.get(
       "/user/:userId",
-      StockTransactionValidator.getTransactionsByUser(),
+      validateParamsDto(UserIdParamDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.getTransactionsByUser.bind(this.stockTransactionController),
     )
@@ -58,7 +59,7 @@ export class StockTransactionRoutes {
     // GET /stock-transactions/stats/:stockItemId - Get stock item statistics
     this.router.get(
       "/stats/:stockItemId",
-      StockTransactionValidator.getStockItemStats(),
+      validateParamsDto(StockItemIdParamDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']),
       this.stockTransactionController.getStockItemStats.bind(this.stockTransactionController),
     )
@@ -66,7 +67,7 @@ export class StockTransactionRoutes {
     // GET /stock-transactions/:id - Get stock transaction by ID
     this.router.get(
       "/:id",
-      StockTransactionValidator.getStockTransactionById(),
+      validateParamsDto(StockTransactionIdParamDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.getStockTransactionById.bind(this.stockTransactionController),
     )
@@ -74,7 +75,8 @@ export class StockTransactionRoutes {
     // PUT /stock-transactions/:id - Update stock transaction
     this.router.put(
       "/:id",
-      StockTransactionValidator.updateStockTransaction(),
+      validateParamsDto(StockTransactionIdParamDto),
+      validateBody(UpdateStockTransactionDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.updateStockTransaction.bind(this.stockTransactionController),
     )
@@ -82,7 +84,7 @@ export class StockTransactionRoutes {
     // DELETE /stock-transactions/:id - Delete stock transaction
     this.router.delete(
       "/:id",
-      StockTransactionValidator.deleteStockTransaction(),
+      validateParamsDto(StockTransactionIdParamDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockTransactionController.deleteStockTransaction.bind(this.stockTransactionController),
     )

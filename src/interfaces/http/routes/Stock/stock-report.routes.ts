@@ -1,6 +1,7 @@
 import { Router } from "express"
 import type { StockReportController } from "../../controllers/Stock/stock-report.controller"
-import { StockReportValidator } from "../../validators/Stock/stock-report.validator"
+import { validateParamsDto, validateQuery } from "../../middlewares/validation.middleware"
+import { DailyStockReportQueryDto, ShiftStockReportParamsDto, ShiftStockReportQueryDto } from "../../../../application/dtos/Stock/stock-report.dto"
 
 export class StockReportRoutes {
   /**
@@ -23,14 +24,15 @@ export class StockReportRoutes {
     // GET /stock-reports/daily - Get daily stock report
     this.router.get(
       "/daily",
-      StockReportValidator.getDailyStockReport(),
+      validateQuery(DailyStockReportQueryDto),
       this.stockReportController.getDailyStockReport.bind(this.stockReportController),
     )
 
     // GET /stock-reports/shift/:shiftId - Get shift stock report
     this.router.get(
       "/shift/:shiftId",
-      StockReportValidator.getShiftStockReport(),
+      validateParamsDto(ShiftStockReportParamsDto),
+      validateQuery(ShiftStockReportQueryDto),
       this.stockReportController.getShiftStockReport.bind(this.stockReportController),
     )
   }

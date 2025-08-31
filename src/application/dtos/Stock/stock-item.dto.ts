@@ -63,6 +63,26 @@ export class UpdateStockItemDto {
   status?: StockItemStatus
 }
 
+export class UpdateQuantityDto {
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  quantity!: number
+}
+
+export class StockItemIdParamDto { @IsUUID() id!: string }
+export class StockItemTypeParamDto { @IsEnum(StockItemType) type!: StockItemType }
+export class PaginationQueryDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  page?: number
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  limit?: number
+}
+
 export class StockItemResponseDto {
   @IsUUID()
   stock_item_id!: string

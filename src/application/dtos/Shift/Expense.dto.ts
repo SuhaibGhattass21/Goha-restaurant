@@ -34,6 +34,8 @@ export class UpdateExpenseDto {
     amount?: number;
 }
 
+export class ExpenseIdParamDto { @IsUUID() id!: string }
+
 export class ExpenseResponseDto {
     expense_id!: string;
     title!: string;

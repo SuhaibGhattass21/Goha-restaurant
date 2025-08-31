@@ -43,6 +43,20 @@ export class UpdateProductDto {
   category_id?: string
 }
 
+export class ProductIdParamDto { @IsUUID() id!: string }
+export class CategoryIdParamDto { @IsUUID() categoryId!: string }
+export class PaginationQueryDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  page?: number
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  limit?: number
+}
+
 export class ProductResponseDto {
   @IsUUID()
   product_id!: string

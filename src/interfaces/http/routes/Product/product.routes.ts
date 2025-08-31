@@ -1,7 +1,8 @@
 import { Router } from "express"
 import type { ProductController } from "../../controllers/Product/product.controller"
-import { ProductValidator } from "../../validators/Product/product.validator"
 import { AuthorizationMiddleware } from "../../middlewares/authorization.middleware"
+import { validateBody, validateParamsDto, validateQuery } from "../../middlewares/validation.middleware"
+import { CreateProductDto, UpdateProductDto, ProductIdParamDto, CategoryIdParamDto, PaginationQueryDto } from "../../../../application/dtos/Product/product.dto"
 
 export class ProductRoutes {
   private router: Router
@@ -21,7 +22,7 @@ export class ProductRoutes {
         "OWNER_ACCESS",
         "access:products",
       ]),
-      ProductValidator.createProduct(),
+      validateBody(CreateProductDto),
       this.productController.createProduct.bind(this.productController),
     )
 
@@ -33,7 +34,7 @@ export class ProductRoutes {
         "access:products",
         "access:cashier",
       ]),
-      ProductValidator.getProducts(),
+      validateQuery(PaginationQueryDto),
       this.productController.getAllProducts.bind(this.productController),
     )
 
@@ -45,7 +46,8 @@ export class ProductRoutes {
         "access:products",
         "access:cashier",
       ]),
-      ProductValidator.getProductsByCategory(),
+      validateParamsDto(CategoryIdParamDto),
+      validateQuery(PaginationQueryDto),
       this.productController.getProductsByCategory.bind(this.productController),
     )
 
@@ -57,7 +59,7 @@ export class ProductRoutes {
         "access:products",
         "access:cashier",
       ]),
-      ProductValidator.getProductById(),
+      validateParamsDto(ProductIdParamDto),
       this.productController.getProductById.bind(this.productController),
     )
 
@@ -68,7 +70,8 @@ export class ProductRoutes {
         "OWNER_ACCESS",
         "access:products",
       ]),
-      ProductValidator.updateProduct(),
+      validateParamsDto(ProductIdParamDto),
+      validateBody(UpdateProductDto),
       this.productController.updateProduct.bind(this.productController),
     )
 
@@ -79,7 +82,7 @@ export class ProductRoutes {
         "OWNER_ACCESS",
         "access:products",
       ]),
-      ProductValidator.deleteProduct(),
+      validateParamsDto(ProductIdParamDto),
       this.productController.deleteProduct.bind(this.productController),
     )
   }

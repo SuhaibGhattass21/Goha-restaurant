@@ -1,7 +1,8 @@
 import { Router } from "express"
 import type { StockItemController } from "../../controllers/Stock/stock-item.controller"
-import { StockItemValidator } from "../../validators/Stock/stock-item.validator"
 import { AuthorizationMiddleware } from "../../../../interfaces/http/middlewares/authorization.middleware"
+import { validateBody, validateParamsDto, validateQuery } from "../../middlewares/validation.middleware"
+import { CreateStockItemDto, UpdateStockItemDto, UpdateQuantityDto, StockItemIdParamDto, StockItemTypeParamDto, PaginationQueryDto } from "../../../../application/dtos/Stock/stock-item.dto"
 
 export class StockItemRoutes {
 
@@ -18,7 +19,7 @@ export class StockItemRoutes {
     // POST /stock-items - Create a new stock item
     this.router.post(
       "/",
-      StockItemValidator.createStockItem(),
+      validateBody(CreateStockItemDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']),
       this.stockItemController.createStockItem.bind(this.stockItemController),
     )
@@ -26,7 +27,7 @@ export class StockItemRoutes {
     // GET /stock-items - Get all stock items with pagination
     this.router.get(
       "/",
-      StockItemValidator.getStockItems(),
+      validateQuery(PaginationQueryDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockItemController.getAllStockItems.bind(this.stockItemController),
     )
@@ -39,7 +40,7 @@ export class StockItemRoutes {
     // GET /stock-items/type/:type - Get stock items by type
     this.router.get(
       "/type/:type",
-      StockItemValidator.getStockItemsByType(),
+      validateParamsDto(StockItemTypeParamDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockItemController.getStockItemsByType.bind(this.stockItemController),
     )
@@ -47,7 +48,7 @@ export class StockItemRoutes {
     // GET /stock-items/:id - Get stock item by ID
     this.router.get(
       "/:id",
-      StockItemValidator.getStockItemById(),
+      validateParamsDto(StockItemIdParamDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockItemController.getStockItemById.bind(this.stockItemController),
     )
@@ -55,7 +56,8 @@ export class StockItemRoutes {
     // PUT /stock-items/:id - Update stock item
     this.router.put(
       "/:id",
-      StockItemValidator.updateStockItem(),
+      validateParamsDto(StockItemIdParamDto),
+      validateBody(UpdateStockItemDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']),
       this.stockItemController.updateStockItem.bind(this.stockItemController),
     )
@@ -63,7 +65,8 @@ export class StockItemRoutes {
     // PATCH /stock-items/:id/quantity - Update stock quantity
     this.router.patch(
       "/:id/quantity",
-      StockItemValidator.updateStockQuantity(),
+      validateParamsDto(StockItemIdParamDto),
+      validateBody(UpdateQuantityDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS', 'access:cashier']),
       this.stockItemController.updateStockQuantity.bind(this.stockItemController),
     )
@@ -71,7 +74,7 @@ export class StockItemRoutes {
     // DELETE /stock-items/:id - Delete stock item
     this.router.delete(
       "/:id",
-      StockItemValidator.deleteStockItem(),
+      validateParamsDto(StockItemIdParamDto),
       AuthorizationMiddleware.requireAnyPermission(['OWNER_ACCESS']),
       this.stockItemController.deleteStockItem.bind(this.stockItemController),
     )

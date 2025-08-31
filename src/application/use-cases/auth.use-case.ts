@@ -186,7 +186,7 @@ export class AuthUseCases {
 
             const hashedNewPassword = await bcrypt.hash(newPassword, this.bcryptRounds);
 
-            await this.userRepository.update(userId, { password: hashedNewPassword });
+            await this.userRepository.update(userId, { password: hashedNewPassword, tokenVersion: (user.tokenVersion || 0) + 1 });
         } catch (error: any) {
             throw new Error(error.message || 'Password change failed');
         }
@@ -200,7 +200,8 @@ export class AuthUseCases {
                 userId: user.id,
                 username: user.username,
                 fullName: user.fullName,
-                permissions
+                permissions,
+                tokenVersion: user.tokenVersion || 0,
             },
             this.jwtSecret,
             { expiresIn: this.jwtExpiry }

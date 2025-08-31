@@ -1,5 +1,4 @@
 import type { Request, Response } from "express"
-import { validationResult } from "express-validator"
 import type { StockItemUseCases } from "../../../../application/use-cases/Stock/stock-item.use-cases"
 
 export class StockItemController {
@@ -7,17 +6,6 @@ export class StockItemController {
 
   async createStockItem(req: Request, res: Response): Promise<void> {
     try {
-      // Check for validation errors
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const stockItemData = req.body
       const stockItem = await this.stockItemUseCases.createStockItem(stockItemData)
 
@@ -45,16 +33,6 @@ export class StockItemController {
 
   async getStockItemById(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const stockItem = await this.stockItemUseCases.getStockItemById(id)
 
@@ -81,16 +59,6 @@ export class StockItemController {
 
   async getAllStockItems(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
 
@@ -111,16 +79,6 @@ export class StockItemController {
 
   async updateStockItem(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const stockItemData = req.body
 
@@ -158,16 +116,6 @@ export class StockItemController {
 
   async deleteStockItem(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const deleted = await this.stockItemUseCases.deleteStockItem(id)
 
@@ -211,16 +159,6 @@ export class StockItemController {
 
   async getStockItemsByType(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { type } = req.params
       const stockItems = await this.stockItemUseCases.getStockItemsByType(type)
 
@@ -239,16 +177,6 @@ export class StockItemController {
 
   async updateStockQuantity(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const { quantity } = req.body
 

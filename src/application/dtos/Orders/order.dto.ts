@@ -9,6 +9,7 @@ import {
   Min,
   IsEnum,
   IsDateString,
+  IsPositive,
 } from "class-validator"
 import { Type } from "class-transformer"
 import { OrderStatus, OrderType } from "../../../domain/enums/Order.enums"
@@ -62,6 +63,47 @@ export class UpdateOrderDto {
   @IsOptional()
   @IsString()
   customer_phone?: string
+}
+
+export class OrderIdParamDto { @IsUUID() id!: string }
+export class ShiftIdParamDto { @IsUUID() shiftId!: string }
+export class CashierIdParamDto { @IsUUID() cashierId!: string }
+
+export class PaginationQueryDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  page?: number
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  limit?: number
+}
+
+export class OrderStatusParamDto { @IsEnum(OrderStatus) status!: OrderStatus }
+export class OrderTypeParamDto { @IsEnum(OrderType) type!: OrderType }
+
+export class DateRangeQueryDto extends PaginationQueryDto {
+  @IsDateString()
+  startDate!: string
+
+  @IsDateString()
+  endDate!: string
+}
+
+export class OrderStatsQueryDto {
+  @IsOptional()
+  @IsUUID()
+  shiftId?: string
+
+  @IsOptional()
+  @IsDateString()
+  startDate?: string
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: string
 }
 
 export class CashierInfoDto {

@@ -1,5 +1,4 @@
 import type { Request, Response } from "express"
-import { validationResult } from "express-validator"
 import type { ProductUseCases } from "../../../../application/use-cases/Product/product.use-cases"
 
 export class ProductController {
@@ -7,17 +6,6 @@ export class ProductController {
 
   async createProduct(req: Request, res: Response): Promise<void> {
     try {
-      // Check for validation errors
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const productData = req.body
       const product = await this.productUseCases.createProduct(productData)
 
@@ -53,16 +41,6 @@ export class ProductController {
 
   async getProductById(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const product = await this.productUseCases.getProductById(id)
 
@@ -89,16 +67,6 @@ export class ProductController {
 
   async getAllProducts(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
 
@@ -119,16 +87,6 @@ export class ProductController {
 
   async getProductsByCategory(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { categoryId } = req.params
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
@@ -158,16 +116,6 @@ export class ProductController {
 
   async updateProduct(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const productData = req.body
 
@@ -213,16 +161,6 @@ export class ProductController {
 
   async deleteProduct(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const deleted = await this.productUseCases.deleteProduct(id)
 

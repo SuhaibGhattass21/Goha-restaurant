@@ -1,5 +1,4 @@
 import type { Request, Response } from "express"
-import { validationResult } from "express-validator"
 import type { OrderUseCases } from "../../../../application/use-cases/Orders/order.use-cases"
 import type { OrderStatus, OrderType } from "../../../../domain/enums/Order.enums"
 import { plainToInstance } from "class-transformer"
@@ -14,16 +13,6 @@ export class OrderController {
 
   async createOrder(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const orderData = req.body
       const order = await this.orderUseCases.createOrder(orderData)
 
@@ -43,16 +32,6 @@ export class OrderController {
 
   async getOrderById(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const order = await this.orderUseCases.getOrderById(id)
 
@@ -79,16 +58,6 @@ export class OrderController {
 
   async getOrdersByShiftIdCafe(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { shiftId } = req.params
       const orders = await this.orderUseCases.getOrdersByShiftIdCafe(shiftId)
 
@@ -107,16 +76,6 @@ export class OrderController {
 
   async getOrdersByShiftIdGoha(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { shiftId } = req.params
       const orders = await this.orderUseCases.getOrdersByShiftIdGoha(shiftId)
 
@@ -135,16 +94,6 @@ export class OrderController {
 
   async getOrdersByCashierId(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { cashierId } = req.params
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
@@ -166,16 +115,6 @@ export class OrderController {
 
   async getOrdersByStatus(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { status } = req.params
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
@@ -197,16 +136,6 @@ export class OrderController {
 
   async getOrdersByType(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { type } = req.params
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
@@ -228,16 +157,6 @@ export class OrderController {
 
   async getOrdersByDateRange(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { startDate, endDate } = req.query
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
@@ -279,16 +198,6 @@ export class OrderController {
 
   async getAllOrdersCafe(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
 
@@ -309,16 +218,6 @@ export class OrderController {
 
   async getAllOrdersExceptCafe(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
 
@@ -339,16 +238,6 @@ export class OrderController {
 
   async updateOrder(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const orderData = req.body
 
@@ -378,16 +267,6 @@ export class OrderController {
 
   async updateOrderStatus(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const { status } = req.body
 
@@ -417,16 +296,6 @@ export class OrderController {
 
   async deleteOrder(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const deleted = await this.orderUseCases.deleteOrder(id)
 
@@ -453,16 +322,6 @@ export class OrderController {
 
   async getOrderStats(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { shiftId, startDate, endDate } = req.query
 
       const stats = await this.orderUseCases.getOrderStats(
@@ -486,16 +345,6 @@ export class OrderController {
 
   async getOrderStatsCafe(req: Request, res: Response): Promise<void> {
     try {
-      // const errors = validationResult(req)
-      // if (!errors.isEmpty()) {
-      //   res.status(400).json({
-      //     success: false,
-      //     message: "Validation failed",
-      //     errors: errors.array(),
-      //   })
-      //   return
-      // }
-
       const { shiftId, startDate, endDate } = req.query
 
       const stats = await this.orderUseCases.getOrderStatsCafe(
@@ -519,16 +368,6 @@ export class OrderController {
 
   async recalculateOrderTotal(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const total = await this.orderUseCases.recalculateOrderTotal(id)
 
@@ -548,16 +387,6 @@ export class OrderController {
 
   async requestCancelOrder(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const { cancelled_by, shift_id, reason } = req.body
 
@@ -591,16 +420,6 @@ export class OrderController {
 
   async cancelOrder(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const { cancelled_by, shift_id, reason } = req.body
 

@@ -39,6 +39,9 @@ export class User {
     @Column({ type: "boolean", default: true, name: "is_active" })
     isActive: boolean = true;
 
+    @Column({ type: 'int', default: 0, name: 'token_version' })
+    tokenVersion: number = 0;
+
     @OneToMany(() => UserPermission, (userPermission) => userPermission.user)
     userPermissions?: UserPermission[];
 

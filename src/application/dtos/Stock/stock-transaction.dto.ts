@@ -54,6 +54,22 @@ export class UpdateStockTransactionDto {
   shift_id?: string;
 }
 
+export class StockTransactionIdParamDto { @IsUUID() id!: string }
+export class StockItemIdParamDto { @IsUUID() stockItemId!: string }
+export class ShiftIdParamDto { @IsUUID() shiftId!: string }
+export class UserIdParamDto { @IsUUID() userId!: string }
+export class PaginationQueryDto {
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  limit?: number;
+}
+
 export class StockTransactionResponseDto {
   @IsUUID()
   transaction_id!: string;

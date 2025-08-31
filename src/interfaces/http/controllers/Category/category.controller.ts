@@ -1,5 +1,4 @@
 import type { Request, Response } from "express"
-import { validationResult } from "express-validator"
 import type { CategoryUseCases } from "../../../../application/use-cases/Category/category.use-cases"
 
 export class CategoryController {
@@ -7,17 +6,6 @@ export class CategoryController {
 
   async createCategory(req: Request, res: Response): Promise<void> {
     try {
-      // Check for validation errors
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const categoryData = req.body
       const category = await this.categoryUseCases.createCategory(categoryData)
 
@@ -45,16 +33,6 @@ export class CategoryController {
 
   async getCategoryById(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const category = await this.categoryUseCases.getCategoryById(id)
 
@@ -81,16 +59,6 @@ export class CategoryController {
 
   async getAllCategories(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const page = Number.parseInt(req.query.page as string) || 1
       const limit = Number.parseInt(req.query.limit as string) || 10
 
@@ -111,16 +79,6 @@ export class CategoryController {
 
   async updateCategory(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const categoryData = req.body
 
@@ -158,16 +116,6 @@ export class CategoryController {
 
   async deleteCategory(req: Request, res: Response): Promise<void> {
     try {
-      const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        res.status(400).json({
-          success: false,
-          message: "Validation failed",
-          errors: errors.array(),
-        })
-        return
-      }
-
       const { id } = req.params
       const deleted = await this.categoryUseCases.deleteCategory(id)
 

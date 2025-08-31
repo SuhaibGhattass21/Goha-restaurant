@@ -71,6 +71,26 @@ export class FilterShiftByStatusDto {
     status!: ShiftStatus;
 }
 
+export class ShiftIdParamDto { @IsUUID() id!: string }
+export class ShiftIdParamDto2 { @IsUUID() shiftId!: string }
+export class CashierIdParamDto { @IsUUID() cashierId!: string }
+export class ShiftStatusParamDto { @IsEnum(ShiftStatus) status!: ShiftStatus }
+export class ShiftTypeParamDto { @IsEnum(ShiftType) type!: ShiftType }
+export class DateQueryDto {
+  @IsOptional()
+  @IsDateString()
+  date?: string;
+}
+export class ShiftSummaryQueryDto {
+  @IsOptional()
+  @IsDateString()
+  date?: string;
+
+  @IsOptional()
+  @IsEnum(ShiftType)
+  shift_type?: ShiftType;
+}
+
 export class ShiftResponseDto {
     @IsUUID()
     shift_id!: string;

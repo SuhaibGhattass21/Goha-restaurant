@@ -70,6 +70,9 @@ export class UpdateShiftWorkerEndDto {
     end_time!: Date;
 }
 
+export class ShiftWorkerIdParamDto { @IsUUID() id!: string }
+export class ShiftIdParamDto { @IsUUID() shiftId!: string }
+
 export class ShiftWorkerResponseDto {
     @IsUUID()
     shift_worker_id!: string;

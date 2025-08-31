@@ -1,23 +1,38 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from './auth.middleware';
+import { AppDataSource } from '../../../infrastructure/database/postgres/db';
+import { User, UserPermission } from '../../../infrastructure/database/models';
 
 export class AuthorizationMiddleware {
+    private static async fetchCurrentPermissions(userId: string): Promise<string[]> {
+        const repo = AppDataSource.getRepository(User);
+        const user = await repo.findOne({
+            where: { id: userId },
+            relations: ['userPermissions', 'userPermissions.permission'],
+        });
+        if (!user || !user.userPermissions) return [];
+        return (user.userPermissions as UserPermission[])
+            .filter(up => !up.is_revoked)
+            .map(up => up.permission.name);
+    }
+
     static requirePermission(permission: string) {
-        return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+        return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
             if (!req.user) {
                 res.status(401).json({
                     success: false,
                     message: 'Authentication required'
                 });
-                return; // Return early instead of returning the response
+                return;
             }
 
-            if (!req.user.permissions.includes(permission)) {
+            const permissions = await AuthorizationMiddleware.fetchCurrentPermissions(req.user.userId);
+            if (!permissions.includes(permission)) {
                 res.status(403).json({
                     success: false,
                     message: `Permission '${permission}' required`
                 });
-                return; // Return early instead of returning the response
+                return;
             }
 
             next();
@@ -25,25 +40,24 @@ export class AuthorizationMiddleware {
     }
 
     static requireAnyPermission(permissions: string[]) {
-        return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+        return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
             if (!req.user) {
                 res.status(401).json({
                     success: false,
                     message: 'Authentication required'
                 });
-                return; // Return early instead of returning the response
+                return;
             }
 
-            const hasPermission = permissions.some(permission =>
-                req.user!.permissions.includes(permission)
-            );
+            const currentPermissions = await AuthorizationMiddleware.fetchCurrentPermissions(req.user.userId);
+            const hasPermission = permissions.some(permission => currentPermissions.includes(permission));
 
             if (!hasPermission) {
                 res.status(403).json({
                     success: false,
                     message: `One of these permissions required: ${permissions.join(', ')}`
                 });
-                return; // Return early instead of returning the response
+                return;
             }
 
             next();
@@ -62,23 +76,26 @@ export class AuthorizationMiddleware {
     }
 
     static requireOwnership(resourceUserIdField: string = 'userId') {
-        return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+        return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
             if (!req.user) {
                 res.status(401).json({
                     success: false,
                     message: 'Authentication required'
                 });
-                return; // Return early instead of returning the response
+                return;
             }
 
-            const resourceUserId = req.params[resourceUserIdField] || req.body[resourceUserIdField];
+            const resourceUserId = (req.params as any)[resourceUserIdField] || (req.body as any)[resourceUserIdField];
 
-            if (resourceUserId !== req.user.userId && !req.user.permissions.includes('OWNER_ACCESS')) {
-                res.status(403).json({
-                    success: false,
-                    message: 'Access denied: Can only access own resources'
-                });
-                return; // Return early instead of returning the response
+            if (resourceUserId !== req.user.userId) {
+                const currentPermissions = await AuthorizationMiddleware.fetchCurrentPermissions(req.user.userId);
+                if (!currentPermissions.includes('OWNER_ACCESS')) {
+                    res.status(403).json({
+                        success: false,
+                        message: 'Access denied: Can only access own resources'
+                    });
+                    return;
+                }
             }
 
             next();
