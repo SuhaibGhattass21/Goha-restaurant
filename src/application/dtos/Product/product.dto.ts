@@ -57,6 +57,15 @@ export class PaginationQueryDto {
   limit?: number
 }
 
+export class ProductCategoryDto {
+  @IsUUID()
+  category_id!: string
+
+  @IsString()
+  name!: string
+}
+
+
 export class ProductResponseDto {
   @IsUUID()
   product_id!: string
@@ -104,14 +113,6 @@ export class ProductListResponseDto {
   @IsInt()
   @Min(1)
   limit!: number
-}
-
-export class ProductCategoryDto {
-  @IsUUID()
-  category_id!: string
-
-  @IsString()
-  name!: string
 }
 
 export class ProductSizePriceDto {
