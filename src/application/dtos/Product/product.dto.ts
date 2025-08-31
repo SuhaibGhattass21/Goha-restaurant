@@ -66,6 +66,27 @@ export class ProductCategoryDto {
 }
 
 
+export class ProductSizePriceDto {
+  @IsUUID()
+  product_size_id!: string
+
+  @IsNumber()
+  price!: number
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ProductSizeDto)
+  size?: ProductSizeDto
+}
+
+export class ProductSizeDto {
+  @IsUUID()
+  size_id!: string
+
+  @IsString()
+  size_name!: string
+}
+
 export class ProductResponseDto {
   @IsUUID()
   product_id!: string
@@ -113,25 +134,4 @@ export class ProductListResponseDto {
   @IsInt()
   @Min(1)
   limit!: number
-}
-
-export class ProductSizePriceDto {
-  @IsUUID()
-  product_size_id!: string
-
-  @IsNumber()
-  price!: number
-
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => ProductSizeDto)
-  size?: ProductSizeDto
-}
-
-export class ProductSizeDto {
-  @IsUUID()
-  size_id!: string
-
-  @IsString()
-  size_name!: string
 }
