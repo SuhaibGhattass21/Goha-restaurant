@@ -146,7 +146,7 @@ export class Server {
 
     this.app.use(rateLimit({
       windowMs: 15 * 60 * 1000,
-      max: process.env.NODE_ENV === "production" ? 100 : 100000,
+      max: process.env.NODE_ENV === "production" ? 100000 : 100000,
     }));
   }
 
