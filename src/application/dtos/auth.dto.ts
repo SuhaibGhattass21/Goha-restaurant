@@ -49,11 +49,11 @@ export class AuthResponseDto {
     @IsNotEmpty()
     user!: UserResponseDto
 
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
     token!: string;
 
-    @IsString()
+    @IsNumber()
     @IsNotEmpty()
     expiresIn!: number;
 }

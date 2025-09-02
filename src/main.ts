@@ -1,5 +1,5 @@
-import { Server } from './interfaces/http/server/server'
 import 'reflect-metadata';
+import { Server } from './interfaces/http/server/server'
 
 const server = new Server()
 server.start().catch((error) => {

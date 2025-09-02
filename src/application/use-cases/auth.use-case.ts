@@ -18,6 +18,15 @@ export class AuthUseCases {
   private bcryptRounds: number;
 
   constructor(private userRepository: IUserRepository) {
+    if (!userRepository) {
+      throw new Error("UserRepository is required for AuthUseCases");
+    }
+    
+    // Validate that userRepository has the required methods
+    if (typeof userRepository.findBy !== 'function') {
+      throw new Error("UserRepository must implement findBy method");
+    }
+    
     this.jwtSecret = process.env.JWT_SECRET || "c7btrc685v42c45v86c2";
     this.jwtExpiry = Number(process.env.JWT_EXPIRY) || 10000;
     this.bcryptRounds = parseInt(process.env.BCRYPT_ROUNDS || "12");
@@ -25,12 +34,29 @@ export class AuthUseCases {
 
   async login(loginData: LoginDto): Promise<AuthResponseDto> {
     try {
+      if (!loginData) {
+        throw new Error("Login data is required");
+      }
+      
+      if (!loginData.username || !loginData.password) {
+        throw new Error("Username and password are required");
+      }
+
       console.log(`User ${JSON.stringify(loginData)} is attempting to log in`);
+      
+      if (!this.userRepository) {
+        throw new Error("User repository not available");
+      }
+
       const user: User = await this.userRepository.findBy({
         username: loginData.username,
       });
 
-      console.log(`User found: ${JSON.stringify(user)}`);
+      console.log(`User found: ${user ? 'Yes' : 'No'}`);
+      
+      if (user) {
+        console.log(`User permissions length: ${user.userPermissions?.length || 0}`);
+      }
 
       if (!user) {
         throw new Error("Invalid credentials");
@@ -48,21 +74,24 @@ export class AuthUseCases {
         throw new Error("Account is deactivated");
       }
 
+      console.log('Generating token...');
       const token = this.generateToken(user);
+      console.log('Token generated successfully');
 
-      console.log(`User ${JSON.stringify(user)} logged in`);
-
+      console.log('Processing user permissions...');
       const userPermissions =
         user.userPermissions
-          ?.filter((up) => up && !up.is_revoked) // filter revoked and null/undefined
+          ?.filter((up) => up && up.permission && !up.is_revoked) // filter revoked, null/undefined, and missing permission
           .map((up) => ({
-            id: up.permission?.id || "",
-            name: up.permission?.name || "",
-            description: up.permission?.description || "",
+            id: up.permission.id || "",
+            name: up.permission.name || "",
+            description: up.permission.description || "",
             granted_at: up.granted_at,
             granted_by_name: up.granted_by?.username || "Unknown",
             is_revoked: up.is_revoked,
           })) || [];
+
+      console.log('User permissions processed successfully');
 
       return {
         user: {
@@ -79,6 +108,7 @@ export class AuthUseCases {
         expiresIn: this.jwtExpiry,
       };
     } catch (error: any) {
+      console.error('Login error:', error);
       throw new Error(error.message || "Login failed");
     }
   }
@@ -138,11 +168,11 @@ export class AuthUseCases {
 
       const userPermissions =
         user.userPermissions
-          ?.filter((up: UserPermission) => up && !up.is_revoked) // explicit type here and null check
+          ?.filter((up: UserPermission) => up && up.permission && !up.is_revoked) // explicit type here and null check
           .map((up: UserPermission) => ({
-            id: up.permission?.id || "",
-            name: up.permission?.name || "",
-            description: up.permission?.description || "",
+            id: up.permission.id || "",
+            name: up.permission.name || "",
+            description: up.permission.description || "",
             granted_at: up.granted_at,
             granted_by_name: up.granted_by?.username || "Unknown",
             is_revoked: up.is_revoked,
@@ -225,21 +255,46 @@ export class AuthUseCases {
   }
 
   private generateToken(user: User): string {
-    const permissions =
-      user.userPermissions?.map(
-        (permission: UserPermission) => permission.permission.name
-      ) || [];
+    try {
+      if (!user) {
+        throw new Error("User object is required for token generation");
+      }
 
-    return jwt.sign(
-      {
-        userId: user.id,
-        username: user.username,
-        fullName: user.fullName,
-        permissions,
-        tokenVersion: user.tokenVersion || 0,
-      },
-      this.jwtSecret,
-      { expiresIn: this.jwtExpiry }
-    );
+      console.log('Processing permissions for token generation...');
+      const permissions =
+        user.userPermissions?.filter(up => {
+          if (!up) {
+            console.warn('Found null/undefined userPermission entry');
+            return false;
+          }
+          if (!up.permission) {
+            console.warn('Found userPermission with null/undefined permission');
+            return false;
+          }
+          if (up.is_revoked) {
+            console.log('Skipping revoked permission:', up.permission.name);
+            return false;
+          }
+          return true;
+        })
+        .map((permission: UserPermission) => permission.permission.name) || [];
+
+      console.log('Permissions for token:', permissions);
+
+      return jwt.sign(
+        {
+          userId: user.id,
+          username: user.username,
+          fullName: user.fullName,
+          permissions,
+          tokenVersion: user.tokenVersion || 0,
+        },
+        this.jwtSecret,
+        { expiresIn: this.jwtExpiry }
+      );
+    } catch (error: any) {
+      console.error('Error generating token:', error);
+      throw new Error(`Token generation failed: ${error.message}`);
+    }
   }
 }

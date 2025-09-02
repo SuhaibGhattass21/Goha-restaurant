@@ -170,6 +170,12 @@ export class Server {
 
   private initializeDependencies(): AppDependencies {
     try {
+      // Validate AppDataSource is initialized
+      if (!AppDataSource.isInitialized) {
+        throw new Error("Database connection not initialized");
+      }
+
+      console.log("📦 Getting TypeORM repositories...");
       // Get TypeORM repositories
       const categoryRepo = AppDataSource.getRepository(Category);
       const categoryExtraRepo = AppDataSource.getRepository(CategoryExtra);
@@ -320,10 +326,21 @@ export class Server {
       const workerRoutes = new WorkerRoutes(workerController);
 
       // Setup User module
+      if (!userRepo) {
+        throw new Error("User repository is not properly initialized");
+      }
+      
       const userRepository = new UserRepositoryImpl(userRepo);
+      console.log("✅ User repository created");
+      
       const authUseCases = new AuthUseCases(userRepository);
+      console.log("✅ Auth use cases created");
+      
       const authController = new AuthController(authUseCases);
+      console.log("✅ Auth controller created");
+      
       const authRoutes = new AuthRoutes(authController);
+      console.log("✅ Auth routes created");
 
       // Setup ShiftWorker module
       const shiftWorkerRepository = new ShiftWorkerRepositoryImpl(
@@ -590,9 +607,25 @@ export class Server {
 
   public async start(): Promise<void> {
     try {
+      // Validate environment variables
+      if (!process.env.DATABASE_URL) {
+        console.warn("⚠️ DATABASE_URL not set, using default connection settings");
+      }
+      
+      console.log("🔗 Initializing database connection...");
       await AppDataSource.initialize();
       console.log("✅ Database connected successfully");
 
+      // Test database connectivity
+      try {
+        await AppDataSource.query("SELECT 1");
+        console.log("✅ Database connectivity test passed");
+      } catch (dbError) {
+        console.error("❌ Database connectivity test failed:", dbError);
+        throw dbError;
+      }
+
+      console.log("🏗️ Initializing application dependencies...");
       const dependencies = this.initializeDependencies();
       console.log("✅ Application dependencies initialized");
 

@@ -3,7 +3,18 @@ import { Repository } from "typeorm";
 import { IUserRepository } from "../../domain/repositories/user.repository.interface";
 import { UserPermission } from "../../infrastructure/database/models";
 export class UserRepositoryImpl implements IUserRepository {
-    constructor(private userRepository: Repository<User>) { }
+    constructor(private userRepository: Repository<User>) { 
+        if (!userRepository) {
+            throw new Error("User repository is required");
+        }
+        
+        // Validate that the repository has the required methods
+        if (typeof userRepository.findOne !== 'function') {
+            throw new Error("Invalid repository provided - missing findOne method");
+        }
+        
+        console.log("✅ UserRepositoryImpl initialized successfully");
+    }
     create(data: User): Promise<User> {
         const user = this.userRepository.create(data);
         return this.userRepository.save(user);
@@ -28,10 +39,19 @@ export class UserRepositoryImpl implements IUserRepository {
     }
 
     findBy(filter: any): Promise<User | null> {
-        return this.userRepository.findOne({
-            where: filter,
-            relations: ["userPermissions", "userPermissions.permission", "userPermissions.granted_by"],
-        });
+        try {
+            if (!filter) {
+                throw new Error("Filter parameter is required");
+            }
+            
+            return this.userRepository.findOne({
+                where: filter,
+                relations: ["userPermissions", "userPermissions.permission", "userPermissions.granted_by"],
+            });
+        } catch (error: any) {
+            console.error("Error in UserRepository.findBy:", error);
+            throw new Error(`Failed to find user: ${error.message}`);
+        }
     }
     update(id: string, data: Partial<User>): Promise<User | null> {
         return this.userRepository.findOne({ where: { id } })

@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { AuthUseCases } from "../../../application/use-cases/auth.use-case";
 import { JwtUtils } from "../../../interfaces/utils/jwt.utils";
 import { AppDataSource } from "../../../infrastructure/database/postgres/db";
 import { User } from "../../../infrastructure/database/models";

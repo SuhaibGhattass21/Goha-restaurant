@@ -3,10 +3,25 @@ import { AuthUseCases } from '../../../application/use-cases/auth.use-case';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 
 export class AuthController {
-    constructor(private authUseCases: AuthUseCases) { }
+    constructor(private authUseCases: AuthUseCases) { 
+        if (!authUseCases) {
+            throw new Error("AuthUseCases is required for AuthController");
+        }
+        console.log("✅ Auth controller initialized successfully");
+    }
 
     async login(req: Request, res: Response): Promise<void> {
         try {
+            console.log("🔐 Login request received");
+            
+            if (!req.body) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Request body is required'
+                });
+                return;
+            }
+
             const authData = await this.authUseCases.login(req.body);
 
             res.status(200).json({
@@ -15,6 +30,7 @@ export class AuthController {
                 data: authData
             });
         } catch (error: any) {
+            console.error("Login error in controller:", error);
             res.status(401).json({
                 success: false,
                 message: error.message || 'Login failed'

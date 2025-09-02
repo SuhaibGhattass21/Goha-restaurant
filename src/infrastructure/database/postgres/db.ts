@@ -1,6 +1,11 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
+
+// Load environment variables first
+dotenv.config();
+
+// Import models after reflect-metadata and dotenv
 import {
   Category,
   CategoryExtra,
@@ -25,8 +30,6 @@ import {
   CancelledOrder,
   Expense,
 } from "../models";
-
-dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: "postgres",
