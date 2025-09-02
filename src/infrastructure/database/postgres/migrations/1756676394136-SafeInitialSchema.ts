@@ -1,0 +1,738 @@
+import { MigrationInterface, QueryRunner } from "typeorm";
+
+export class SafeInitialSchema1756676394136 implements MigrationInterface {
+    name = 'SafeInitialSchema1756676394136'
+
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        // Enable UUID extension if not exists
+        await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
+
+        // Create enums if not exists
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."workers_status_enum" AS ENUM('admin', 'cashier', 'chef', 'waiter', 'delivery', 'kitchen', 'steawer', 'kitchen_assistant');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."orders_order_type_enum" AS ENUM('dine-in', 'takeaway', 'delivery', 'cafe');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."orders_status_enum" AS ENUM('completed', 'cancelled', 'active', 'pending');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."cancelled_orders_status_enum" AS ENUM('completed', 'cancelled', 'active', 'pending');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."shifts_shift_type_enum" AS ENUM('morning', 'night');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."shifts_status_enum" AS ENUM('opened', 'closed');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."external_receipts_payment_method_enum" AS ENUM('cash', 'card', 'wallet');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."stock_transactions_type_enum" AS ENUM('in', 'out');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."stock_items_type_enum" AS ENUM('مكونات', 'ادوات', 'خضراوات', 'فاكهة', 'لحم', 'فراخ', 'سمك', 'مشروبات', 'اخري');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."stock_items_status_enum" AS ENUM('available', 'lowstock', 'outofstock');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                CREATE TYPE "public"."supplier_invoices_status_enum" AS ENUM('paid', 'unpaid', 'partial');
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        // Create tables if not exists
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "categories" (
+                "category_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "name" text NOT NULL,
+                "description" text,
+                CONSTRAINT "UQ_8b0be371d28245da6e4f4b61878" UNIQUE ("name"),
+                CONSTRAINT "PK_51615bef2cea22812d0dcab6e18" PRIMARY KEY ("category_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "category_sizes" (
+                "size_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "size_name" text NOT NULL,
+                "category_id" uuid,
+                CONSTRAINT "PK_5c640aec247526ecafd8084f73f" PRIMARY KEY ("size_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "category_extras" (
+                "extra_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "name" text NOT NULL,
+                "price" numeric(10,2) NOT NULL,
+                "category_id" uuid,
+                CONSTRAINT "PK_e712231d845ac54a008da131a72" PRIMARY KEY ("extra_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "products" (
+                "product_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "name" text NOT NULL,
+                "description" text,
+                "image_url" text,
+                "is_active" boolean NOT NULL DEFAULT true,
+                "category_id" uuid,
+                CONSTRAINT "PK_a8940a4bf3b90bd7ac15c8f4dd9" PRIMARY KEY ("product_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "product_size_prices" (
+                "product_size_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "price" numeric(10,2) NOT NULL,
+                "product_id" uuid,
+                "size_id" uuid,
+                CONSTRAINT "PK_83400f18532c6f13f527d91b3d5" PRIMARY KEY ("product_size_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "users" (
+                "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "username" text NOT NULL,
+                "full_name" text NOT NULL,
+                "hour_rate" numeric,
+                "password" text NOT NULL,
+                "phone" character varying,
+                "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "is_active" boolean NOT NULL DEFAULT true,
+                "token_version" integer NOT NULL DEFAULT '0',
+                CONSTRAINT "UQ_fe0bb3f6520ee0469504521e710" UNIQUE ("username"),
+                CONSTRAINT "UQ_a000cca60bcf04454e727699490" UNIQUE ("phone"),
+                CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "workers" (
+                "worker_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "full_name" text NOT NULL,
+                "user_id" uuid,
+                "phone" text,
+                "status" "public"."workers_status_enum" NOT NULL,
+                "base_hourly_rate" numeric(10,2) NOT NULL,
+                "is_active" boolean NOT NULL DEFAULT true,
+                "joined_at" TIMESTAMP NOT NULL DEFAULT now(),
+                CONSTRAINT "REL_e47e873d6f19443891cca73bd8" UNIQUE ("user_id"),
+                CONSTRAINT "PK_b9960b94d87ab2e1fcfec59cd2a" PRIMARY KEY ("worker_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "permissions" (
+                "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "name" text NOT NULL,
+                "description" text,
+                "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                CONSTRAINT "UQ_48ce552495d14eae9b187bb6716" UNIQUE ("name"),
+                CONSTRAINT "PK_920331560282b8bd21bb02290df" PRIMARY KEY ("id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "user_permissions" (
+                "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "granted_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "is_revoked" boolean NOT NULL DEFAULT false,
+                "user_id" uuid,
+                "permission_id" uuid,
+                "granted_by" uuid,
+                CONSTRAINT "PK_01f4295968ba33d73926684264f" PRIMARY KEY ("id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "shifts" (
+                "shift_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "shift_type" "public"."shifts_shift_type_enum" NOT NULL,
+                "start_time" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "end_time" TIMESTAMP WITH TIME ZONE NOT NULL,
+                "status" "public"."shifts_status_enum" NOT NULL DEFAULT 'opened',
+                "initial_balance" numeric(10,2) NOT NULL DEFAULT '0',
+                "is_started_by_cashier" boolean NOT NULL DEFAULT false,
+                "is_close_requested" boolean NOT NULL DEFAULT false,
+                "is_closed" boolean NOT NULL DEFAULT false,
+                "created_at" date NOT NULL,
+                "opened_by" uuid,
+                "closed_by" uuid,
+                "approved_by_admin_id" uuid,
+                CONSTRAINT "PK_c3077046266a8fd616a6acb511f" PRIMARY KEY ("shift_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "shift_workers" (
+                "shift_worker_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "shift_id" uuid NOT NULL,
+                "worker_id" uuid NOT NULL,
+                "hourly_rate" numeric(10,2) NOT NULL,
+                "start_time" TIMESTAMP NOT NULL DEFAULT now(),
+                "end_time" TIMESTAMP WITH TIME ZONE,
+                "calculated_salary" numeric(10,2) NOT NULL DEFAULT '0',
+                CONSTRAINT "PK_465c28853e6247a43a06c87d0be" PRIMARY KEY ("shift_worker_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "expenses" (
+                "expense_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "title" text NOT NULL,
+                "description" text,
+                "amount" numeric(10,2) NOT NULL,
+                "shift_id" uuid NOT NULL,
+                "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "created_by" uuid,
+                CONSTRAINT "PK_e05b03cdc63e9849adcebeb0118" PRIMARY KEY ("expense_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "orders" (
+                "order_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "table_number" text,
+                "order_type" "public"."orders_order_type_enum" NOT NULL,
+                "status" "public"."orders_status_enum" NOT NULL DEFAULT 'active',
+                "total_price" numeric(10,2) NOT NULL,
+                "customer_name" text,
+                "customer_phone" text,
+                "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "user_id" uuid,
+                "shift_id" uuid,
+                CONSTRAINT "PK_cad55b3cb25b38be94d2ce831db" PRIMARY KEY ("order_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "order_items" (
+                "order_item_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "quantity" integer NOT NULL,
+                "unit_price" numeric(10,2) NOT NULL,
+                "special_instructions" text,
+                "order_id" uuid,
+                "product_size_id" uuid,
+                CONSTRAINT "PK_54c952fdc94b9b487ef968b4047" PRIMARY KEY ("order_item_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "order_item_extras" (
+                "order_item_extra_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "price" numeric(10,2) NOT NULL,
+                "quantity" integer NOT NULL DEFAULT '1',
+                "order_item_id" uuid,
+                "category_extra_id" uuid,
+                CONSTRAINT "PK_24de605ca9f7a25e4fe668684b3" PRIMARY KEY ("order_item_extra_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "cancelled_orders" (
+                "cancelled_order_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "reason" text,
+                "status" "public"."cancelled_orders_status_enum" NOT NULL DEFAULT 'pending',
+                "cancelled_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "approved_at" TIMESTAMP WITH TIME ZONE DEFAULT now(),
+                "order_id" uuid,
+                "cancelled_by" uuid,
+                "shift_id" uuid,
+                "approved_by" uuid,
+                CONSTRAINT "PK_2329d6ef4af30098ddf3bf8fcf8" PRIMARY KEY ("cancelled_order_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "external_receipts" (
+                "receipt_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "total_amount" numeric(10,2) NOT NULL,
+                "payment_method" "public"."external_receipts_payment_method_enum" NOT NULL DEFAULT 'cash',
+                "image_url" text NOT NULL,
+                "is_printed" boolean NOT NULL DEFAULT false,
+                "notes" text,
+                "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "order_id" uuid,
+                "shift_id" uuid,
+                "cashier_id" uuid,
+                CONSTRAINT "PK_09bdf094eb86a16461d0c96d960" PRIMARY KEY ("receipt_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "stock_items" (
+                "stock_item_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "name" text NOT NULL,
+                "type" "public"."stock_items_type_enum" NOT NULL,
+                "unit" text NOT NULL,
+                "current_quantity" numeric(10,2) NOT NULL DEFAULT '0',
+                "minimum_value" numeric(10,2) NOT NULL DEFAULT '0',
+                "status" "public"."stock_items_status_enum" NOT NULL,
+                "last_updated_at" date NOT NULL,
+                CONSTRAINT "UQ_315d49646302ea7342f085a2ded" UNIQUE ("name"),
+                CONSTRAINT "PK_f79e338cd4bfeae9341703119c5" PRIMARY KEY ("stock_item_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "stock_transactions" (
+                "transaction_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "type" "public"."stock_transactions_type_enum" NOT NULL,
+                "quantity" numeric(10,2) NOT NULL,
+                "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "stock_item_id" uuid,
+                "user_id" uuid,
+                "shift_id" uuid,
+                CONSTRAINT "PK_25d5deac448160b7580c5a21df9" PRIMARY KEY ("transaction_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "suppliers" (
+                "supplier_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "name" text NOT NULL,
+                "phone" text,
+                "notes" text,
+                CONSTRAINT "PK_a2692f796d16e0a30040860112a" PRIMARY KEY ("supplier_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "supplier_invoices" (
+                "invoice_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "total_amount" numeric(10,2) NOT NULL,
+                "status" "public"."supplier_invoices_status_enum" NOT NULL,
+                "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "supplier_id" uuid,
+                CONSTRAINT "PK_6722f490d842b5ef510c9ca5e2e" PRIMARY KEY ("invoice_id")
+            )
+        `);
+
+        await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS "supplier_payments" (
+                "payment_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "amount" numeric(10,2) NOT NULL,
+                "paid_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "invoice_id" uuid,
+                "user_id" uuid,
+                CONSTRAINT "PK_c4fd62a5d00f90bee43253987c8" PRIMARY KEY ("payment_id")
+            )
+        `);
+
+        // Add foreign key constraints (only if they don't exist)
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "category_sizes" ADD CONSTRAINT "FK_d8b1769ab10ad4fc1dd2f7b2fb4" FOREIGN KEY ("category_id") REFERENCES "categories"("category_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "product_size_prices" ADD CONSTRAINT "FK_f78dfd827a8fb1af6860c3354fa" FOREIGN KEY ("product_id") REFERENCES "products"("product_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "product_size_prices" ADD CONSTRAINT "FK_05bae1e87f96cf3c0e10f14c206" FOREIGN KEY ("size_id") REFERENCES "category_sizes"("size_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "products" ADD CONSTRAINT "FK_9a5f6868c96e0069e699f33e124" FOREIGN KEY ("category_id") REFERENCES "categories"("category_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "category_extras" ADD CONSTRAINT "FK_944e03af55cc5069964cc25ce8a" FOREIGN KEY ("category_id") REFERENCES "categories"("category_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "shift_workers" ADD CONSTRAINT "FK_aa9339ec388c8e49bd87c551929" FOREIGN KEY ("shift_id") REFERENCES "shifts"("shift_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "shift_workers" ADD CONSTRAINT "FK_f197168b373b825d2c619d8c15f" FOREIGN KEY ("worker_id") REFERENCES "workers"("worker_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "workers" ADD CONSTRAINT "FK_e47e873d6f19443891cca73bd8c" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "user_permissions" ADD CONSTRAINT "FK_3495bd31f1862d02931e8e8d2e8" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "user_permissions" ADD CONSTRAINT "FK_8145f5fadacd311693c15e41f10" FOREIGN KEY ("permission_id") REFERENCES "permissions"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "user_permissions" ADD CONSTRAINT "FK_ef71071c7832d547c1b966a20c3" FOREIGN KEY ("granted_by") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "expenses" ADD CONSTRAINT "FK_b8220647a9e8ba971320a94d49a" FOREIGN KEY ("shift_id") REFERENCES "shifts"("shift_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "expenses" ADD CONSTRAINT "FK_7c0c012c2f8e6578277c239ee61" FOREIGN KEY ("created_by") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "order_item_extras" ADD CONSTRAINT "FK_aacb138279f83d4f9ae082c1547" FOREIGN KEY ("order_item_id") REFERENCES "order_items"("order_item_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "order_item_extras" ADD CONSTRAINT "FK_826efeb36056478bec0b84d6265" FOREIGN KEY ("category_extra_id") REFERENCES "category_extras"("extra_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "order_items" ADD CONSTRAINT "FK_145532db85752b29c57d2b7b1f1" FOREIGN KEY ("order_id") REFERENCES "orders"("order_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "order_items" ADD CONSTRAINT "FK_acd63e423ec8c60e98678024640" FOREIGN KEY ("product_size_id") REFERENCES "product_size_prices"("product_size_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "orders" ADD CONSTRAINT "FK_a922b820eeef29ac1c6800e826a" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "orders" ADD CONSTRAINT "FK_a47d559598368bc78800dd5175b" FOREIGN KEY ("shift_id") REFERENCES "shifts"("shift_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "cancelled_orders" ADD CONSTRAINT "FK_b9cbc463ca590f7d33a99e02eef" FOREIGN KEY ("order_id") REFERENCES "orders"("order_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "cancelled_orders" ADD CONSTRAINT "FK_c807a51b6420cc5f630e0f39858" FOREIGN KEY ("cancelled_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "cancelled_orders" ADD CONSTRAINT "FK_9c88409eeb0dffa703d7cdaa51a" FOREIGN KEY ("shift_id") REFERENCES "shifts"("shift_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "cancelled_orders" ADD CONSTRAINT "FK_ac0e10232d39d777f554f3ef0af" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "shifts" ADD CONSTRAINT "FK_899d18fe05e249b7a5c369bd7dc" FOREIGN KEY ("opened_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "shifts" ADD CONSTRAINT "FK_40667989e1124e036be013fa9e2" FOREIGN KEY ("closed_by") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "shifts" ADD CONSTRAINT "FK_d84ad3d1d3760ce59e7d4740b15" FOREIGN KEY ("approved_by_admin_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "external_receipts" ADD CONSTRAINT "FK_4b72797c6d9afe17d0cae05c4e6" FOREIGN KEY ("order_id") REFERENCES "orders"("order_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "external_receipts" ADD CONSTRAINT "FK_2428fa3bde30479cdc80d6d0985" FOREIGN KEY ("shift_id") REFERENCES "shifts"("shift_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "external_receipts" ADD CONSTRAINT "FK_2d25b24d906ecbb785110f6e640" FOREIGN KEY ("cashier_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "stock_transactions" ADD CONSTRAINT "FK_7f381d92c8a84228d51968163bf" FOREIGN KEY ("stock_item_id") REFERENCES "stock_items"("stock_item_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "stock_transactions" ADD CONSTRAINT "FK_07476234b775566efbb13338403" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "stock_transactions" ADD CONSTRAINT "FK_3958ffc93efb50ab30241ec958d" FOREIGN KEY ("shift_id") REFERENCES "shifts"("shift_id") ON DELETE CASCADE ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "supplier_payments" ADD CONSTRAINT "FK_f2cd5b3aae1aadab76c74de8146" FOREIGN KEY ("invoice_id") REFERENCES "supplier_invoices"("invoice_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "supplier_payments" ADD CONSTRAINT "FK_99283b63c5ce97cf7a4dcc08808" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+
+        await queryRunner.query(`
+            DO $$ BEGIN
+                ALTER TABLE "supplier_invoices" ADD CONSTRAINT "FK_1c85b2d278b6b6f3ab2ea9dc582" FOREIGN KEY ("supplier_id") REFERENCES "suppliers"("supplier_id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+            EXCEPTION
+                WHEN duplicate_object THEN null;
+            END $$;
+        `);
+    }
+
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        // Drop foreign key constraints
+        await queryRunner.query(`ALTER TABLE "supplier_invoices" DROP CONSTRAINT IF EXISTS "FK_1c85b2d278b6b6f3ab2ea9dc582"`);
+        await queryRunner.query(`ALTER TABLE "supplier_payments" DROP CONSTRAINT IF EXISTS "FK_99283b63c5ce97cf7a4dcc08808"`);
+        await queryRunner.query(`ALTER TABLE "supplier_payments" DROP CONSTRAINT IF EXISTS "FK_f2cd5b3aae1aadab76c74de8146"`);
+        await queryRunner.query(`ALTER TABLE "stock_transactions" DROP CONSTRAINT IF EXISTS "FK_3958ffc93efb50ab30241ec958d"`);
+        await queryRunner.query(`ALTER TABLE "stock_transactions" DROP CONSTRAINT IF EXISTS "FK_07476234b775566efbb13338403"`);
+        await queryRunner.query(`ALTER TABLE "stock_transactions" DROP CONSTRAINT IF EXISTS "FK_7f381d92c8a84228d51968163bf"`);
+        await queryRunner.query(`ALTER TABLE "external_receipts" DROP CONSTRAINT IF EXISTS "FK_2d25b24d906ecbb785110f6e640"`);
+        await queryRunner.query(`ALTER TABLE "external_receipts" DROP CONSTRAINT IF EXISTS "FK_2428fa3bde30479cdc80d6d0985"`);
+        await queryRunner.query(`ALTER TABLE "external_receipts" DROP CONSTRAINT IF EXISTS "FK_4b72797c6d9afe17d0cae05c4e6"`);
+        await queryRunner.query(`ALTER TABLE "shifts" DROP CONSTRAINT IF EXISTS "FK_d84ad3d1d3760ce59e7d4740b15"`);
+        await queryRunner.query(`ALTER TABLE "shifts" DROP CONSTRAINT IF EXISTS "FK_40667989e1124e036be013fa9e2"`);
+        await queryRunner.query(`ALTER TABLE "shifts" DROP CONSTRAINT IF EXISTS "FK_899d18fe05e249b7a5c369bd7dc"`);
+        await queryRunner.query(`ALTER TABLE "cancelled_orders" DROP CONSTRAINT IF EXISTS "FK_ac0e10232d39d777f554f3ef0af"`);
+        await queryRunner.query(`ALTER TABLE "cancelled_orders" DROP CONSTRAINT IF EXISTS "FK_9c88409eeb0dffa703d7cdaa51a"`);
+        await queryRunner.query(`ALTER TABLE "cancelled_orders" DROP CONSTRAINT IF EXISTS "FK_c807a51b6420cc5f630e0f39858"`);
+        await queryRunner.query(`ALTER TABLE "cancelled_orders" DROP CONSTRAINT IF EXISTS "FK_b9cbc463ca590f7d33a99e02eef"`);
+        await queryRunner.query(`ALTER TABLE "orders" DROP CONSTRAINT IF EXISTS "FK_a47d559598368bc78800dd5175b"`);
+        await queryRunner.query(`ALTER TABLE "orders" DROP CONSTRAINT IF EXISTS "FK_a922b820eeef29ac1c6800e826a"`);
+        await queryRunner.query(`ALTER TABLE "order_items" DROP CONSTRAINT IF EXISTS "FK_acd63e423ec8c60e98678024640"`);
+        await queryRunner.query(`ALTER TABLE "order_items" DROP CONSTRAINT IF EXISTS "FK_145532db85752b29c57d2b7b1f1"`);
+        await queryRunner.query(`ALTER TABLE "order_item_extras" DROP CONSTRAINT IF EXISTS "FK_826efeb36056478bec0b84d6265"`);
+        await queryRunner.query(`ALTER TABLE "order_item_extras" DROP CONSTRAINT IF EXISTS "FK_aacb138279f83d4f9ae082c1547"`);
+        await queryRunner.query(`ALTER TABLE "expenses" DROP CONSTRAINT IF EXISTS "FK_7c0c012c2f8e6578277c239ee61"`);
+        await queryRunner.query(`ALTER TABLE "expenses" DROP CONSTRAINT IF EXISTS "FK_b8220647a9e8ba971320a94d49a"`);
+        await queryRunner.query(`ALTER TABLE "user_permissions" DROP CONSTRAINT IF EXISTS "FK_ef71071c7832d547c1b966a20c3"`);
+        await queryRunner.query(`ALTER TABLE "user_permissions" DROP CONSTRAINT IF EXISTS "FK_8145f5fadacd311693c15e41f10"`);
+        await queryRunner.query(`ALTER TABLE "user_permissions" DROP CONSTRAINT IF EXISTS "FK_3495bd31f1862d02931e8e8d2e8"`);
+        await queryRunner.query(`ALTER TABLE "workers" DROP CONSTRAINT IF EXISTS "FK_e47e873d6f19443891cca73bd8c"`);
+        await queryRunner.query(`ALTER TABLE "shift_workers" DROP CONSTRAINT IF EXISTS "FK_f197168b373b825d2c619d8c15f"`);
+        await queryRunner.query(`ALTER TABLE "shift_workers" DROP CONSTRAINT IF EXISTS "FK_aa9339ec388c8e49bd87c551929"`);
+        await queryRunner.query(`ALTER TABLE "category_extras" DROP CONSTRAINT IF EXISTS "FK_944e03af55cc5069964cc25ce8a"`);
+        await queryRunner.query(`ALTER TABLE "products" DROP CONSTRAINT IF EXISTS "FK_9a5f6868c96e0069e699f33e124"`);
+        await queryRunner.query(`ALTER TABLE "product_size_prices" DROP CONSTRAINT IF EXISTS "FK_05bae1e87f96cf3c0e10f14c206"`);
+        await queryRunner.query(`ALTER TABLE "product_size_prices" DROP CONSTRAINT IF EXISTS "FK_f78dfd827a8fb1af6860c3354fa"`);
+        await queryRunner.query(`ALTER TABLE "category_sizes" DROP CONSTRAINT IF EXISTS "FK_d8b1769ab10ad4fc1dd2f7b2fb4"`);
+
+        // Drop tables
+        await queryRunner.query(`DROP TABLE IF EXISTS "supplier_payments"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "supplier_invoices"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "suppliers"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "stock_transactions"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "stock_items"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "external_receipts"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "cancelled_orders"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "order_item_extras"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "order_items"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "orders"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "expenses"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "shift_workers"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "shifts"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "user_permissions"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "permissions"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "workers"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "users"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "product_size_prices"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "products"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "category_extras"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "category_sizes"`);
+        await queryRunner.query(`DROP TABLE IF EXISTS "categories"`);
+
+        // Drop enums
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."supplier_invoices_status_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."stock_items_status_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."stock_items_type_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."stock_transactions_type_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."external_receipts_payment_method_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."shifts_status_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."shifts_shift_type_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."cancelled_orders_status_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."orders_status_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."orders_order_type_enum"`);
+        await queryRunner.query(`DROP TYPE IF EXISTS "public"."workers_status_enum"`);
+    }
+}
