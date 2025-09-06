@@ -18,6 +18,7 @@
         "sourceMap": true,
         "removeComments": false,
         "allowSyntheticDefaultImports": true,
+        "verbatimModuleSyntax": false,
         "baseUrl": ".",
         "paths": {
             "@domain/*": [

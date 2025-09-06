@@ -2,6 +2,7 @@ import express from "express";
 import "reflect-metadata";
 import helmet from "helmet";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "../../config/swagger/swagger.config";
 import { CategoryExtraController } from "../controllers/Category/category-extra.controller";
@@ -60,6 +61,13 @@ import { StockTransactionController } from "../controllers/Stock/stock-transacti
 import { StockTransactionRoutes } from "../routes/Stock/stock-transaction.routes";
 import { StockTransactionRepositoryImpl } from "../../../infrastructure/repositories/Stock/stock-transaction.repository.impl";
 import { StockTransactionUseCases } from "../../../application/use-cases/Stock/stock-transaction.use-cases";
+import { StockReportRepositoryImpl } from "../../../infrastructure/repositories/Stock/stock-report.repository.impl";
+import { StockReportUseCases } from "../../../application/use-cases/Stock/stock-report.use-cases";
+import { StockReportController } from "../controllers/Stock/stock-report.controller";
+import { StockReportRoutes } from "../routes/Stock/stock-report.routes";
+import { UserController } from "../controllers/user.controller";
+import { UserRoutes } from "../routes/user.routes";
+import { AuthorizationMiddleware } from "../middlewares/authorization.middleware";
 import { OrderController } from "../controllers/Orders/order.controller";
 import { OrderRoutes } from "../routes/Orders/order.routes";
 import { OrderRepositoryImpl } from "../../../infrastructure/repositories/Orders/order.repository.impl";
@@ -108,15 +116,6 @@ import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { AuthRoutes } from "../routes/auth.routes";
 import { AuthUseCases } from "../../../application/use-cases/auth.use-case";
 import { UserRepositoryImpl } from "../../../infrastructure/repositories/user.repository.impl";
-import { UserController } from "../controllers/user.controller";
-import { UserRoutes } from "../routes/user.routes";
-import { StockReportController } from "../controllers/Stock/stock-report.controller";
-import { StockReportRoutes } from "../routes/Stock/stock-report.routes";
-import { StockReportRepositoryImpl } from "../../../infrastructure/repositories/Stock/stock-report.repository.impl";
-import { StockReportUseCases } from "../../../application/use-cases/Stock/stock-report.use-cases";
-import { AuthorizationMiddleware } from "../middlewares/authorization.middleware";
-import { IUserRepository } from "@domain/repositories/user.repository.interface";
-import rateLimit from "express-rate-limit";
 export class Server {
   private app: express.Application;
   private readonly PORT: number;
@@ -153,18 +152,71 @@ export class Server {
 
   private setupHealthCheck(): void {
     this.app.get("/health", async (req, res) => {
-      const db = await AppDataSource.query("select 1")
-        .then(() => "connected")
-        .catch(() => "disconnected");
-      res
-        .status(200)
-        .json({
-          status: "OK",
-          message: "Goha Restaurant Cafe System is running",
+      try {
+        // Check database connection
+        let db = "disconnected";
+        let dbError = null;
+        try {
+          await AppDataSource.query("SELECT 1");
+          db = "connected";
+        } catch (error) {
+          console.error("Health check database error:", error);
+          dbError = error instanceof Error ? error.message : "Unknown database error";
+          db = "disconnected";
+        }
+
+        // Check if critical tables exist
+        let tablesStatus = "unknown";
+        let tablesError = null;
+        if (db === "connected") {
+          try {
+            await AppDataSource.query("SELECT 1 FROM users LIMIT 1");
+            await AppDataSource.query("SELECT 1 FROM permissions LIMIT 1");
+            tablesStatus = "ready";
+          } catch (error) {
+            console.error("Health check tables error:", error);
+            tablesError = error instanceof Error ? error.message : "Unknown table error";
+            tablesStatus = "tables_missing";
+          }
+        } else {
+          tablesStatus = "database_disconnected";
+        }
+
+        const isHealthy = db === "connected" && tablesStatus === "ready";
+        
+        const healthData = {
+          status: isHealthy ? "OK" : "UNHEALTHY",
+          message: "Goha Restaurant Cafe System",
           timestamp: new Date().toISOString(),
-          database: db,
+          database: {
+            status: db,
+            error: dbError,
+          },
+          tables: {
+            status: tablesStatus,
+            error: tablesError,
+          },
           version: process.env.npm_package_version || "1.0.0",
+          environment: process.env.NODE_ENV || "development",
+          uptime: Math.floor(process.uptime()),
+          memory: {
+            used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+            total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+          },
+        };
+        
+        res
+          .status(isHealthy ? 200 : 503)
+          .json(healthData);
+      } catch (error) {
+        console.error("Health check error:", error);
+        res.status(503).json({
+          status: "ERROR",
+          message: "Health check failed",
+          error: error instanceof Error ? error.message : "Unknown error",
+          timestamp: new Date().toISOString(),
         });
+      }
     });
   }
 
@@ -175,7 +227,7 @@ export class Server {
         throw new Error("Database connection not initialized");
       }
 
-      console.log("📦 Getting TypeORM repositories...");
+      console.log("Getting TypeORM repositories...");
       // Get TypeORM repositories
       const categoryRepo = AppDataSource.getRepository(Category);
       const categoryExtraRepo = AppDataSource.getRepository(CategoryExtra);
@@ -331,16 +383,16 @@ export class Server {
       }
       
       const userRepository = new UserRepositoryImpl(userRepo);
-      console.log("✅ User repository created");
+      console.log("User repository created");
       
       const authUseCases = new AuthUseCases(userRepository);
-      console.log("✅ Auth use cases created");
+      console.log("Auth use cases created");
       
       const authController = new AuthController(authUseCases);
-      console.log("✅ Auth controller created");
+      console.log("Auth controller created");
       
       const authRoutes = new AuthRoutes(authController);
-      console.log("✅ Auth routes created");
+      console.log("Auth routes created");
 
       // Setup ShiftWorker module
       const shiftWorkerRepository = new ShiftWorkerRepositoryImpl(
@@ -607,31 +659,87 @@ export class Server {
 
   public async start(): Promise<void> {
     try {
-      // Validate environment variables
       if (!process.env.DATABASE_URL) {
-        console.warn("⚠️ DATABASE_URL not set, using default connection settings");
+        console.error("DATABASE_URL environment variable is required");
+        throw new Error("DATABASE_URL is required");
       }
       
-      console.log("🔗 Initializing database connection...");
-      await AppDataSource.initialize();
-      console.log("✅ Database connected successfully");
+      console.log("Initializing database connection...");
+      
+      const maxRetries = 10;
+      let retryCount = 0;
+      
+      while (retryCount < maxRetries) {
+        try {
+          if (!AppDataSource.isInitialized) {
+            await AppDataSource.initialize();
+          }
+          console.log("Database connected successfully");
+          break;
+        } catch (error) {
+          retryCount++;
+          console.error(`Database connection attempt ${retryCount} failed:`, error);
+          
+          if (retryCount >= maxRetries) {
+            throw new Error(`Failed to connect to database after ${maxRetries} attempts`);
+          }
+          
+          const waitTime = Math.min(5000 + (retryCount * 2000), 30000); // Exponential backoff, max 30s
+          console.log(`Retrying database connection in ${waitTime/1000} seconds...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+      }
 
-      // Test database connectivity
+      if (process.env.NODE_ENV === "production") {
+        try {
+          console.log("Running database migrations...");
+          await AppDataSource.runMigrations();
+          console.log("Database migrations completed successfully");
+        } catch (migrationError) {
+          console.error("Migration failed:", migrationError);
+          console.log("Continuing startup despite migration warnings...");
+        }
+      }
+
       try {
         await AppDataSource.query("SELECT 1");
-        console.log("✅ Database connectivity test passed");
+        console.log("Database connectivity test passed");
       } catch (dbError) {
-        console.error("❌ Database connectivity test failed:", dbError);
+        console.error("Database connectivity test failed:", dbError);
         throw dbError;
       }
 
-      console.log("🏗️ Initializing application dependencies...");
+      let tablesExist = false;
+      const tableCheckRetries = 5;
+      for (let i = 0; i < tableCheckRetries; i++) {
+        try {
+          await AppDataSource.query("SELECT 1 FROM users LIMIT 1");
+          await AppDataSource.query("SELECT 1 FROM permissions LIMIT 1");
+          console.log("Database tables verified");
+          tablesExist = true;
+          break;
+        } catch (tableError) {
+          console.error(`Database tables check attempt ${i + 1} failed:`, tableError);
+          if (i === tableCheckRetries - 1) {
+            console.error("Database tables not found or inaccessible after all retries");
+            console.log("This might indicate that migrations haven't run yet");
+            throw new Error("Database tables not found - please ensure migrations have run");
+          }
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+      }
+
+      if (!tablesExist) {
+        throw new Error("Database tables verification failed");
+      }
+
+      console.log("Initializing application dependencies...");
       const dependencies = this.initializeDependencies();
-      console.log("✅ Application dependencies initialized");
+      console.log("Application dependencies initialized");
 
       this.setupSwagger();
       this.setupRoutes(dependencies);
-      console.log("✅ Routes configured");
+      console.log("Routes configured");
 
       this.setupErrorHandlers();
       this.gracefulShutdown();
@@ -642,9 +750,12 @@ export class Server {
         );
         console.log(`Swagger: http://localhost:${this.PORT}/api-docs`);
         console.log(`Health: http://localhost:${this.PORT}/health`);
+        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`Process ID: ${process.pid}`);
       });
     } catch (error) {
       console.error("Failed to start application:", error);
+      console.error("Stack trace:", error instanceof Error ? error.stack : 'No stack trace');
       await this.shutdown();
     }
   }

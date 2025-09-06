@@ -28,15 +28,11 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies and ts-node for seeding
-RUN npm ci --only=production --silent && \
-    npm install ts-node @types/node @types/bcrypt typescript --save --silent && \
-    npm cache clean --force
+# Install only production dependencies
+RUN npm ci --only=production --silent && npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/start.sh ./start.sh
 COPY --from=builder /app/init-db.sql ./init-db.sql
 
@@ -59,4 +55,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
 # Start the application using our startup script
-CMD ["sh", "start.sh"]
+CMD ["sudo", "sh", "start.sh"]

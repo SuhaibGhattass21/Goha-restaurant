@@ -29,7 +29,7 @@ export class CategorySizeRepositoryImpl implements ICategorySizeRepository {
     })
 
     const savedSize = await this.categorySizeRepository.save(size)
-    console.log("✅ Created size:", savedSize)
+    console.log("Created size:", savedSize)
     return savedSize
   }
 
