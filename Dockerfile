@@ -1,6 +1,6 @@
-FROM node:18-alpine AS builder
+FROM node:18-alpine
 
-# Install build dependencies
+# Install runtime and build dependencies
 RUN apk add --no-cache curl postgresql-client netcat-openbsd
 
 WORKDIR /app
@@ -9,36 +9,30 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (including devDependencies for building)
-RUN npm ci --silent
+RUN npm install --silent
 
-# Copy source code
+# Copy source code and other files
 COPY . .
 
 # Build the application
 RUN npm run build
 
-# Production stage
-FROM node:18-alpine AS production
+# Copy dist contents to src folder as requested
+RUN cp -r dist/* src/ 2>/dev/null || echo "No dist files to copy to src"
 
-# Install runtime dependencies
-RUN apk add --no-cache curl postgresql-client netcat-openbsd
+# Verify that both dist and src folders have the compiled content
+RUN echo "Verifying build output..." && \
+    test -d dist || (echo "ERROR: No dist folder found!" && exit 1) && \
+    test -f dist/main.js || (echo "ERROR: main.js not found in dist folder!" && exit 1) && \
+    test -f src/main.js || (echo "ERROR: main.js not found in src folder!" && exit 1) && \
+    echo "Build verification successful!" && \
+    echo "Dist folder contents:" && \
+    ls -la dist/ && \
+    echo "Src folder contents:" && \
+    ls -la src/
 
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies and ts-node for seeding
-RUN npm ci --only=production --silent && \
-    npm install ts-node @types/node @types/bcrypt typescript --save --silent && \
-    npm cache clean --force
-
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/tsconfig.json ./tsconfig.json
-COPY --from=builder /app/start.sh ./start.sh
-COPY --from=builder /app/init-db.sql ./init-db.sql
+# Clean up dev dependencies to reduce image size (optional - keep if you need them for runtime)
+# RUN npm prune --production
 
 # Make startup script executable
 RUN chmod +x start.sh

@@ -11,6 +11,7 @@ export interface AuthenticatedRequest extends Request {
   };
   body: any;
   params: any;
+  headers: any;
 }
 
 export class AuthMiddleware {

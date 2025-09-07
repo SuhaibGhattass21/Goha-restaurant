@@ -29,49 +29,41 @@ import {
 
 dotenv.config();
 
+// Use only compiled JS files for entities and migrations in production
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL || "",
   synchronize: false, 
   logging: process.env.NODE_ENV === "development" ? ["query", "error"] : ["error"],
-  // Always include both src (ts) and dist (js) so migrations are discovered whether
-  // we run with ts-node or with compiled JS.
-  migrations: [
-    "src/infrastructure/database/postgres/migrations/*.{ts,js}",
-    "dist/infrastructure/database/postgres/migrations/*.{ts,js}",
-  ],
-  // Keep runtime entities for dev via classes; production runtime uses compiled JS.
-  entities: 
-    process.env.NODE_ENV === "production"
-      ? [
-          "dist/infrastructure/database/models/*.js",
-          // Also include src for ts-node-based tooling in production scripts (e.g., seeding)
-          "src/infrastructure/database/models/*.ts",
-        ]
-      : [
-          User,
-          Product,
-          Category,
-          CategorySize,
-          ProductSizePrice,
-          CategoryExtra,
-          Order,
-          OrderItem,
-          Shift,
-          StockItem,
-          StockTransaction,
-          OrderItemExtra,
-          ShiftWorker,
-          Supplier,
-          SupplierInvoice,
-          SupplierPayment,
-          ExternalReceipt,
-          Permissions,
-          UserPermission,
-          Worker,
-          CancelledOrder,
-          Expense,
-        ],
+  migrations: process.env.NODE_ENV === "production"
+    ? ["dist/infrastructure/database/postgres/migrations/*.js"]
+    : ["src/infrastructure/database/postgres/migrations/*.ts"],
+  entities: process.env.NODE_ENV === "production"
+    ? ["dist/infrastructure/database/models/*.js"]
+    : [
+        User,
+        Product,
+        Category,
+        CategorySize,
+        ProductSizePrice,
+        CategoryExtra,
+        Order,
+        OrderItem,
+        Shift,
+        StockItem,
+        StockTransaction,
+        OrderItemExtra,
+        ShiftWorker,
+        Supplier,
+        SupplierInvoice,
+        SupplierPayment,
+        ExternalReceipt,
+        Permissions,
+        UserPermission,
+        Worker,
+        CancelledOrder,
+        Expense,
+      ],
   subscribers: [],
   migrationsRun: false, 
   extra: {

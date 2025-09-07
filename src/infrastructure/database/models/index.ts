@@ -12,11 +12,11 @@ export { ShiftWorker } from "./ShiftWorker.model";
 export { StockItem } from "./StockItem.model";
 export { StockTransaction } from "./StockTransaction.model";
 export { Supplier } from "./Supplier.model";
-export { SupplierInvoice } from "./SupplierInvoices.model"
+export { SupplierInvoice } from "./SupplierInvoices.model";
 export { SupplierPayment } from "./SupplierPayments.model";
 export { User } from "./user.model";
 export { Permissions } from "./permissions.model";
 export { UserPermission } from "./userPermissions.model";
 export { Worker } from "./Worker.model";
 export { CancelledOrder } from "./CancelledOrder.model";
-export { Expense } from "./Expense.model"
+export { Expense } from "./Expense.model";

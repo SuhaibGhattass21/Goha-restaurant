@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import 'reflect-metadata';
-import { AppDataSource } from '../src/infrastructure/database/postgres/db.js';
+// Use compiled DataSource in production/container
+import { AppDataSource } from '../dist/infrastructure/database/postgres/db.js';
 
 async function runMigrations() {
   try {

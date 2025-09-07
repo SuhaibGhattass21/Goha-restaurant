@@ -151,7 +151,7 @@ export class Server {
 
 
   private setupHealthCheck(): void {
-    this.app.get("/health", async (req, res) => {
+    this.app.get("/health", async (req: express.Request, res: express.Response) => {
       try {
         // Check database connection
         let db = "disconnected";
