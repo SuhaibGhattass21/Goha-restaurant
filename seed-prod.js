@@ -38,7 +38,7 @@ if (fs.existsSync("./dist")) {
   console.log("dist directory does not exist");
 }
 
-let AppDataSource, User, Permissions;
+let AppDataSource, User, Permissions, UserPermission;
 
 try {
   // Try different require paths
@@ -52,6 +52,7 @@ try {
   console.log("Models module loaded successfully:", Object.keys(modelsModule));
   User = modelsModule.User;
   Permissions = modelsModule.Permissions;
+  UserPermission = modelsModule.UserPermission;
   
 } catch (error) {
   console.error("Failed to load modules:", error.message);
@@ -63,6 +64,7 @@ try {
     const models = require("./dist/infrastructure/database/models");
     User = models.User;
     Permissions = models.Permissions;
+    UserPermission = models.UserPermission;
   } catch (altError) {
     console.error("Alternative paths also failed:", altError.message);
     process.exit(1);
@@ -81,6 +83,7 @@ async function seedDatabase() {
 
     const userRepository = AppDataSource.getRepository(User);
     const permissionRepository = AppDataSource.getRepository(Permissions);
+    const userPermissionRepository = AppDataSource.getRepository(UserPermission);
 
     // Check if admin user already exists
     const existingAdmin = await userRepository.findOne({
@@ -98,10 +101,15 @@ async function seedDatabase() {
       { name: "access:users", description: "Access to user management" },
       { name: "access:permissions", description: "Access to permission management" },
       { name: "access:cashier", description: "Access to cashier features" },
+      { name: "access:category", description: "Access to category management" },
+      { name: "access:products", description: "Access to product management" },
+      { name: "access:shift", description: "Access to shift management" },
+      { name: "access:workers", description: "Access to worker management" },
       { name: "access:stock", description: "Access to stock management" },
       { name: "access:orders", description: "Access to order management" },
       { name: "access:expenses", description: "Access to expense management" },
       { name: "access:reports", description: "Access to reports" },
+      { name: "shift:summary", description: "Access to shift summary features" },
     ];
 
     console.log("Creating default permissions...");
@@ -135,6 +143,27 @@ async function seedDatabase() {
     await userRepository.save(adminUser);
     console.log("  ✓ Created admin user (username: admin, password: admin123)");
     console.log("   Please change the default password after first login!");
+
+    // Assign OWNER_ACCESS permission to admin user
+    console.log("Assigning OWNER_ACCESS permission to admin user...");
+    const ownerAccessPermission = await permissionRepository.findOne({
+      where: { name: "OWNER_ACCESS" }
+    });
+
+    if (ownerAccessPermission) {
+      const userPermission = userPermissionRepository.create({
+        user: adminUser,
+        permission: ownerAccessPermission,
+        granted_by: adminUser, // Self-granted for initial setup
+        granted_at: new Date(),
+        is_revoked: false
+      });
+
+      await userPermissionRepository.save(userPermission);
+      console.log("  ✓ Assigned OWNER_ACCESS permission to admin user");
+    } else {
+      console.log("  ⚠ OWNER_ACCESS permission not found, skipping assignment");
+    }
 
     console.log("Database seeding completed successfully");
     
