@@ -30,7 +30,7 @@ export class CategoryExtraRepositoryImpl implements ICategoryExtraRepository {
     })
 
     const savedExtra = await this.categoryExtraRepository.save(extra)
-    console.log("✅ Created extra:", savedExtra)
+    console.log("Created extra:", savedExtra)
     return savedExtra
   }
 

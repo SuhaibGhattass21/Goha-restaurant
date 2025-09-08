@@ -7,7 +7,7 @@ export class AuthController {
         if (!authUseCases) {
             throw new Error("AuthUseCases is required for AuthController");
         }
-        console.log("✅ Auth controller initialized successfully");
+        console.log("Auth controller initialized successfully");
     }
 
     async login(req: Request, res: Response): Promise<void> {

@@ -1,11 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
-
-// Load environment variables first
-dotenv.config();
-
-// Import models after reflect-metadata and dotenv
 import {
   Category,
   CategoryExtra,
@@ -31,41 +26,50 @@ import {
   Expense,
 } from "../models";
 
+
+dotenv.config();
+
+// Use only compiled JS files for entities and migrations in production
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL || "",
-  synchronize: process.env.NODE_ENV === "development",
-  logging: process.env.NODE_ENV === "development",
-  migrations: [
-    process.env.NODE_ENV === "production"
-      ? "dist/infrastructure/database/postgres/migrations/*.js"
-      : "src/infrastructure/database/postgres/migrations/*.ts",
-  ],
-  entities: [
-    User,
-    Product,
-    Category,
-    CategorySize,
-    ProductSizePrice,
-    CategoryExtra,
-    Order,
-    OrderItem,
-    Shift,
-    StockItem,
-    StockTransaction,
-    OrderItemExtra,
-    ShiftWorker,
-    Supplier,
-    SupplierInvoice,
-    SupplierPayment,
-    ExternalReceipt,
-    User,
-    Permissions,
-    UserPermission,
-    Worker,
-    CancelledOrder,
-    Expense,
-  ],
+  synchronize: false, 
+  logging: process.env.NODE_ENV === "development" ? ["query", "error"] : ["error"],
+  migrations: process.env.NODE_ENV === "production"
+    ? ["dist/infrastructure/database/postgres/migrations/*.js"]
+    : ["src/infrastructure/database/postgres/migrations/*.ts"],
+  entities: process.env.NODE_ENV === "production"
+    ? ["dist/infrastructure/database/models/*.js"]
+    : [
+        User,
+        Product,
+        Category,
+        CategorySize,
+        ProductSizePrice,
+        CategoryExtra,
+        Order,
+        OrderItem,
+        Shift,
+        StockItem,
+        StockTransaction,
+        OrderItemExtra,
+        ShiftWorker,
+        Supplier,
+        SupplierInvoice,
+        SupplierPayment,
+        ExternalReceipt,
+        Permissions,
+        UserPermission,
+        Worker,
+        CancelledOrder,
+        Expense,
+      ],
   subscribers: [],
-  migrationsRun: process.env.NODE_ENV === "production",
+  migrationsRun: false, 
+  extra: {
+    connectionTimeoutMillis: 30000,
+    idleTimeoutMillis: 30000,
+    max: 20,
+    ssl: process.env.DATABASE_SSL === "true" ? { rejectUnauthorized: false } : false,
+  },
 });

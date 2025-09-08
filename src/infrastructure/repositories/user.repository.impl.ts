@@ -13,7 +13,7 @@ export class UserRepositoryImpl implements IUserRepository {
             throw new Error("Invalid repository provided - missing findOne method");
         }
         
-        console.log("✅ UserRepositoryImpl initialized successfully");
+        console.log("UserRepositoryImpl initialized successfully");
     }
     create(data: User): Promise<User> {
         const user = this.userRepository.create(data);
