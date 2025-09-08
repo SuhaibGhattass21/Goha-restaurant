@@ -68,7 +68,7 @@ export class UpdateShiftWorkerEndDto {
 
     @IsDate()
     @Type(() => Date)
-    end_time!: Date;
+    end_time: Date = new Date();
 }
 
 export class ShiftWorkerIdParamDto { @IsUUID() id!: string }
