@@ -38,6 +38,7 @@ export class ShiftWorkerUseCase {
             shift_worker_id: entity.shift_worker_id,
             shift_id: entity.shift?.shift_id,
             worker_id: entity.worker?.worker_id,
+            worker_name: entity.worker?.name,
             status: entity.status?.status,
             hourly_rate: entity.hourly_rate,
             start_time: entity.start_time,

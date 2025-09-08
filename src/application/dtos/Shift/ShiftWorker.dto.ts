@@ -6,7 +6,8 @@ import {
     IsEnum,
     Min,
     IsArray,
-    ValidateNested
+    ValidateNested,
+    IsString
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { WorkerStatus } from '../../../domain/enums/Worker.enums';
@@ -82,6 +83,9 @@ export class ShiftWorkerResponseDto {
 
     @IsUUID()
     worker_id!: string;
+
+    @IsString()
+    worker_name!: string;
 
     @IsEnum(WorkerStatus)
     status!: WorkerStatus;
