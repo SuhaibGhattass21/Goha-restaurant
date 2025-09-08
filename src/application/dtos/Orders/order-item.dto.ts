@@ -3,7 +3,7 @@ import { Type } from "class-transformer"
 
 export class CreateOrderItemDto {
   @IsUUID()
-  order_id!: string
+  order_id?: string
 
   @IsUUID()
   product_size_id!: string

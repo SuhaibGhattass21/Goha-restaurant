@@ -322,7 +322,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
 
     const total = order.items.reduce((orderTotal, item) => {
       const itemTotal = Number(item.unit_price) * item.quantity
-      const extrasTotal = item.extras?.reduce((sum, extra) => sum + Number(extra.price), 0) || 0
+      const extrasTotal = item.extras?.reduce((sum, extra) => sum + (Number(extra.price) * Number(extra.quantity || 1)), 0) || 0
       return orderTotal + itemTotal + extrasTotal
     }, 0)
 

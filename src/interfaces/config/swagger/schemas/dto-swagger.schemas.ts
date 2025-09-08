@@ -308,6 +308,37 @@ export const swaggerSchemas = {
         },
     },
 
+    RegisterDto: {
+        type: "object",
+        required: ["username", "password", "fullName", "hourRate"],
+        properties: {
+            username: {
+                type: "string",
+                format: "username",
+                description: "User's email address",
+                example: "ysn",
+            },
+            password: {
+                type: "string",
+                format: "password",
+                description: "User's password",
+                example: "009opoP",
+            },
+            fullName: {
+                type: "string",
+                format: "fullName",
+                description: "User's full name",
+                example: "yassin",
+            },
+            hourRate: {
+                type: "number",
+                format: "hourRate",
+                description: "",
+                example: 200,
+            }
+        },
+    },
+
     CreateUserDTO: {
         type: "object",
         required: ["username", "fullName", "password"],

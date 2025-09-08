@@ -17,7 +17,18 @@ export const swaggerOptions: swaggerJSDoc.Options = {
         ],
         components: {
             schemas: swaggerSchemas,
-        }
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                    description: 'Enter your JWT token in the format "Bearer {token}"'
+                }
+            }
+        },
+        security: [{
+            bearerAuth: []
+        }]
     },
     apis: [
         './src/interfaces/config/swagger/schemas/*.ts',

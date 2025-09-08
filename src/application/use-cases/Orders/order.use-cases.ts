@@ -12,7 +12,7 @@ import type {
   FilterOrdersByShiftTypeAndDateDto,
   CancelOrderDto,
 } from "../../../application/dtos/Orders/order.dto"
-import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums" 
+import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums"
 import type { CancelledOrderUseCases } from "./cancelled-order.use-cases"
 
 export class OrderUseCases {
@@ -71,7 +71,7 @@ export class OrderUseCases {
     return orders.map((order) => this.mapToSummaryDto(order))
   }
 
-    async getOrdersByShiftIdCafe(shiftId: string): Promise<OrderSummaryDto[]> {
+  async getOrdersByShiftIdCafe(shiftId: string): Promise<OrderSummaryDto[]> {
     const orders = await this.orderRepository.findByShiftIdCafe(shiftId)
     return orders.map((order) => this.mapToSummaryDto(order))
   }
@@ -124,7 +124,7 @@ export class OrderUseCases {
     return this.orderRepository.getOrdersByShiftTypeAndDate(dto.shift_type, dto.date);
   }
 
-    async getAllOrdersExceptCafe(page = 1, limit = 10): Promise<OrderListResponseDto> {
+  async getAllOrdersExceptCafe(page = 1, limit = 10): Promise<OrderListResponseDto> {
     const { orders, total } = await this.orderRepository.findAllExceptCafe(page, limit)
 
     return {
@@ -166,7 +166,7 @@ export class OrderUseCases {
         order_id: order.order_id,
         cancelled_by: order.cashier.id,
         shift_id: order.shift.shift_id,
-        reason: "Order status changed to CANCELLED automatically", 
+        reason: "Order status changed to CANCELLED automatically",
       })
     }
     if (order) {
@@ -238,7 +238,7 @@ export class OrderUseCases {
 
     // Recalculate order total
     await this.orderRepository.calculateOrderTotal(cancelOrderData.order_id)
-    
+
     // Get the complete updated order
     const completeOrder = await this.orderRepository.findById(cancelOrderData.order_id)
     if (!completeOrder) {
@@ -255,7 +255,7 @@ export class OrderUseCases {
     return await this.orderRepository.getOrderStats(shiftId, startDate, endDate)
   }
 
-    async getOrderStatsCafe(shiftId?: string, startDate?: Date, endDate?: Date): Promise<OrderStatsDto> {
+  async getOrderStatsCafe(shiftId?: string, startDate?: Date, endDate?: Date): Promise<OrderStatsDto> {
     return await this.orderRepository.getOrderStatsCafe(shiftId, startDate, endDate)
   }
 
@@ -278,7 +278,7 @@ export class OrderUseCases {
         ? {
           shift_id: order.shift.shift_id,
           shift_type: order.shift.shift_type,
-          start_time: order.shift.start_time?.toISOString() || "", 
+          start_time: order.shift.start_time?.toISOString() || "",
           status: order.shift.status,
         }
         : undefined,
@@ -288,7 +288,7 @@ export class OrderUseCases {
       total_price: Number(order.total_price),
       customer_name: order.customer_name,
       customer_phone: order.customer_phone,
-      created_at: order.created_at?.toISOString() || "", 
+      created_at: order.created_at?.toISOString() || "",
       items: order.items?.map((item) => this.mapItemToResponseDto(item)) || [],
       items_count: order.items?.length || 0,
     }
@@ -307,47 +307,48 @@ export class OrderUseCases {
     }
   }
 
- private mapItemToResponseDto(item: any): any {
-  const basePrice = Number(item.unit_price) * item.quantity
-  const extrasPrice = item.extras?.reduce((sum: number, extra: any) => sum + Number(extra.price), 0) || 0
-  const totalPrice = basePrice + extrasPrice
-  
-  const product = item.product_size?.product
-  const category = product?.category
+  private mapItemToResponseDto(item: any): any {
+    const basePrice = Number(item.unit_price) * item.quantity
+    const extrasPrice = item.extras?.reduce((sum: number, extra: any) => sum + Number(extra.price), 0) || 0
+    const totalPrice = basePrice + extrasPrice
 
-  return {
-    order_item_id: item.order_item_id,
-    order_id: item.order?.order_id || "",
-    product_size: item.product_size
-      ? {
+    const product = item.product_size?.product
+    const category = product?.category
+
+    return {
+      order_item_id: item.order_item_id,
+      order_id: item.order?.order_id || "",
+      product_size: item.product_size
+        ? {
           product_size_id: item.product_size.product_size_id,
           product_name: product?.name || "",
           size_name: item.product_size.size?.size_name || "",
           price: Number(item.product_size.price),
-          category_name: category?.name || "", 
+          category_name: category?.name || "",
           product_description: product?.description || "",
           category_description: category?.description || "",
         }
-      : undefined,
-    quantity: item.quantity,
-    unit_price: Number(item.unit_price),
-    special_instructions: item.special_instructions,
-    category_id: category?.category_id || "",  
-    category_name: category?.name || "",        
-    extras:
-      item.extras?.map((extra: any) => ({
-        order_item_extra_id: extra.order_item_extra_id,
-        order_item_id: extra.orderItem?.order_item_id || "",
-        extra: extra.extra
-          ? {
+        : undefined,
+      quantity: item.quantity,
+      unit_price: Number(item.unit_price),
+      special_instructions: item.special_instructions,
+      category_id: category?.category_id || "",
+      category_name: category?.name || "",
+      extras:
+        item.extras?.map((extra: any) => ({
+          order_item_extra_id: extra.order_item_extra_id,
+          order_item_id: extra.orderItem?.order_item_id || "",
+          extra: extra.extra
+            ? {
               extra_id: extra.extra.extra_id,
               name: extra.extra.name,
               price: Number(extra.extra.price),
             }
-          : undefined,
-        price: Number(extra.price),
-      })) || [],
-    total_price: Number(totalPrice.toFixed(2)),
+            : undefined,
+          quantity: Number(extra.quantity || 1),
+          price: Number(extra.price),
+        })) || [],
+      total_price: Number(totalPrice.toFixed(2)),
+    }
   }
-}
 }

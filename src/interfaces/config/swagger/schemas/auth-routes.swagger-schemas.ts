@@ -46,17 +46,20 @@
  *           schema:
  *             type: object
  *             properties:
- *               email:
+ *               username:
  *                 type: string
- *                 format: email
+ *                 format: username
  *                 description: User's email address
  *               password:
  *                 type: string
  *                 format: password
  *                 description: User's password
- *               name:
+ *               fullName:
  *                 type: string
  *                 description: User's full name
+ *               hourRate:
+ *                 type: string
+ *                 description: User's password   
  *     responses:
  *       201:
  *         description: User successfully registered

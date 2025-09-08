@@ -18,7 +18,7 @@ export class OrderItemUseCases {
 
   async createOrderItem(orderItemData: CreateOrderItemDto): Promise<OrderItemResponseDto> {
     const orderItem = await this.orderItemRepository.create({
-      order_id: orderItemData.order_id,
+      order_id: orderItemData.order_id || "",
       product_size_id: orderItemData.product_size_id,
       quantity: orderItemData.quantity,
       unit_price: orderItemData.unit_price,
