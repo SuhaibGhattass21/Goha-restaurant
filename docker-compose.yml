@@ -4,7 +4,7 @@ services:
       context: .
       target: production
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - PORT=3000
       - NODE_ENV=production
@@ -32,6 +32,9 @@ services:
           memory: 256M
     networks:
       - app-network
+    volumes:
+      # Mount scripts for emergency recovery (optional)
+      - ./scripts:/app/scripts:ro
   db:
     image: postgres:15
     ports:
