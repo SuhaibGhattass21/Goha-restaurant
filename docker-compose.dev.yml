@@ -1,0 +1,20 @@
+# Docker Compose override for development
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  app:
+    build:
+      target: builder  
+    volumes:
+      - ./src:/app/src  
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]
+    
+  db:
+    ports:
+      - "5433:5432"  
+    environment:
+      - POSTGRES_DB=goha_restaurant_dev

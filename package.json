@@ -15,6 +15,8 @@
     "schema:drop": "typeorm-ts-node-commonjs schema:drop -d ./src/infrastructure/database/postgres/db.ts",
     "seed": "ts-node src/infrastructure/database/postgres/seed.ts",
     "seed:prod": "NODE_ENV=production node seed-prod.js",
+    "verify:tables": "node scripts/verify-tables.js",
+    "db:recovery": "node scripts/emergency-db-recovery.js",
     "test": "jest --config jest.config.js",
     "test:watch": "jest --watch --config jest.config.js",
     "test:coverage": "jest --coverage --config jest.config.js",

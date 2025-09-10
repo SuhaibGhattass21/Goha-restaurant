@@ -168,15 +168,30 @@ export class Server {
         // Check if critical tables exist
         let tablesStatus = "unknown";
         let tablesError = null;
+        let missingTables = [];
+        
         if (db === "connected") {
           try {
-            await AppDataSource.query("SELECT 1 FROM users LIMIT 1");
-            await AppDataSource.query("SELECT 1 FROM permissions LIMIT 1");
-            tablesStatus = "ready";
+            const criticalTables = ['users', 'permissions', 'categories', 'products', 'orders'];
+            
+            for (const table of criticalTables) {
+              try {
+                await AppDataSource.query(`SELECT 1 FROM ${table} LIMIT 1`);
+              } catch (tableErr) {
+                missingTables.push(table);
+              }
+            }
+            
+            if (missingTables.length === 0) {
+              tablesStatus = "ready";
+            } else {
+              tablesStatus = "tables_missing";
+              tablesError = `Missing tables: ${missingTables.join(', ')}`;
+            }
           } catch (error) {
             console.error("Health check tables error:", error);
             tablesError = error instanceof Error ? error.message : "Unknown table error";
-            tablesStatus = "tables_missing";
+            tablesStatus = "tables_error";
           }
         } else {
           tablesStatus = "database_disconnected";
@@ -695,9 +710,16 @@ export class Server {
           console.log("Running database migrations...");
           await AppDataSource.runMigrations();
           console.log("Database migrations completed successfully");
+          
+          // Additional verification after migrations
+          console.log("Verifying migration results...");
+          await AppDataSource.query("SELECT 1 FROM users LIMIT 1");
+          await AppDataSource.query("SELECT 1 FROM permissions LIMIT 1");
+          console.log("Migration verification completed successfully");
+          
         } catch (migrationError) {
-          console.error("Migration failed:", migrationError);
-          console.log("Continuing startup despite migration warnings...");
+          console.error("Migration or verification failed:", migrationError);
+          throw new Error(`Database setup failed: ${migrationError instanceof Error ? migrationError.message : 'Unknown migration error'}`);
         }
       }
 
@@ -710,22 +732,40 @@ export class Server {
       }
 
       let tablesExist = false;
-      const tableCheckRetries = 5;
+      const tableCheckRetries = 3;
+      const essentialTables = ['users', 'permissions', 'user_permissions', 'categories', 'products'];
+      
       for (let i = 0; i < tableCheckRetries; i++) {
         try {
-          await AppDataSource.query("SELECT 1 FROM users LIMIT 1");
-          await AppDataSource.query("SELECT 1 FROM permissions LIMIT 1");
-          console.log("Database tables verified");
+          console.log(`Database table verification attempt ${i + 1}/${tableCheckRetries}...`);
+          
+          // Check multiple essential tables 
+          for (const table of essentialTables) {
+            await AppDataSource.query(`SELECT 1 FROM ${table} LIMIT 1`);
+          }
+          
+          console.log("All essential database tables verified successfully");
           tablesExist = true;
           break;
         } catch (tableError) {
           console.error(`Database tables check attempt ${i + 1} failed:`, tableError);
+          
           if (i === tableCheckRetries - 1) {
             console.error("Database tables not found or inaccessible after all retries");
-            console.log("This might indicate that migrations haven't run yet");
-            throw new Error("Database tables not found - please ensure migrations have run");
+            console.log("This indicates that migrations haven't run successfully or database schema is corrupted");
+            
+            // Log more specific error information
+            if (tableError instanceof Error) {
+              if (tableError.message.includes('relation') && tableError.message.includes('does not exist')) {
+                const tableName = tableError.message.match(/relation "([^"]+)"/)?.[1] || 'unknown';
+                console.error(`Missing table: ${tableName}`);
+                console.log("Suggested fix: Ensure migrations run successfully before starting the application");
+              }
+            }
+            
+            throw new Error(`Essential database tables not found: ${tableError instanceof Error ? tableError.message : 'Unknown table error'}`);
           }
-          await new Promise(resolve => setTimeout(resolve, 5000));
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
 
