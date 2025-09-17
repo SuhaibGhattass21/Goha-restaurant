@@ -14,6 +14,7 @@ import type {
 } from "../../../application/dtos/Orders/order.dto"
 import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums"
 import type { CancelledOrderUseCases } from "./cancelled-order.use-cases"
+import { OrderItemExtra } from "@infrastructure/database/models"
 
 export class OrderUseCases {
   constructor(
@@ -309,7 +310,9 @@ export class OrderUseCases {
 
   private mapItemToResponseDto(item: any): any {
     const basePrice = Number(item.unit_price) * item.quantity
-    const extrasPrice = item.extras?.reduce((sum: number, extra: any) => sum + Number(extra.price), 0) || 0
+    const extrasPrice = item.extras?.reduce(
+      (sum, extra) => sum + Number(extra.price) * Number(extra.quantity || 1), 0
+    ) || 0
     const totalPrice = basePrice + extrasPrice
 
     const product = item.product_size?.product
@@ -335,7 +338,7 @@ export class OrderUseCases {
       category_id: category?.category_id || "",
       category_name: category?.name || "",
       extras:
-        item.extras?.map((extra: any) => ({
+        item.extras?.map((extra: OrderItemExtra) => ({
           order_item_extra_id: extra.order_item_extra_id,
           order_item_id: extra.orderItem?.order_item_id || "",
           extra: extra.extra

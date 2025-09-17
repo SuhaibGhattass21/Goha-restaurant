@@ -119,7 +119,7 @@ export class OrderItemUseCases {
         }
         : undefined,
       quantity: orderItem.quantity,
-      unit_price: Number(orderItem.unit_price),
+      unit_price: orderItem.unit_price,
       category_id: orderItem.product_size.product.category.category_id,
       category_name: orderItem.product_size.product.category.name,
       special_instructions: orderItem.special_instructions,
@@ -136,12 +136,12 @@ export class OrderItemUseCases {
         ? {
           extra_id: extra.extra.extra_id,
           name: extra.extra.name,
-          price: Number(extra.extra.price),
+          price: extra.extra.price,
           category_name: extra.extra.category?.name || "",
         }
         : undefined,
-      quantity: Number(extra.quantity) || 1,
-      price: Number(extra.price),
+      quantity: extra.quantity || 1,
+      price: extra.price,
     }
   }
 }
