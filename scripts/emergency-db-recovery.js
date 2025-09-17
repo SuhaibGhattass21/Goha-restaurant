@@ -13,7 +13,7 @@ console.log("");
 
 // Check if we're in production
 if (process.env.NODE_ENV === 'production') {
-  console.log("WARNING: You are running this in PRODUCTION mode!");
+  console.log("🚨 WARNING: You are running this in PRODUCTION mode!");
   console.log("This will delete all data and rebuild the database schema.");
   console.log("Make sure you have a backup before proceeding!");
   console.log("");
@@ -21,6 +21,19 @@ if (process.env.NODE_ENV === 'production') {
   if (!process.argv.includes('--force')) {
     console.log("To proceed in production, add --force flag:");
     console.log("node scripts/emergency-db-recovery.js --force");
+    process.exit(1);
+  }
+  
+  // Additional confirmation for production
+  console.log("⚠️  FINAL WARNING: This will permanently delete all production data!");
+  console.log("⚠️  Ensure you have created a database backup!");
+  console.log("⚠️  Type 'CONFIRM_DELETE' to proceed (case sensitive):");
+  
+  // In a real scenario, you'd use readline for input
+  // For now, require an additional flag for extra safety
+  if (!process.argv.includes('--confirm-delete')) {
+    console.log("❌ Production safety check failed. Add --confirm-delete flag to proceed.");
+    console.log("Usage: node scripts/emergency-db-recovery.js --force --confirm-delete");
     process.exit(1);
   }
 }

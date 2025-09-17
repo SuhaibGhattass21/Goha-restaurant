@@ -12,7 +12,7 @@ export class AuthController {
 
     async login(req: Request, res: Response): Promise<void> {
         try {
-            console.log("🔐 Login request received");
+            console.log("Login request received");
             
             if (!req.body) {
                 res.status(400).json({
