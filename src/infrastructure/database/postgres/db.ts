@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
+import { ProductionSafetyChecker } from "./production-safety";
 import {
   Category,
   CategoryExtra,
@@ -26,14 +27,17 @@ import {
   Expense,
 } from "../models";
 
-
 dotenv.config();
+
+// Verify production safety before creating DataSource
+ProductionSafetyChecker.verifyProductionSafety();
 
 // Use only compiled JS files for entities and migrations in production
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL || "",
-  synchronize: false, 
+  // Use production safety configuration
+  ...ProductionSafetyChecker.getSafeProductionConfig(),
   logging: process.env.NODE_ENV === "development" ? ["query", "error"] : ["error"],
   migrations: process.env.NODE_ENV === "production"
     ? ["dist/infrastructure/database/postgres/migrations/*.js"]
@@ -65,7 +69,6 @@ export const AppDataSource = new DataSource({
         Expense,
       ],
   subscribers: [],
-  migrationsRun: false, 
   extra: {
     connectionTimeoutMillis: 30000,
     idleTimeoutMillis: 30000,
