@@ -347,7 +347,6 @@ export class OrderUseCases {
   private mapExtraToResponseDto(extra: OrderItemExtra): any {
     return {
       order_item_extra_id: extra.order_item_extra_id,
-      order_item_id: extra.orderItem.order_item_id || "",
       extra: extra.extra
         ? {
           extra_id: extra.extra.extra_id,
