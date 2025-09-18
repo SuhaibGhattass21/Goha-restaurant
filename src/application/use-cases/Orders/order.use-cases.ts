@@ -322,7 +322,6 @@ export class OrderUseCases {
 
     return {
       order_item_id: item.order_item_id,
-      order_id: item.order?.order_id || "",   // <-- map from relation if available
       product_size: item.product_size
         ? {
           product_size_id: item.product_size.product_size_id,
