@@ -125,6 +125,7 @@ export class ShiftRepositoryImpl implements IShiftRepository {
         const cafeOrders = orders.filter(o => o.order_type === 'cafe');
 
         const totalOrders = orders.length;
+        const cancelledOrders = shift.cancelledOrders.length;
         const intial_balance = shift.initial_balance || 0;
         const totalRevenue = nonCafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
         const cafeRevenue = cafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
@@ -154,12 +155,12 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             start_time: shift.start_time,
             end_time: shift.end_time!,
             intial_balance: intial_balance,
-            total_orders: totalOrders,
+            total_orders: Number(totalOrders) - Number(cancelledOrders),
             total_revenue: totalRevenue,
             cafe_revenue: cafeRevenue,
             total_expenses: totalExpenses,
             total_salaries: totalSalaries,
-            final_number: (totalRevenue + intial_balance) - totalExpenses - totalSalaries,
+            final_number: (Number(totalRevenue.toFixed(2)) + Number(intial_balance.toFixed(2))) - Number(totalExpenses.toFixed(2)) - Number(totalSalaries.toFixed(2)),
             cashiers,
         };
     }
