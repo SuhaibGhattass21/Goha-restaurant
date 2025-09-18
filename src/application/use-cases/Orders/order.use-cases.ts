@@ -2,6 +2,7 @@ import type { IOrderRepository } from "@domain/repositories/Orders/order.reposit
 import type { IOrderItemRepository } from "@domain/repositories/Orders/order-item.repository.interface"
 import type { IOrderItemExtraRepository } from "@domain/repositories/Orders/order-item-extra.repository.interface"
 import type { Order } from "../../../infrastructure/database/models/Order.model"
+import { OrderItem } from "../../../infrastructure/database/models/OrderItem.model"
 import type {
   CreateOrderDto,
   OrderResponseDto,
@@ -12,9 +13,11 @@ import type {
   FilterOrdersByShiftTypeAndDateDto,
   CancelOrderDto,
 } from "../../../application/dtos/Orders/order.dto"
+import { OrderItemExtraResponseDto } from "../../../application/dtos/Orders/order-item.dto"
 import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums"
 import type { CancelledOrderUseCases } from "./cancelled-order.use-cases"
 import { OrderItemExtra } from "@infrastructure/database/models"
+import { OrderItemResponseDto } from "@application/dtos/Orders/order-item.dto"
 
 export class OrderUseCases {
   constructor(
@@ -308,50 +311,53 @@ export class OrderUseCases {
     }
   }
 
-  private mapItemToResponseDto(item: any): any {
-    const basePrice = Number(item.unit_price) * item.quantity
-    const extrasPrice = item.extras?.reduce(
-      (sum, extra) => sum + Number(extra.price) * Number(extra.quantity || 1), 0
-    ) || 0
-    const totalPrice = basePrice + extrasPrice
-
-    const product = item.product_size?.product
-    const category = product?.category
+  private mapItemToResponseDto(item: OrderItem): any {
+    const basePrice = Number(item.unit_price) * item.quantity;
+    const extrasPrice =
+      item.extras?.reduce(
+        (sum, extra) => sum + Number(extra.price) * Number(extra.quantity || 1),
+        0
+      ) || 0;
+    const totalPrice = basePrice + extrasPrice;
 
     return {
       order_item_id: item.order_item_id,
-      order_id: item.order?.order_id || "",
+      order_id: item.order?.order_id || "",   // <-- map from relation if available
       product_size: item.product_size
         ? {
           product_size_id: item.product_size.product_size_id,
-          product_name: product?.name || "",
-          size_name: item.product_size.size?.size_name || "",
+          product_name: item.product_size.product.name || "",
+          size_name: item.product_size.size.size_name || "",
           price: Number(item.product_size.price),
-          category_name: category?.name || "",
-          product_description: product?.description || "",
-          category_description: category?.description || "",
+          category_name: item.product_size.product.category.name || "",
+          product_description: item.product_size.product.description || "",
         }
         : undefined,
       quantity: item.quantity,
-      unit_price: Number(item.unit_price),
+      basePrice: Number(basePrice.toFixed(2)),
       special_instructions: item.special_instructions,
-      category_id: category?.category_id || "",
-      category_name: category?.name || "",
-      extras:
-        item.extras?.map((extra: OrderItemExtra) => ({
-          order_item_extra_id: extra.order_item_extra_id,
-          order_item_id: extra.orderItem?.order_item_id || "",
-          extra: extra.extra
-            ? {
-              extra_id: extra.extra.extra_id,
-              name: extra.extra.name,
-              price: Number(extra.extra.price),
-            }
-            : undefined,
-          quantity: Number(extra.quantity || 1),
-          price: Number(extra.price),
-        })) || [],
+      category_id: item.product_size.product.category.category_id,
+      category_name: item.product_size.product.category.name,
+      extras: item.extras?.map((extra) => this.mapExtraToResponseDto(extra)) || [],
+      extrasPrice: Number(extrasPrice.toFixed(2)),
       total_price: Number(totalPrice.toFixed(2)),
-    }
+    };
   }
+
+  private mapExtraToResponseDto(extra: OrderItemExtra): any {
+    return {
+      order_item_extra_id: extra.order_item_extra_id,
+      order_item_id: extra.orderItem?.order_item_id || "",
+      extra: extra.extra
+        ? {
+          extra_id: extra.extra.extra_id,
+          name: extra.extra.name,
+          price: Number(extra.extra.price),
+          category_name: extra.extra.category?.name || "",
+        }
+        : undefined,
+      quantity: extra.quantity || 1,
+    };
+  }
+
 }
