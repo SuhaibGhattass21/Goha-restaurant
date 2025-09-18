@@ -125,7 +125,7 @@ export class ShiftRepositoryImpl implements IShiftRepository {
         const cafeOrders = orders.filter(o => o.order_type === 'cafe');
 
         const totalOrders = orders.length;
-        const cancelledOrders = shift.cancelledOrders.length;
+        const cancelledOrders = (shift.cancelledOrders || []).length;
         const intial_balance = shift.initial_balance || 0;
         const totalRevenue = nonCafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
         const cafeRevenue = cafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
