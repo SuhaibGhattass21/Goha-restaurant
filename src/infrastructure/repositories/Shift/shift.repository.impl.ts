@@ -149,6 +149,9 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             username,
         }));
 
+        const totalEarned: number = Number(totalRevenue + intial_balance);
+        const totalExpensesMoney: number = Number(totalExpenses + totalSalaries)
+
         return {
             shift_id: shift.shift_id,
             shift_type: shift.shift_type,
@@ -160,7 +163,7 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             cafe_revenue: Number(cafeRevenue),
             total_expenses: Number(totalExpenses),
             total_salaries: Number(totalSalaries),
-            final_number: (totalRevenue + intial_balance) - totalExpenses - totalSalaries,
+            final_number: Number(totalEarned - totalExpensesMoney),
             cashiers,
         };
     }
