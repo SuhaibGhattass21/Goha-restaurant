@@ -12,10 +12,15 @@ import {
   UserPermission,
 } from "../../infrastructure/database/models";
 import { IUserRepository } from "../../domain/repositories/user.repository.interface";
+import { LoggerService } from "../../infrastructure/logger/logger.service";
+import { LoggingUtils } from "../../infrastructure/logger/utils/logging.utils";
+import { LogBusinessOperation } from "../../infrastructure/logger/decorators/log.decorator";
+
 export class AuthUseCases {
   private jwtSecret: string;
   private jwtExpiry: number;
   private bcryptRounds: number;
+  private logger: LoggerService;
 
   constructor(private userRepository: IUserRepository) {
     if (!userRepository) {
@@ -30,9 +35,13 @@ export class AuthUseCases {
     this.jwtSecret = process.env.JWT_SECRET || "c7btrc685v42c45v86c2";
     this.jwtExpiry = Number(process.env.JWT_EXPIRY) || 10000;
     this.bcryptRounds = parseInt(process.env.BCRYPT_ROUNDS || "12");
+    this.logger = LoggerService.getInstance();
   }
 
-  async login(loginData: LoginDto): Promise<AuthResponseDto> {
+  @LogBusinessOperation('USER', 'LOGIN_ATTEMPT')
+  async login(loginData: LoginDto, ipAddress?: string, userAgent?: string): Promise<AuthResponseDto> {
+    const traceId = LoggingUtils.generateCorrelationId();
+    
     try {
       if (!loginData) {
         throw new Error("Login data is required");
@@ -42,7 +51,19 @@ export class AuthUseCases {
         throw new Error("Username and password are required");
       }
 
-      console.log(`User ${JSON.stringify(loginData)} is attempting to log in`);
+      // Log login attempt
+      LoggingUtils.logAuthEvent(
+        'LOGIN_ATTEMPT',
+        loginData.username,
+        ipAddress || 'unknown',
+        userAgent
+      );
+
+      this.logger.info(`User attempting to log in`, {
+        component: 'AUTH_USE_CASE',
+        operation: 'LOGIN',
+        traceId
+      } as any);
       
       if (!this.userRepository) {
         throw new Error("User repository not available");

@@ -1,5 +1,5 @@
 import { CreateCategorySizeDto, UpdateCategorySizeDto } from "@application/dtos/Category/category-size.dto";
-import { CategorySize } from "@infrastructure/database/models";
+import { CategorySize } from "../../../infrastructure/database/models";
 
 export interface ICategorySizeRepository {
     create(sizeData: CreateCategorySizeDto): Promise<CategorySize>

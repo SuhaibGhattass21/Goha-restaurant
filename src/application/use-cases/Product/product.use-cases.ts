@@ -7,34 +7,91 @@ import type {
   ProductListResponseDto,
   UpdateProductDto,
 } from "@application/dtos/Product/product.dto"
+import { LoggerService } from "../../../infrastructure/logger/logger.service"
+import { LoggingUtils } from "../../../infrastructure/logger/utils/logging.utils"
+import { LogBusinessOperation, LogMethod } from "../../../infrastructure/logger/decorators/log.decorator"
 
 export class ProductUseCases {
+  private logger = LoggerService.getInstance();
+
   constructor(
     private productRepository: IProductRepository,
     private categoryRepository: ICategoryRepository,
   ) { }
 
+  @LogBusinessOperation('PRODUCT', 'CREATE')
   async createProduct(productData: CreateProductDto): Promise<ProductResponseDto> {
-    // Check if category exists
-    const categoryPromise = this.categoryRepository.findById(productData.category_id)
-    // Check if product with same name already exists in this category
-    const existingProductPromise = this.productRepository.findByNameAndCategory(
-      productData.name,
-      productData.category_id,
-    )
+    const traceId = LoggingUtils.generateCorrelationId();
+    
+    this.logger.info('Creating new product', {
+      component: 'PRODUCT_SERVICE',
+      operation: 'CREATE_PRODUCT',
+      traceId,
+      data: LoggingUtils.sanitizeData(productData)
+    } as any);
 
-    const [isCategoryExists, isProductExists] = await Promise.all([categoryPromise, existingProductPromise])
+    try {
+      // Check if category exists
+      const categoryPromise = this.categoryRepository.findById(productData.category_id)
+      // Check if product with same name already exists in this category
+      const existingProductPromise = this.productRepository.findByNameAndCategory(
+        productData.name,
+        productData.category_id,
+      )
 
-    if (!isCategoryExists) {
-      throw new Error("Category not found")
+      const [isCategoryExists, isProductExists] = await Promise.all([categoryPromise, existingProductPromise])
+
+      if (!isCategoryExists) {
+        this.logger.warn('Category not found for product creation', {
+          component: 'PRODUCT_SERVICE',
+          operation: 'CREATE_PRODUCT',
+          traceId,
+          categoryId: productData.category_id
+        } as any);
+        throw new Error("Category not found")
+      }
+
+      if (isProductExists) {
+        this.logger.warn('Product with same name already exists', {
+          component: 'PRODUCT_SERVICE',
+          operation: 'CREATE_PRODUCT',
+          traceId,
+          productName: productData.name,
+          categoryId: productData.category_id
+        } as any);
+        throw new Error("Product with this name already exists in this category")
+      }
+
+      const product = await this.productRepository.create(productData)
+      
+      // Log successful business operation
+      LoggingUtils.logBusinessOperation(
+        'PRODUCT',
+        product.product_id,
+        'CREATE',
+        undefined, // No specific user context in this example
+        undefined,
+        product
+      );
+
+      this.logger.info('Product created successfully', {
+        component: 'PRODUCT_SERVICE',
+        operation: 'CREATE_PRODUCT',
+        traceId,
+        productId: product.product_id,
+        productName: product.name
+      } as any);
+
+      return this.mapToResponseDto(product)
+    } catch (error) {
+      this.logger.error('Failed to create product', error, {
+        component: 'PRODUCT_SERVICE',
+        operation: 'CREATE_PRODUCT',
+        traceId,
+        data: LoggingUtils.sanitizeData(productData)
+      } as any);
+      throw error;
     }
-
-    if (isProductExists) {
-      throw new Error("Product with this name already exists in this category")
-    }
-
-    const product = await this.productRepository.create(productData)
-    return this.mapToResponseDto(product)
   }
 
   async getProductById(id: string): Promise<ProductResponseDto | null> {

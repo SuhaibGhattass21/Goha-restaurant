@@ -1,6 +1,6 @@
 import { ShiftWorkerUseCase } from "../../../application/use-cases/Shift/shiftWorker.use-case";
 import { AddShiftWorkerDto, ShiftWorkerResponseDto, UpdateShiftWorkerDto, UpdateShiftWorkerEndDto } from "../../../application/dtos/Shift/ShiftWorker.dto";
-import { ShiftWorker } from "@infrastructure/database/models";
+import { ShiftWorker } from "../../../infrastructure/database/models/ShiftWorker.model";
 
 export class ShiftWorkerService {
     constructor(private usecase: ShiftWorkerUseCase) { }

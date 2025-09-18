@@ -6,7 +6,7 @@ import type {
   CategoryExtraResponseDto,
   CategoryExtraListResponseDto
 } from "../../dtos/Category/category-extra.dto"
-import type { CategoryExtra } from "@infrastructure/database/models/CategoryExtra.model"
+import type { CategoryExtra } from "../../../infrastructure/database/models/CategoryExtra.model"
 
 export class CategoryExtraUseCases {
   constructor(

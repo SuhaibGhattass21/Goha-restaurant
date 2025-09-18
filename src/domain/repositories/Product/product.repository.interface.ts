@@ -1,5 +1,5 @@
 import type { CreateProductDto, UpdateProductDto } from "@application/dtos/Product/product.dto"
-import type { Product } from "@infrastructure/database/models"
+import { Product } from "../../../infrastructure/database/models/Product.model"
 
 export interface IProductRepository {
   create(productData: CreateProductDto): Promise<Product>

@@ -1,4 +1,4 @@
-import { ShiftWorker } from "@infrastructure/database/models";
+import { ShiftWorker } from "../../../infrastructure/database/models/ShiftWorker.model";
 import { AddShiftWorkerDto, UpdateShiftWorkerDto } from "../../../application/dtos/Shift/ShiftWorker.dto";
 
 export interface IShiftWorkerRepository {

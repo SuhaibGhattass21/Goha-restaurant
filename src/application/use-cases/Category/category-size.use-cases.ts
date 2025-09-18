@@ -6,7 +6,7 @@ import type {
   CategorySizeResponseDto,
   CategorySizeListResponseDto
 } from "../../dtos/Category/category-size.dto"
-import type { CategorySize } from "@infrastructure/database/models/CategorySize.model"
+import type { CategorySize } from "../../../infrastructure/database/models/CategorySize.model"
 
 export class CategorySizeUseCases {
   constructor(

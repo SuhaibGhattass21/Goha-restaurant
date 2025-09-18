@@ -1,4 +1,4 @@
-import { Worker } from "@infrastructure/database/models";
+import { Worker } from "../../../infrastructure/database/models/Worker.model";
 import { CreateWorkerDto, UpdateWorkerDto } from "../../../application/dtos/Shift/Worker.dto";
 
 export interface IWorkerRepository {

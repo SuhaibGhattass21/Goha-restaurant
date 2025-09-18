@@ -1,0 +1,13 @@
+import { Request } from 'express';
+
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: string;
+    username: string;
+    permissions: string[];
+  };
+  body: any;
+  params: any;
+  headers: any;
+  traceId?: string;
+}

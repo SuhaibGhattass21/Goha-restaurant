@@ -33,6 +33,7 @@ export async function seedDatabase() {
       { name: "access:orders", description: "Access to order management" },
       { name: "access:expenses", description: "Access to expense management" },
       { name: "access:reports", description: "Access to reports" },
+      { name: "access:logs", description: "Access to logs" },
     ];
 
     console.log("Creating default permissions...");
