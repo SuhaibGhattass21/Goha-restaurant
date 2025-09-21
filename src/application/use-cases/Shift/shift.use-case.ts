@@ -9,7 +9,7 @@ import type {
     ShiftSummaryFilterDto,
     ShiftSummaryWithDetailsDto
 } from '@application/dtos/Shift/Shift.dto';
-import type { Shift } from '@infrastructure/database/models/Shift.model';
+import type { Shift } from '../../../infrastructure/database/models/Shift.model';
 import { ShiftStatus, ShiftType } from '../../../domain/enums/Shift.enums';
 
 export class ShiftUseCases {

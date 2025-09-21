@@ -1,5 +1,5 @@
 import { CreateCategoryDto, UpdateCategoryDto } from "@application/dtos/Category/category.dto";
-import { Category } from "@infrastructure/database/models";
+import { Category } from "../../../infrastructure/database/models";
 
 export interface ICategoryRepository {
     create(categoryData: CreateCategoryDto): Promise<Category>

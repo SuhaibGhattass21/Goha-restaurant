@@ -1,5 +1,5 @@
 import { Repository } from "typeorm";
-import { Worker } from "@infrastructure/database/models";
+import { Worker } from "../../../infrastructure/database/models/Worker.model";
 import { CreateWorkerDto, UpdateWorkerDto } from "../../../application/dtos/Shift/Worker.dto";
 import { IWorkerRepository } from "../../../domain/repositories/Shift/worker.repository.interface";
 

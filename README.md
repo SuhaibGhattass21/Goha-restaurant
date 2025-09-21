@@ -161,6 +161,15 @@ DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
 - `POST /api/v1/orders` - Create order
 - `PUT /api/v1/orders/:id` - Update order
 
+### Logs
+- `GET /api/v1/logs` - Retrieve application logs with filtering and pagination
+- `GET /api/v1/logs/export` - Export logs to file
+- `GET /api/v1/logs/stats` - Get log statistics and analytics
+- `GET /api/v1/logs/analysis` - Get log analysis and insights
+- `GET /api/v1/logs/health` - Get logging system health status
+- `POST /api/v1/orders` - Create order
+- `PUT /api/v1/orders/:id` - Update order
+
 [See Swagger documentation for complete API reference]
 
 ## Database Schemas

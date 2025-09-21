@@ -2,7 +2,7 @@ import type {
   CreateStockTransactionDto,
   UpdateStockTransactionDto,
 } from "@application/dtos/Stock/stock-transaction.dto"
-import type { StockTransaction } from "@infrastructure/database/models"
+import type { StockTransaction } from "../../../infrastructure/database/models/StockTransaction.model"
 
 export interface IStockTransactionRepository {
   create(transactionData: CreateStockTransactionDto): Promise<StockTransaction>

@@ -1,5 +1,5 @@
 import type { CreateStockItemDto, UpdateStockItemDto } from "@application/dtos/Stock/stock-item.dto"
-import type { StockItem } from "@infrastructure/database/models"
+import { StockItem } from "../../../infrastructure/database/models/StockItem.model"
 
 export interface IStockItemRepository {
   create(stockItemData: CreateStockItemDto): Promise<StockItem>

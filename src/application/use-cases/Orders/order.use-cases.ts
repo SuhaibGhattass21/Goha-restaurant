@@ -18,8 +18,13 @@ import { OrderStatus, type OrderType } from "../../../domain/enums/Order.enums"
 import type { CancelledOrderUseCases } from "./cancelled-order.use-cases"
 import { OrderItemExtra } from "@infrastructure/database/models"
 import { OrderItemResponseDto } from "@application/dtos/Orders/order-item.dto"
+import { LoggerService } from "../../../infrastructure/logger/logger.service"
+import { LoggingUtils } from "../../../infrastructure/logger/utils/logging.utils"
+import { LogBusinessOperation, LogMethod } from "../../../infrastructure/logger/decorators/log.decorator"
 
 export class OrderUseCases {
+  private logger = LoggerService.getInstance();
+
   constructor(
     private orderRepository: IOrderRepository,
     private orderItemRepository: IOrderItemRepository,
@@ -27,51 +32,124 @@ export class OrderUseCases {
     private cancelledOrderUseCases: CancelledOrderUseCases, // Add this line
   ) { }
 
+  @LogBusinessOperation('ORDER', 'CREATE')
   async createOrder(orderData: CreateOrderDto): Promise<OrderResponseDto> {
-    const order = await this.orderRepository.create({
-      cashier_id: orderData.cashier_id,
-      shift_id: orderData.shift_id,
-      table_number: orderData.table_number,
-      order_type: orderData.order_type,
-      customer_name: orderData.customer_name,
-      customer_phone: orderData.customer_phone,
-    })
+    const traceId = LoggingUtils.generateCorrelationId();
+    
+    this.logger.info('Creating new order', {
+      component: 'ORDER_SERVICE',
+      operation: 'CREATE_ORDER',
+      traceId,
+      data: LoggingUtils.sanitizeData(orderData) as any
+    });
 
-    for (const itemData of orderData.items) {
-      const orderItem = await this.orderItemRepository.create({
-        order_id: order.order_id,
-        product_size_id: itemData.product_size_id,
-        quantity: itemData.quantity,
-        unit_price: itemData.unit_price,
-        special_instructions: itemData.special_instructions,
+    try {
+      const order = await this.orderRepository.create({
+        cashier_id: orderData.cashier_id,
+        shift_id: orderData.shift_id,
+        table_number: orderData.table_number,
+        order_type: orderData.order_type,
+        customer_name: orderData.customer_name,
+        customer_phone: orderData.customer_phone,
       })
 
-      if (itemData.extras && itemData.extras.length > 0) {
-        const extrasData = itemData.extras.map((extra) => ({
-          ...extra,
-          order_item_id: orderItem.order_item_id,
-        }))
-        await this.orderItemExtraRepository.createMany(extrasData)
+      this.logger.debug('Order created, adding items', {
+        component: 'ORDER_SERVICE',
+        operation: 'ADD_ORDER_ITEMS',
+        traceId,
+        orderId: order.order_id,
+        itemCount: orderData.items.length
+      });
+
+      for (const itemData of orderData.items) {
+        const orderItem = await this.orderItemRepository.create({
+          order_id: order.order_id,
+          product_size_id: itemData.product_size_id,
+          quantity: itemData.quantity,
+          unit_price: itemData.unit_price,
+          special_instructions: itemData.special_instructions,
+        })
+
+        if (itemData.extras && itemData.extras.length > 0) {
+          const extrasData = itemData.extras.map((extra) => ({
+            ...extra,
+            order_item_id: orderItem.order_item_id,
+          }))
+          await this.orderItemExtraRepository.createMany(extrasData)
+        }
       }
+
+      await this.orderRepository.calculateOrderTotal(order.order_id)
+
+      const completeOrder = await this.orderRepository.findById(order.order_id)
+      if (!completeOrder) {
+        this.logger.error('Failed to retrieve created order', {
+          component: 'ORDER_SERVICE',
+          operation: 'CREATE_ORDER',
+          traceId,
+          orderId: order.order_id
+        } as any);
+        throw new Error("Failed to create order")
+      }
+
+      // Log successful business operation
+      LoggingUtils.logBusinessOperation(
+        'ORDER',
+        completeOrder.order_id,
+        'CREATE',
+        orderData.cashier_id,
+        undefined,
+        completeOrder
+      );
+
+      this.logger.info('Order created successfully', {
+        component: 'ORDER_SERVICE',
+        operation: 'CREATE_ORDER',
+        traceId,
+        orderId: completeOrder.order_id,
+        total: completeOrder.total_price || 0
+      } as any);
+
+      return this.mapToResponseDto(completeOrder)
+    } catch (error) {
+      this.logger.error('Failed to create order', error, {
+        component: 'ORDER_SERVICE',
+        operation: 'CREATE_ORDER',
+        traceId,
+        data: LoggingUtils.sanitizeData(orderData)
+      } as any);
+      throw error;
     }
-
-    await this.orderRepository.calculateOrderTotal(order.order_id)
-
-    const completeOrder = await this.orderRepository.findById(order.order_id)
-    if (!completeOrder) {
-      throw new Error("Failed to create order")
-    }
-
-    return this.mapToResponseDto(completeOrder)
   }
 
+  @LogMethod({ component: 'ORDER_SERVICE' })
   async getOrderById(id: string): Promise<OrderResponseDto | null> {
     const order = await this.orderRepository.findById(id)
+    if (order) {
+      this.logger.debug('Order retrieved successfully', {
+        component: 'ORDER_SERVICE',
+        operation: 'GET_ORDER_BY_ID',
+        orderId: id
+      } as any);
+    } else {
+      this.logger.warn('Order not found', {
+        component: 'ORDER_SERVICE',
+        operation: 'GET_ORDER_BY_ID',
+        orderId: id
+      } as any);
+    }
     return order ? this.mapToResponseDto(order) : null
   }
 
+  @LogMethod({ component: 'ORDER_SERVICE' })
   async getOrdersByShiftIdGoha(shiftId: string): Promise<OrderSummaryDto[]> {
     const orders = await this.orderRepository.findByShiftIdGoha(shiftId)
+    this.logger.info('Retrieved Goha orders by shift', {
+      component: 'ORDER_SERVICE',
+      operation: 'GET_ORDERS_BY_SHIFT_GOHA',
+      shiftId,
+      orderCount: orders.length
+    } as any);
     return orders.map((order) => this.mapToSummaryDto(order))
   }
 

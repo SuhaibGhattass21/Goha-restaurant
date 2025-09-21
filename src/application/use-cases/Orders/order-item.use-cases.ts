@@ -8,7 +8,7 @@ import type {
   UpdateOrderItemDto,
   OrderItemExtraResponseDto,
 } from "../../../application/dtos/Orders/order-item.dto"
-import { OrderItemExtra } from "@infrastructure/database/models"
+import { OrderItemExtra } from "../../../infrastructure/database/models"
 
 export class OrderItemUseCases {
   constructor(

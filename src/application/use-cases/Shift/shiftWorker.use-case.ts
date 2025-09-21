@@ -1,6 +1,6 @@
 import { AddShiftWorkerDto, ShiftWorkerResponseDto, UpdateShiftWorkerDto, UpdateShiftWorkerEndDto } from "../../dtos/Shift/ShiftWorker.dto";
 import { IShiftWorkerRepository } from "../../../domain/repositories/Shift/shiftWorker.repository.interface";
-import { ShiftWorker } from "@infrastructure/database/models";
+import { ShiftWorker } from "../../../infrastructure/database/models";
 
 export class ShiftWorkerUseCase {
     constructor(private repo: IShiftWorkerRepository) { }

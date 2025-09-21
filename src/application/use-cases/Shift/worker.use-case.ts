@@ -1,6 +1,6 @@
 import { IWorkerRepository } from "../../../domain/repositories/Shift/worker.repository.interface";
 import { CreateWorkerDto, UpdateWorkerDto, WorkerResponseDto } from "../../../application/dtos/Shift/Worker.dto";
-import { Worker } from "@infrastructure/database/models";
+import { Worker } from "../../../infrastructure/database/models";
 
 export class WorkerUseCases {
     constructor(private repo: IWorkerRepository) { }

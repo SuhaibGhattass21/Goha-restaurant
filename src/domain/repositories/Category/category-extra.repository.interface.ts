@@ -1,5 +1,5 @@
 import { CreateCategoryExtraDto, UpdateCategoryExtraDto } from "@application/dtos/Category/category-extra.dto";
-import { CategoryExtra } from "@infrastructure/database/models";
+import { CategoryExtra } from "../../../infrastructure/database/models";
 
 export interface ICategoryExtraRepository {
     create(extraData: CreateCategoryExtraDto): Promise<CategoryExtra>
