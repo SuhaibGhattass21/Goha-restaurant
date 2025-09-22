@@ -424,11 +424,19 @@ export class OrderUseCases {
   private mapExtraToResponseDto(extra: OrderItemExtra): any {
     return {
       order_item_extra_id: extra.order_item_extra_id,
-      extra_name: extra.extra.name,
+      order_item_id: extra.orderItem?.order_item_id || "",
+      extra: extra.extra
+        ? {
+          extra_id: extra.extra.extra_id,
+          name: extra.extra.name,
+          price: Number(extra.extra.price),
+          category_name: extra.extra.category?.name || "",
+        }
+        : undefined,
       price: Number(extra.price),
-      category_name: extra.extra.category.name || "",
       quantity: extra.quantity || 1,
     };
   }
+
 
 }
