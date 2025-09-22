@@ -35,7 +35,7 @@ export class OrderUseCases {
   @LogBusinessOperation('ORDER', 'CREATE')
   async createOrder(orderData: CreateOrderDto): Promise<OrderResponseDto> {
     const traceId = LoggingUtils.generateCorrelationId();
-    
+
     this.logger.info('Creating new order', {
       component: 'ORDER_SERVICE',
       operation: 'CREATE_ORDER',
@@ -424,7 +424,6 @@ export class OrderUseCases {
   private mapExtraToResponseDto(extra: OrderItemExtra): any {
     return {
       order_item_extra_id: extra.order_item_extra_id,
-      extra: extra.extra.extra_id,
       extra_name: extra.extra.name,
       price: Number(extra.price),
       category_name: extra.extra.category.name || "",
