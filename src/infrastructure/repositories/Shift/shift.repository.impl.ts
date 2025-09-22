@@ -126,7 +126,6 @@ export class ShiftRepositoryImpl implements IShiftRepository {
 
         const totalOrders = orders.length;
         const cancelledOrders = (shift.cancelledOrders || []).length;
-        const intial_balance = shift.initial_balance || 0;
         const totalRevenue = nonCafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
         const cafeRevenue = cafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
         const totalExpenses = (shift.expenses ?? []).reduce((acc, e) => acc + Number(e.amount), 0);
@@ -149,21 +148,26 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             username,
         }));
 
-        const totalEarned: number = Number(totalRevenue + intial_balance);
-        const totalExpensesMoney: number = Number(totalExpenses + totalSalaries)
+        const intial_balance = Number(shift.initial_balance || 0);
+
+        const totalEarned: number = totalRevenue + intial_balance;
+        const totalExpensesMoney: number = totalExpenses + totalSalaries;
+
+        const final_number: number = totalEarned - totalExpensesMoney;
+
 
         return {
             shift_id: shift.shift_id,
             shift_type: shift.shift_type,
             start_time: shift.start_time,
             end_time: shift.end_time!,
-            intial_balance: Number(intial_balance),
+            intial_balance,
             total_orders: Number(totalOrders) - Number(cancelledOrders),
-            total_revenue: Number(totalRevenue),
-            cafe_revenue: Number(cafeRevenue),
-            total_expenses: Number(totalExpenses),
-            total_salaries: Number(totalSalaries),
-            final_number: Number(totalEarned - totalExpensesMoney),
+            total_revenue: totalRevenue,
+            cafe_revenue: cafeRevenue,
+            total_expenses: totalExpenses,
+            total_salaries: totalSalaries,
+            final_number,
             cashiers,
         };
     }
