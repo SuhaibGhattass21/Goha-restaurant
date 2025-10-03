@@ -79,7 +79,7 @@ export class ShiftRepositoryImpl implements IShiftRepository {
     async getShiftsByStatus(status: ShiftStatus): Promise<Shift[]> {
         return this.repo.find({
             where: { status },
-            relations: ["opened_by", "closed_by", "shiftWorkers"],
+            relations: ["opened_by", "closed_by", "shiftWorkers", "workers"],
         });
     }
 
@@ -188,18 +188,17 @@ export class ShiftRepositoryImpl implements IShiftRepository {
 
         if (!shift) throw new Error("Shift not found");
 
-        const orders = shift.orders || [];
-        const nonCafeOrders = orders.filter(o => o.order_type !== "cafe");
-        const cafeOrders = orders.filter(o => o.order_type === "cafe");
+                const orders = shift.orders ?? [];
+        const nonCafeOrders = orders.filter(o => o.order_type !== 'cafe');
+        const cafeOrders = orders.filter(o => o.order_type === 'cafe');
 
-        const cancelledOrders = shift.cancelledOrders || [];
-
-        const totalOrders = nonCafeOrders.length;
-        const totalCancelledOrders = cancelledOrders.length;
-        const totalCafeOrders = cafeOrders.length;
-        const intial_balance = shift.initial_balance || 0;
+        const totalOrders = orders.length;
+        const cancelledOrders = (shift.cancelledOrders || []).length;
+        const totalCafeOrders = (shift.orders.filter(o => o.order_type === 'cafe') || []).length;
         const totalRevenue = nonCafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
         const cafeRevenue = cafeOrders.reduce((acc, o) => acc + Number(o.total_price), 0);
+        const totalExpenses = (shift.expenses ?? []).reduce((acc, e) => acc + Number(e.amount), 0);
+        const totalSalaries = (shift.shiftWorkers ?? []).reduce((acc, sw) => acc + Number(sw.calculated_salary), 0);
 
         const expenses: ExpenseDetailDto[] = (shift.expenses || []).map(e => ({
             expense_id: e.expense_id,
@@ -210,7 +209,6 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             created_at: e.created_at,
         }));
 
-        const totalExpenses = expenses.reduce((acc, e) => acc + e.amount, 0);
 
         const workers: WorkerSalaryDetailDto[] = (shift.shiftWorkers || []).map(sw => ({
             shift_worker_id: sw.shift_worker_id,
@@ -222,7 +220,6 @@ export class ShiftRepositoryImpl implements IShiftRepository {
             calculated_salary: Number(sw.calculated_salary)
         }));
 
-        const totalSalaries = workers.reduce((acc, w) => acc + w.calculated_salary, 0);
 
         const cashiersMap = new Map<string, string>();
 
@@ -274,20 +271,28 @@ export class ShiftRepositoryImpl implements IShiftRepository {
         //     username
         // }));
 
+        const intial_balance = Number(shift.initial_balance || 0);
+
+        const totalEarned: number = totalRevenue + intial_balance;
+        const totalExpensesMoney: number = totalExpenses + totalSalaries;
+
+        const final_number: number = totalEarned - totalExpensesMoney;
+
+
         return {
             shift_id: shift.shift_id,
             shift_type: shift.shift_type,
             start_time: shift.start_time,
             end_time: shift.end_time!,
             intial_balance: intial_balance,
-            total_orders: totalOrders,
-            total_cancelled_orders: totalCancelledOrders,
+            total_orders: Number(totalOrders) - Number(cancelledOrders),
+            total_cancelled_orders: cancelledOrders,
             total_cafe_orders: totalCafeOrders,
             total_revenue: totalRevenue,
             cafe_revenue: cafeRevenue,
             total_expenses: totalExpenses,
             total_salaries: totalSalaries,
-            final_number: (totalRevenue + intial_balance) - totalExpenses - totalSalaries,
+            final_number,
             cashiers,
             expenses,
             workers,
