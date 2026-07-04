@@ -1,4 +1,7 @@
 import express from "express";
+import fs from "fs";
+import http from "http";
+import https from "https";
 import "reflect-metadata";
 import helmet from "helmet";
 import cors from "cors";
@@ -128,6 +131,8 @@ import logsRoutes from "../routes/logs.routes";
 export class Server {
   private app: express.Application;
   private readonly PORT: number;
+  private server: http.Server | https.Server | null = null;
+  private serverProtocol: "http" | "https" = "http";
 
   // Add logging and monitoring initialization
   private logger: LoggerService;
@@ -139,9 +144,53 @@ export class Server {
   constructor() {
     this.app = express();
     this.PORT = Number.parseInt(process.env.PORT || "3000", 10);
+
+    if (process.env.NODE_ENV === "production") {
+      this.app.set("trust proxy", 1);
+    }
+
     this.initializeLogging();
     this.setupMiddlewares();
     this.setupHealthCheck();
+  }
+
+  private getHttpsOptions(): https.ServerOptions | null {
+    const httpsEnabled = process.env.HTTPS_ENABLED === "true";
+    const keyPath = process.env.HTTPS_KEY_PATH;
+    const certPath = process.env.HTTPS_CERT_PATH;
+
+    if (!httpsEnabled && !keyPath && !certPath) {
+      return null;
+    }
+
+    if (!keyPath || !certPath) {
+      throw new Error(
+        "HTTPS_KEY_PATH and HTTPS_CERT_PATH are required when HTTPS is enabled"
+      );
+    }
+
+    const options: https.ServerOptions = {
+      key: fs.readFileSync(keyPath),
+      cert: fs.readFileSync(certPath),
+    };
+
+    if (process.env.HTTPS_PASSPHRASE) {
+      options.passphrase = process.env.HTTPS_PASSPHRASE;
+    }
+
+    return options;
+  }
+
+  private createServer(): http.Server | https.Server {
+    const httpsOptions = this.getHttpsOptions();
+
+    if (httpsOptions) {
+      this.serverProtocol = "https";
+      return https.createServer(httpsOptions, this.app);
+    }
+
+    this.serverProtocol = "http";
+    return http.createServer(this.app);
   }
 
   private initializeLogging(): void {
@@ -724,6 +773,21 @@ export class Server {
 
   private async shutdown(): Promise<void> {
     try {
+      if (this.server) {
+        console.log("Closing application server...");
+        await new Promise<void>((resolve, reject) => {
+          this.server?.close((error) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+
+            resolve();
+          });
+        });
+        console.log("Application server closed.");
+      }
+
       console.log("Closing database connection...");
       await AppDataSource.destroy();
       console.log("Database connection closed.");
@@ -845,20 +909,26 @@ export class Server {
 
       this.setupErrorHandling();
 
-      this.app.listen(this.PORT, () => {
-        console.log(
-          `Goha Restaurant Cafe System running at: http://localhost:${this.PORT}`
-        );
-        console.log(`Swagger: http://localhost:${this.PORT}/api-docs`);
-        console.log(`Health: http://localhost:${this.PORT}/health`);
-        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-        console.log(`Process ID: ${process.pid}`);
-        
-        // Log successful startup
-        this.logger.info('Server started successfully', {
-          component: 'SERVER'
-        } as any);
+      this.server = this.createServer();
+
+      await new Promise<void>((resolve) => {
+        this.server?.listen(this.PORT, resolve);
       });
+
+      const protocol = this.serverProtocol;
+
+      console.log(
+        `Goha Restaurant Cafe System running at: ${protocol}://localhost:${this.PORT}`
+      );
+      console.log(`${protocol.toUpperCase()} Swagger: ${protocol}://localhost:${this.PORT}/api-docs`);
+      console.log(`${protocol.toUpperCase()} Health: ${protocol}://localhost:${this.PORT}/health`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`Process ID: ${process.pid}`);
+
+      // Log successful startup
+      this.logger.info('Server started successfully', {
+        component: 'SERVER'
+      } as any);
 
       // Setup graceful shutdown handlers
       process.on('SIGTERM', async () => {

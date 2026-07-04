@@ -1,6 +1,9 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 import { swaggerSchemas } from './schemas/dto-swagger.schemas';
 
+const defaultProtocol = process.env.HTTPS_ENABLED === 'true' ? 'https' : 'http';
+const defaultServerUrl = process.env.API_URL || `${defaultProtocol}://localhost:${process.env.PORT || 3000}/api/v1`;
+
 export const swaggerOptions: swaggerJSDoc.Options = {
     definition: {
         openapi: '3.0.0',
@@ -11,7 +14,7 @@ export const swaggerOptions: swaggerJSDoc.Options = {
         },
         servers: [
             {
-                url: process.env.API_URL || 'http://localhost:3000/api/v1',
+                url: defaultServerUrl,
                 description: 'Development server',
             },
         ],

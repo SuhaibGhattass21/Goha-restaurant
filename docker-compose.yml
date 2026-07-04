@@ -19,7 +19,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD-SHELL", "if [ \"$HTTPS_ENABLED\" = \"true\" ]; then curl -fk https://localhost:${PORT:-3000}/health || exit 1; else curl -f http://localhost:${PORT:-3000}/health || exit 1; fi"]
       interval: 30s
       timeout: 10s
       retries: 5

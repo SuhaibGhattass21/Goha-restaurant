@@ -52,6 +52,8 @@ src/
    - Swagger Docs: http://localhost:3000/api-docs
    - Health Check: http://localhost:3000/health
 
+If you deploy behind a VM TLS terminator or with certificates mounted into the app container, set `HTTPS_ENABLED=true` and provide `HTTPS_KEY_PATH` and `HTTPS_CERT_PATH`. The app will start an HTTPS listener and keep proxy-aware request handling enabled in production.
+
 ## Development Setup
 
 1. **Prerequisites**
@@ -215,6 +217,10 @@ npm run test:coverage   # Run tests with coverage
 | JWT_SECRET | Yes | JWT signing secret | - |
 | JWT_REFRESH_SECRET | Yes | JWT refresh token secret | - |
 | ALLOWED_ORIGINS | No | CORS allowed origins | * |
+| HTTPS_ENABLED | No | Enable the built-in HTTPS server when `true` | false |
+| HTTPS_KEY_PATH | No | Path to the TLS private key file | - |
+| HTTPS_CERT_PATH | No | Path to the TLS certificate file | - |
+| HTTPS_PASSPHRASE | No | Passphrase for the private key, if needed | - |
 
 ## Default Credentials
 
