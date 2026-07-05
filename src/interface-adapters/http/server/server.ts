@@ -213,15 +213,56 @@ export class Server {
     });
   }
 
+  private getAllowedOrigins(): string[] {
+    return (process.env.ALLOWED_ORIGINS || "*")
+      .split(",")
+      .map((origin) => origin.trim().replace(/\/$/, ""))
+      .filter(Boolean);
+  }
+
+  private originPatternToRegExp(pattern: string): RegExp {
+    const escapedPattern = pattern
+      .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
+      .replace(/\*/g, "[^/]*");
+
+    return new RegExp(`^${escapedPattern}$`);
+  }
+
+  private isOriginAllowed(origin: string, allowedOrigins: string[]): boolean {
+    const normalizedOrigin = origin.replace(/\/$/, "");
+
+    return allowedOrigins.some((allowedOrigin) => {
+      if (allowedOrigin === "*") {
+        return true;
+      }
+
+      if (allowedOrigin.includes("*")) {
+        return this.originPatternToRegExp(allowedOrigin).test(normalizedOrigin);
+      }
+
+      return allowedOrigin === normalizedOrigin;
+    });
+  }
+
   private setupMiddlewares(): void {
     // Security middleware
     this.app.use(helmet());
 
     // CORS middleware
+    const allowedOrigins = this.getAllowedOrigins();
     this.app.use(
       cors({
-        origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
+        origin: (origin, callback) => {
+          if (!origin || this.isOriginAllowed(origin, allowedOrigins)) {
+            callback(null, true);
+            return;
+          }
+
+          callback(new Error(`CORS blocked origin: ${origin}`));
+        },
         credentials: true,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
       })
     );
 

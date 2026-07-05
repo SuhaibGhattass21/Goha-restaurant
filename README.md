@@ -226,7 +226,7 @@ npm run test:coverage   # Run tests with coverage
 | JWT_SECRET | Yes | JWT signing secret | - |
 | JWT_REFRESH_SECRET | Yes | JWT refresh token secret | - |
 | JWT_EXPIRES_IN | Yes | Access token lifetime, for example `7d` or `1h` | `7d` |
-| ALLOWED_ORIGINS | No | CORS allowed origins | * |
+| ALLOWED_ORIGINS | No | Comma-separated CORS origins. Supports wildcards like `https://*.vercel.app` | * |
 | SERVER_NAME | Yes | Public hostname used by nginx | - |
 | TLS_MODE | No | `auto`, `on`, or `off` for proxy TLS behavior | `auto` |
 | TLS_CERT_PATH | Yes | TLS certificate path inside the proxy container | `/etc/nginx/certs/fullchain.pem` |
