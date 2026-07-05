@@ -7,9 +7,9 @@ map ${UPSTREAM_SCHEME}://goha_app $goha_upstream {
 }
 
 server {
-    listen 80;
-    listen [::]:80;
-    server_name ${SERVER_NAME};
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name ${SERVER_NAME} _;
 
     client_max_body_size 10m;
 

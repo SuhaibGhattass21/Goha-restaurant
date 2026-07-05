@@ -7,9 +7,9 @@ map ${UPSTREAM_SCHEME}://goha_app $goha_upstream {
 }
 
 server {
-    listen 80;
-    listen [::]:80;
-    server_name ${SERVER_NAME};
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name ${SERVER_NAME} _;
 
     location /health {
         proxy_pass $goha_upstream/health;
@@ -27,10 +27,10 @@ server {
 }
 
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
     http2 on;
-    server_name ${SERVER_NAME};
+    server_name ${SERVER_NAME} _;
 
     ssl_certificate ${TLS_CERT_PATH};
     ssl_certificate_key ${TLS_KEY_PATH};
