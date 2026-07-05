@@ -55,7 +55,7 @@ src/
    - Swagger Docs: `https://your-domain/api-docs`
    - Health Check: `https://your-domain/health`
 
-The production Compose stack now expects a reverse proxy in front of the app. Nginx forwards traffic to the backend on internal port `3000`. With `TLS_MODE=auto`, it serves HTTP on port `80` until certificate files are available, then serves HTTPS on `443` and redirects HTTP to HTTPS. If you want the Node app itself to terminate TLS instead, set `HTTPS_ENABLED=true` and provide `HTTPS_KEY_PATH` and `HTTPS_CERT_PATH`, but that is no longer the default deployment path.
+The production Compose stack now expects a reverse proxy in front of the app. Nginx forwards traffic to the backend on internal port `3000`. With `TLS_MODE=auto`, it serves HTTP on port `80` until certificate files are available, then serves HTTPS on `443` and redirects HTTP to HTTPS. If `HTTPS_ENABLED=true`, the app also starts its own internal HTTPS listener and the startup script copies the mounted certificate files into a runtime location readable by the unprivileged app user before launch.
 
 ## Development Setup
 

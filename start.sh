@@ -4,6 +4,34 @@ set -e
 
 echo "Starting Goha Restaurant Cafe System..."
 
+prepare_https_materials() {
+  if [ "${HTTPS_ENABLED:-false}" != "true" ]; then
+    return 0
+  fi
+
+  cert_source="${HTTPS_CERT_PATH:-}"
+  key_source="${HTTPS_KEY_PATH:-}"
+
+  if [ -z "$cert_source" ] || [ -z "$key_source" ]; then
+    echo "HTTPS is enabled but HTTPS_CERT_PATH or HTTPS_KEY_PATH is missing"
+    exit 1
+  fi
+
+  runtime_cert_dir="/app/runtime-certs"
+  runtime_cert_path="$runtime_cert_dir/cert.pem"
+  runtime_key_path="$runtime_cert_dir/key.pem"
+
+  mkdir -p "$runtime_cert_dir"
+  cp "$cert_source" "$runtime_cert_path"
+  cp "$key_source" "$runtime_key_path"
+  chown nodeapp:nodejs "$runtime_cert_path" "$runtime_key_path"
+  chmod 644 "$runtime_cert_path"
+  chmod 600 "$runtime_key_path"
+
+  export HTTPS_CERT_PATH="$runtime_cert_path"
+  export HTTPS_KEY_PATH="$runtime_key_path"
+}
+
 check_db() {
   echo "Checking database connectivity..."
   max_retries=30
@@ -100,5 +128,7 @@ else
   echo "Development mode detected, skipping migration check"
 fi
 
+prepare_https_materials
+
 echo "Starting the application..."
-exec npm start
+exec su-exec nodeapp npm start

@@ -26,7 +26,8 @@ FROM node:20-alpine AS production
 RUN apk add --no-cache \
     postgresql-client \
     curl \
-    dumb-init
+    dumb-init \
+    su-exec
 
 # Create app directory and non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -50,8 +51,8 @@ COPY --from=builder /app/init-db.sql ./
 RUN chmod +x start.sh
 
 # Change ownership to non-root user
-RUN chown -R nodeapp:nodejs /app
-USER nodeapp
+RUN mkdir -p /app/runtime-certs && \
+    chown -R nodeapp:nodejs /app
 
 # Expose port
 EXPOSE 3000

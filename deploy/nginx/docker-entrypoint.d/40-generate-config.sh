@@ -4,9 +4,14 @@ set -eu
 TLS_MODE_VALUE="${TLS_MODE:-auto}"
 CERT_PATH="${TLS_CERT_PATH:-/etc/nginx/certs/fullchain.pem}"
 KEY_PATH="${TLS_KEY_PATH:-/etc/nginx/certs/privkey.pem}"
+UPSTREAM_SCHEME_VALUE="http"
 HTTP_TEMPLATE="/opt/goha-nginx/http-only.conf.template"
 HTTPS_TEMPLATE="/opt/goha-nginx/https.conf.template"
 TARGET_CONFIG="/etc/nginx/conf.d/default.conf"
+
+if [ "${HTTPS_ENABLED:-false}" = "true" ]; then
+  UPSTREAM_SCHEME_VALUE="https"
+fi
 
 case "$TLS_MODE_VALUE" in
   auto)
@@ -32,4 +37,5 @@ case "$TLS_MODE_VALUE" in
     ;;
 esac
 
-envsubst '${SERVER_NAME} ${TLS_CERT_PATH} ${TLS_KEY_PATH}' < "$TEMPLATE" > "$TARGET_CONFIG"
+UPSTREAM_SCHEME="$UPSTREAM_SCHEME_VALUE" \
+envsubst '${SERVER_NAME} ${TLS_CERT_PATH} ${TLS_KEY_PATH} ${UPSTREAM_SCHEME}' < "$TEMPLATE" > "$TARGET_CONFIG"
