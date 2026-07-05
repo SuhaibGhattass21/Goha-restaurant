@@ -38,7 +38,7 @@ src/
    ```
 
 2. **Add TLS certificates for the proxy**
-   Put your certificate and key in [deploy/nginx/certs/README.md](/Users/abdo/projects/Goha-restaurant/deploy/nginx/certs/README.md:1) as `fullchain.pem` and `privkey.pem`, or update `TLS_CERT_PATH` and `TLS_KEY_PATH` in `.env`.
+   Put your certificate and key in [deploy/nginx/certs/README.md](/Users/abdo/projects/Goha-restaurant/deploy/nginx/certs/README.md:1) as `fullchain.pem` and `privkey.pem`, or update `TLS_CERT_PATH` and `TLS_KEY_PATH` in `.env`. If you are still setting up DNS/certificates, leave `TLS_MODE=auto` and the proxy will start on plain HTTP first.
 
 3. **Start the application**
    ```bash
@@ -55,7 +55,7 @@ src/
    - Swagger Docs: `https://your-domain/api-docs`
    - Health Check: `https://your-domain/health`
 
-The production Compose stack now expects a reverse proxy in front of the app. Nginx listens on port `80` and `443`, redirects HTTP to HTTPS, and forwards traffic to the backend on internal port `3000`. If you want the Node app itself to terminate TLS instead, set `HTTPS_ENABLED=true` and provide `HTTPS_KEY_PATH` and `HTTPS_CERT_PATH`, but that is no longer the default deployment path.
+The production Compose stack now expects a reverse proxy in front of the app. Nginx forwards traffic to the backend on internal port `3000`. With `TLS_MODE=auto`, it serves HTTP on port `80` until certificate files are available, then serves HTTPS on `443` and redirects HTTP to HTTPS. If you want the Node app itself to terminate TLS instead, set `HTTPS_ENABLED=true` and provide `HTTPS_KEY_PATH` and `HTTPS_CERT_PATH`, but that is no longer the default deployment path.
 
 ## Development Setup
 
@@ -228,6 +228,7 @@ npm run test:coverage   # Run tests with coverage
 | JWT_EXPIRES_IN | Yes | Access token lifetime, for example `7d` or `1h` | `7d` |
 | ALLOWED_ORIGINS | No | CORS allowed origins | * |
 | SERVER_NAME | Yes | Public hostname used by nginx | - |
+| TLS_MODE | No | `auto`, `on`, or `off` for proxy TLS behavior | `auto` |
 | TLS_CERT_PATH | Yes | TLS certificate path inside the proxy container | `/etc/nginx/certs/fullchain.pem` |
 | TLS_KEY_PATH | Yes | TLS private key path inside the proxy container | `/etc/nginx/certs/privkey.pem` |
 | HTTPS_ENABLED | No | Enable the built-in HTTPS server when `true` | false |
