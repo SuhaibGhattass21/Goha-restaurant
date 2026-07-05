@@ -37,22 +37,25 @@ src/
    # Edit .env with your production values
    ```
 
-2. **Start the application**
+2. **Add TLS certificates for the proxy**
+   Put your certificate and key in [deploy/nginx/certs/README.md](/Users/abdo/projects/Goha-restaurant/deploy/nginx/certs/README.md:1) as `fullchain.pem` and `privkey.pem`, or update `TLS_CERT_PATH` and `TLS_KEY_PATH` in `.env`.
+
+3. **Start the application**
    ```bash
    docker-compose up --build -d
    ```
 
-3. **Check health status**
+4. **Check health status**
    ```bash
-   curl http://localhost:3000/health
+   curl -k https://localhost/health
    ```
 
-4. **Access the application**
-   - API: http://localhost:3000/api/v1
-   - Swagger Docs: http://localhost:3000/api-docs
-   - Health Check: http://localhost:3000/health
+5. **Access the application**
+   - API: `https://your-domain/api/v1`
+   - Swagger Docs: `https://your-domain/api-docs`
+   - Health Check: `https://your-domain/health`
 
-If you deploy behind a VM TLS terminator or with certificates mounted into the app container, set `HTTPS_ENABLED=true` and provide `HTTPS_KEY_PATH` and `HTTPS_CERT_PATH`. The app will start an HTTPS listener and keep proxy-aware request handling enabled in production.
+The production Compose stack now expects a reverse proxy in front of the app. Nginx listens on port `80` and `443`, redirects HTTP to HTTPS, and forwards traffic to the backend on internal port `3000`. If you want the Node app itself to terminate TLS instead, set `HTTPS_ENABLED=true` and provide `HTTPS_KEY_PATH` and `HTTPS_CERT_PATH`, but that is no longer the default deployment path.
 
 ## Development Setup
 
@@ -82,7 +85,13 @@ If you deploy behind a VM TLS terminator or with certificates mounted into the a
 
 ## Production Deployment
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed production deployment instructions.
+The intended production topology is:
+
+- `proxy` container on host ports `80` and `443`
+- `app` container on internal port `3000`
+- `db` container on internal port `5432`
+
+This keeps TLS and public traffic handling at the proxy layer while the Node service stays private on the Docker network.
 
 ## Common Issues and Solutions
 
@@ -109,8 +118,8 @@ docker-compose exec app npm run migration:run:prod
 # Check container logs
 docker logs goha-restaurant-app-1
 
-# Check health status
-curl -v http://localhost:3000/health
+# Check health status through the proxy
+curl -vk https://localhost/health
 
 # Check database connectivity
 docker-compose exec db pg_isready -U postgres
@@ -216,7 +225,11 @@ npm run test:coverage   # Run tests with coverage
 | PORT | No | Application port | 3000 |
 | JWT_SECRET | Yes | JWT signing secret | - |
 | JWT_REFRESH_SECRET | Yes | JWT refresh token secret | - |
+| JWT_EXPIRES_IN | Yes | Access token lifetime, for example `7d` or `1h` | `7d` |
 | ALLOWED_ORIGINS | No | CORS allowed origins | * |
+| SERVER_NAME | Yes | Public hostname used by nginx | - |
+| TLS_CERT_PATH | Yes | TLS certificate path inside the proxy container | `/etc/nginx/certs/fullchain.pem` |
+| TLS_KEY_PATH | Yes | TLS private key path inside the proxy container | `/etc/nginx/certs/privkey.pem` |
 | HTTPS_ENABLED | No | Enable the built-in HTTPS server when `true` | false |
 | HTTPS_KEY_PATH | No | Path to the TLS private key file | - |
 | HTTPS_CERT_PATH | No | Path to the TLS certificate file | - |
@@ -233,7 +246,7 @@ After seeding the database, you can log in with:
 ## Support
 
 For deployment issues:
-1. Check [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed guidance
+1. Confirm the proxy container can read your certificate files
 2. Review application logs and health check endpoint
 3. Verify database connectivity and migrations
 4. Ensure all environment variables are properly set

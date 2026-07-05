@@ -6,6 +6,7 @@ import {
 } from "../../application/dtos/auth.dto";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import type { SignOptions } from "jsonwebtoken";
 import { User } from "../../infrastructure/database/models/user.model";
 import {
   Permissions,
@@ -18,7 +19,7 @@ import { LogBusinessOperation } from "../../infrastructure/logger/decorators/log
 
 export class AuthUseCases {
   private jwtSecret: string;
-  private jwtExpiry: number;
+  private jwtExpiry: SignOptions["expiresIn"];
   private bcryptRounds: number;
   private logger: LoggerService;
 
@@ -33,7 +34,7 @@ export class AuthUseCases {
     }
     
     this.jwtSecret = process.env.JWT_SECRET || "c7btrc685v42c45v86c2";
-    this.jwtExpiry = Number(process.env.JWT_EXPIRY) || 10000;
+    this.jwtExpiry = (process.env.JWT_EXPIRES_IN || process.env.JWT_EXPIRY || "7d") as SignOptions["expiresIn"];
     this.bcryptRounds = parseInt(process.env.BCRYPT_ROUNDS || "12");
     this.logger = LoggerService.getInstance();
   }
@@ -224,7 +225,7 @@ export class AuthUseCases {
 
   async refreshToken(
     userId: string
-  ): Promise<{ token: string; expiresIn: number }> {
+  ): Promise<{ token: string; expiresIn: string | number }> {
     try {
       const user = await this.userRepository.findById(userId);
       if (!user || !user.isActive) {

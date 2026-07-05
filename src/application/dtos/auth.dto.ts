@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, MinLength, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, IsOptional } from 'class-validator';
 import { UserResponseDto } from './user.dto';
 
 export class LoginDto {
@@ -53,7 +53,6 @@ export class AuthResponseDto {
     @IsNotEmpty()
     token!: string;
 
-    @IsNumber()
     @IsNotEmpty()
-    expiresIn!: number;
-}
+    expiresIn!: string | number;
+} 

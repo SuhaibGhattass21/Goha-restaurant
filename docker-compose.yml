@@ -3,23 +3,26 @@ services:
     build:
       context: .
       target: production
-    ports:
-      - "3000:3000"
     environment:
-      - PORT=3000
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
-      - API_URL=http://localhost:3000/api/v1
-      - DATABASE_SSL=false
+      - PORT=${PORT:-3000}
+      - NODE_ENV=${NODE_ENV:-production}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@db:5432/postgres}
+      - DATABASE_SSL=${DATABASE_SSL:-false}
+      - API_URL=${API_URL:-https://localhost/api/v1}
       - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-your-super-secret-refresh-key}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://localhost}
+      - HTTPS_ENABLED=${HTTPS_ENABLED:-false}
+      - HTTPS_KEY_PATH=${HTTPS_KEY_PATH:-}
+      - HTTPS_CERT_PATH=${HTTPS_CERT_PATH:-}
+      - HTTPS_PASSPHRASE=${HTTPS_PASSPHRASE:-}
     depends_on:
       db:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "if [ \"$HTTPS_ENABLED\" = \"true\" ]; then curl -fk https://localhost:${PORT:-3000}/health || exit 1; else curl -f http://localhost:${PORT:-3000}/health || exit 1; fi"]
+      test: ["CMD-SHELL", "if [ \"$$HTTPS_ENABLED\" = \"true\" ]; then curl -fk https://localhost:$${PORT:-3000}/health || exit 1; else curl -f http://localhost:$${PORT:-3000}/health || exit 1; fi"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -35,6 +38,26 @@ services:
     volumes:
       # Mount scripts for emergency recovery (optional)
       - ./scripts:/app/scripts:ro
+    expose:
+      - "3000"
+  proxy:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - SERVER_NAME=${SERVER_NAME:-localhost}
+      - TLS_CERT_PATH=${TLS_CERT_PATH:-/etc/nginx/certs/fullchain.pem}
+      - TLS_KEY_PATH=${TLS_KEY_PATH:-/etc/nginx/certs/privkey.pem}
+    volumes:
+      - ./deploy/nginx/templates:/etc/nginx/templates:ro
+      - ./deploy/nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
   db:
     image: postgres:15
     ports:

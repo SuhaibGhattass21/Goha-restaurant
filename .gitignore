@@ -3,3 +3,5 @@ node_modules
 dist
 .env.*
 !.env.example
+deploy/nginx/certs/*.pem
+deploy/nginx/certs/*.key
